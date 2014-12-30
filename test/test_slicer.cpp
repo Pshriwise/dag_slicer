@@ -21,6 +21,7 @@ MBInterface *mbi = new MBCore();
 void get_sets_by_category_test();
 void get_surfaces_test();
 void get_all_volumes_test();
+void test_point_match();
 
 int main( int /* argc */, char** /* argv */) 
 { 
@@ -33,6 +34,8 @@ int main( int /* argc */, char** /* argv */)
   failed_tests += RUN_TEST(get_sets_by_category_test);
   failed_tests += RUN_TEST(get_surfaces_test);
   failed_tests += RUN_TEST(get_all_volumes_test);
+  failed_tests += RUN_TEST(test_point_match);
+
 }
 
 void get_sets_by_category_test()
@@ -73,6 +76,35 @@ void get_all_volumes_test()
   ERR_CHECK(result);
   //test file is a cylinder and should have 1 volume
   CHECK_EQUAL( 1, (int)volumes.size() ); 
+
+}
+
+void test_point_match()
+{
+
+  //setup two cart vectors that will represent points 
+  MBCartVect a,b;
+ 
+  //initialize
+  a[0] = 1.0; a[1] = 1.0; a[2] = 1-1e-8;
+  
+  //make b equal to a
+  b=a; 
+
+  //These should be recognized as coincident
+  CHECK( point_match(a,b) );
+
+  //Now alter b a little bit
+  b[2] = 1.0;
+
+  //These should still be recognized as coincident
+  CHECK( point_match(a,b) );
+
+  //Now alter b a lot (relatively)
+  b[2] = 2.0;
+
+  //This should not be recognized as coincident
+  CHECK( !point_match(a,b) );
 
 }
 
