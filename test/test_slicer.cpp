@@ -19,6 +19,8 @@ MBInterface *mbi = new MBCore();
 
 //test functions
 void get_sets_by_category_test();
+void get_surfaces_test();
+void get_all_volumes_test();
 
 int main( int /* argc */, char** /* argv */) 
 { 
@@ -29,7 +31,8 @@ int main( int /* argc */, char** /* argv */)
   //get_sets_by_category_test( mbi );
   int failed_tests = 0; 
   failed_tests += RUN_TEST(get_sets_by_category_test);
-
+  failed_tests += RUN_TEST(get_surfaces_test);
+  failed_tests += RUN_TEST(get_all_volumes_test);
 }
 
 void get_sets_by_category_test()
@@ -44,14 +47,32 @@ void get_sets_by_category_test()
 
   sets.clear();
   char category2[CATEGORY_TAG_SIZE] = "Surface";
-  result = get_sets_by_category(mbi, sets, category2);
+  result = get_sets_by_category( mbi, sets, category2 );
  
-  CHECK_EQUAL(3, (int)sets.size() );  
+  CHECK_EQUAL(3, (int)sets.size() );
 
 }  
   
 
+void get_surfaces_test()
+{
 
+  MBRange surfaces; 
+  MBErrorCode result = get_surfaces( mbi, surfaces );
+  ERR_CHECK(result);
+  //test file is a cylinder and should have 3 surfaces
+  CHECK_EQUAL( 3, (int)surfaces.size() );
 
+}
 
-  
+void get_all_volumes_test()
+{
+
+  MBRange volumes; 
+  MBErrorCode result = get_all_volumes( mbi, volumes );
+  ERR_CHECK(result);
+  //test file is a cylinder and should have 1 volume
+  CHECK_EQUAL( 1, (int)volumes.size() ); 
+
+}
+

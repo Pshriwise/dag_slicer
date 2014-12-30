@@ -189,28 +189,7 @@ const char* mb_type_str( moab::EntityType type )
   }
 }
 
-const char* mb_type_str( moab::EntityHandle a )
-{ return NULL;/*mb_type_str( moab::TYPE_FROM_HANDLE(a) );*/ }
-/*
-void check_equal( moab::EntityHandle A, moab::EntityHandle B, const char* sA, const char* sB, int line, const char* file )
-{
-  if (A == B)
-    return;
-  
-  printf( "Entity handles not equal: %s == %s\n", sA, sB );
-  printf( "  at line %d of '%s'\n", line, file ); 
-  if (A) 
-    printf( "  Expected value: %lx (%s %ld)\n", (unsigned long)A, mb_type_str( A ), (long)ID_FROM_HANDLE(A) ); 
-  else 
-    printf( "  Expected value: 0\n" ); 
-  if (B)
-    printf( "  Actual value:   %lx (%s %ld)\n", (unsigned long)B, mb_type_str( B ), (long)ID_FROM_HANDLE(B) ); 
-  else 
-    printf( "  Actual value: 0\n" ); 
-  printf( "\n" ); 
-  flag_error(); 
-}  
-*/
+
 
 void check_true( bool cond, const char* str, int line, const char* file )
 {

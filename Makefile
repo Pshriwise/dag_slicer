@@ -14,6 +14,9 @@ src:
 test: src
 	$(MAKE) -C $(TEST_DIR)
 
+check: test
+	$(MAKE) check -C $(TEST_DIR)
+
 clean: 
 	rm -f *~
 	$(MAKE) clean -C $(TEST_DIR)
