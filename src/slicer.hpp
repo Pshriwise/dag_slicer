@@ -2,6 +2,7 @@
 
 //c++ includes
 #include <assert.h>
+#include <math.h>
 #include <iostream> 
 #include <string>
 
@@ -30,3 +31,7 @@ MBErrorCode get_sets_by_category( MBInterface *mbi, MBRange &entsets, char* cate
 MBErrorCode get_surfaces( MBInterface* mbi, MBRange &surfs);
 
 MBErrorCode get_all_volumes( MBInterface *mbi, MBRange &vols);
+
+
+MBErrorCode intersection( MBInterface *mbi,  int axis, double coord, MBEntityHandle tri, MBCartVect *line, bool &intersect);
+
