@@ -121,20 +121,25 @@ MBErrorCode intersection( MBInterface *mbi,  int axis, double coord, MBEntityHan
   ERR_CHECK(result);
   result = mbi->get_coords( &(verts[2]), 1, tri_coords[2].array() );
   ERR_CHECK(result);
-  
+
+  Line tri_intersection; 
+  triangle_plane_intersect(axis, coord, tri_coords, tri_intersection);
   return result; 
 }
 
-void triangle_plane_intersect( int axis, double coord, MBCartVect *coords)
+
+
+void triangle_plane_intersect( int axis, double coord, MBCartVect *coords, Line &line_out)
 {
   
   //check to see how many triangle edges cross the coordinate
   int count = 0; int nlines = 0; 
   MBCartVect p0,p1,p2,p3;
 
+  //expecting three points for the triangle
   for( unsigned int i = 0 ; i < 3; i++) 
     p3[i] = copysign(1.0, coords[i][axis] - coord);
-
+  /*
   if (p3[0] * p3[1] < 0) count += 1;
   if (p3[1] * p3[2] < 0) count += 1;
   if (p3[2] * p3[0] < 0) count += 1;
@@ -144,36 +149,39 @@ void triangle_plane_intersect( int axis, double coord, MBCartVect *coords)
     nlines += 1;
   else if (count == 3)
     nlines += 2; 
-
+  */
 
   if (p3[0] * p3[1] < 0 )
     {
-      for(unsigned int i = 0; i < 3; i++)
-	{
-	  p0[i] = coords[0][i];
-	  p1[i] = coords[1][i];
-	  //get_intersection(p0, p1, ax, coord, points)
-	}
+      p0 = coords[0];
+      p1 = coords[1];
+      get_intersection(p0, p1, axis, coord, line_out);
     } 
   if (p3[1] * p3[2] < 0 )
     {
-      for(unsigned int i = 0; i < 3; i++)
-	{
-	  p0[i] = coords[1][i];
-	  p1[i] = coords[2][i];
-	  //get_intersection(p0, p1, ax, coord, points)
-	}
+      p0 = coords[1];
+      p1 = coords[2];
+      get_intersection(p0, p1, axis, coord, line_out);
     }
   if (p3[2] * p3[0] < 0 )
     {
-      for(unsigned int i = 0; i < 3; i++)
-	{
-	  p0[i] = coords[2][i];
-	  p1[i] = coords[0][i];
-	  //get_intersection(p0, p1, ax, coord, points)
-	}
+      p0 = coords[2];
+      p1 = coords[0];
+      get_intersection(p0, p1, axis, coord, line_out);
     }
+  
 
+}
 
+void get_intersection( MBCartVect pnt0, MBCartVect pnt1, int axis, double coord, Line &line )
+{
 
+  MBCartVect vec = pnt1-pnt0;
+
+  double t = (coord - pnt0[axis])/vec[axis];
+
+  MBCartVect pnt_out = pnt0 + t*vec;
+
+  (line.begin[0] == NULL) ? line.begin = pnt_out : line.end = pnt_out; 
+  
 }
