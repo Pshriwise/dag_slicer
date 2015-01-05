@@ -62,7 +62,31 @@ MBErrorCode get_all_volumes( MBInterface *mbi, MBRange &vols)
   return result; 
 }
 
-MBErrorCode create_surface_intersections( MBInterface *mbi, MBRange surfs, int axis, double coord,   std::map<MBEntityHandle,std::vector<Loop> > &intersection_map)
+MBErrorCode slice_faceted_model( MBInterface *mbi, std::string filename, int axis, double coord)
+{
+  MBErrorCode result; 
+  std::map<MBEntityHandle,std::vector<Loop> > intersection_map;
+
+  result = mbi->load_file( filename.c_str() );
+  ERR_CHECK(result);
+  
+  MBRange surfaces; 
+  result = get_surfaces( mbi, surfaces );
+  ERR_CHECK(result);
+
+  result = create_surface_intersections( mbi, surfaces, axis, coord, intersection_map);
+
+  MBRange volumes; 
+  result = get_all_volumes( mbi, volumes );
+  ERR_CHECK(result);
+  
+
+  return MB_SUCCESS;
+
+}
+
+
+MBErrorCode create_surface_intersections( MBInterface *mbi, MBRange surfs, int axis, double coord, std::map<MBEntityHandle,std::vector<Loop> > &intersection_map)
 {
 
   MBErrorCode result; 
