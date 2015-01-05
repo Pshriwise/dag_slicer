@@ -17,10 +17,11 @@ using namespace moab;
 //global moab instance
 MBInterface *mbi = new MBCore(); 
 
-
+//structure functions
 void line_struct_test();
 //test functions
 void create_surface_intersections_test();
+void intersection_test();
 void triangle_plane_intersect_test();
 void get_intersection_test();
 void get_sets_by_category_test();
@@ -88,6 +89,53 @@ void create_surface_intersections_test()
 
 }
 
+void intersection_test()
+{
+  MBErrorCode result; 
+  
+  //create a new triangle in the moab instance 
+  MBCartVect coords[3];
+  coords[0][0] = 1; coords[0][1] = 0; coords[0][2] = 0;
+  coords[1][0] = 0; coords[1][1] = 1; coords[1][2] = 0;
+  coords[2][0] = 0; coords[2][1] = 0; coords[2][2] = 1;
+  
+  MBEntityHandle v0,v1,v2,tri;
+ 
+  result = mbi->create_vertex( coords[0].array(), v0); 
+  ERR_CHECK(result);
+  result = mbi->create_vertex( coords[1].array(), v1); 
+  ERR_CHECK(result);
+  result = mbi->create_vertex( coords[2].array(), v2); 
+  ERR_CHECK(result);
+
+  MBEntityHandle verts[] = {v0,v1,v2};
+  result = mbi->create_element(MBTRI, verts, 3, tri);
+  ERR_CHECK(result);
+
+  Line test_line; bool intersect;
+  result = intersection( mbi, 2, 0.5, tri, test_line, intersect);
+  ERR_CHECK(result);
+
+  CHECK(intersect);
+
+  //make sure the values we get back from this function are 
+  //correct
+  CHECK( test_line.begin[0] == 0 );
+  CHECK( test_line.begin[1] == 0.5 );
+  CHECK( test_line.begin[2] == 0.5 );
+
+  CHECK( test_line.end[0] == 0.5 );
+  CHECK( test_line.end[1] == 0 );
+  CHECK( test_line.end[2] == 0.5 );
+
+  Line test_line2;
+  //this plane should not intersect our triangle
+  result = intersection( mbi, 2, 6, tri, test_line2, intersect);
+  ERR_CHECK(result);
+
+  CHECK(!intersect);
+  
+}
 
 void triangle_plane_intersect_test()
 {
@@ -114,6 +162,13 @@ void triangle_plane_intersect_test()
   CHECK( test_line.end[0] == 0.5 );
   CHECK( test_line.end[1] == 0 );
   CHECK( test_line.end[2] == 0.5 );
+
+  Line test_line2;
+  // this plane should not intersect with the triangle
+  triangle_plane_intersect( 2, 6.0, coords, test_line2 );
+  
+  CHECK( !test_line2.started );
+  CHECK( !test_line2.full );
 
 }
 
