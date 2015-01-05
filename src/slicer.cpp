@@ -222,25 +222,20 @@ void triangle_plane_intersect( int axis, double coord, MBCartVect *coords, Line 
       p0 = coords[0];
       p1 = coords[1];
       get_intersection(p0, p1, axis, coord, line_out);
-      line_out.started = true;
     } 
   if (p3[1] * p3[2] < 0 )
     {
       p0 = coords[1];
       p1 = coords[2];
       get_intersection(p0, p1, axis, coord, line_out);
-      line_out.started = true;
     }
   if (p3[2] * p3[0] < 0 )
     {
       p0 = coords[2];
       p1 = coords[0];
       get_intersection(p0, p1, axis, coord, line_out);
-      line_out.started = true;
     }
   
-  line_out.full = true;
-
 }
 
 void get_intersection( MBCartVect pnt0, MBCartVect pnt1, int axis, double coord, Line &line )
@@ -253,6 +248,6 @@ void get_intersection( MBCartVect pnt0, MBCartVect pnt1, int axis, double coord,
 
   MBCartVect pnt_out = pnt0 + t*vec;
 
-  (line.started) ? line.end = pnt_out : line.begin = pnt_out; 
+  line.add_pnt(pnt_out);
 
 }

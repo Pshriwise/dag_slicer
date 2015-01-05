@@ -31,6 +31,24 @@ struct Line {
   MBCartVect end; 
   bool started;
   bool full; 
+  void add_pnt( MBCartVect a )
+  {
+    
+    if (full) std::cout << "Line is full. Point not added." << std::endl;
+
+    if(!started)
+      {
+	begin = a;
+	started = true; 
+      }
+    else
+      {
+	end = a;
+	full = true;
+      }
+
+  }
+
 };
 
 struct Loop{
