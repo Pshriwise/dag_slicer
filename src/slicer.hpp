@@ -30,6 +30,10 @@ struct Line {
   MBCartVect begin; 
   MBCartVect end; 
   bool full; 
+  void check_cap ()
+  {
+    if (begin[0] != NULL && end[0] != NULL) full = true;
+  }
 };
 
 struct Loop{
@@ -49,9 +53,9 @@ MBErrorCode get_surfaces( MBInterface* mbi, MBRange &surfs);
 
 MBErrorCode get_all_volumes( MBInterface *mbi, MBRange &vols);
 
+MBErrorCode surface_intersections(MBInterface *mbi, std::vector<MBEntityHandle> tris, int axis, double coord, std::vector<Loop> &surf_intersections);
 
-MBErrorCode intersection( MBInterface *mbi,  int axis, double coord, MBEntityHandle tri, MBCartVect *line, bool &intersect);
-
+MBErrorCode intersection( MBInterface *mbi,  int axis, double coord, MBEntityHandle tri, Line &tri_intersection, bool &intersect);
 
 void triangle_plane_intersect( int axis, double coord, MBCartVect *coords, Line &line_out);
 

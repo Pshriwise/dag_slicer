@@ -67,7 +67,7 @@ MBErrorCode create_surface_intersections( MBInterface *mbi, MBRange surfs, int a
 
   MBErrorCode result; 
 
-  std::map<MBEntityHandle,std::vector< std::vector<MBCartVect> > > intersection_dict;
+  std::map<MBEntityHandle,std::vector<Loop> > intersection_map;
 
   MBRange::iterator i; 
   for ( i = surfs.begin(); i !=surfs.end(); i++)
@@ -78,6 +78,12 @@ MBErrorCode create_surface_intersections( MBInterface *mbi, MBRange surfs, int a
       ERR_CHECK(result); 
       
       //now create surface intersection
+      std::vector<Loop> surf_intersections;
+      result = surface_intersections( mbi, surf_tris, axis, coord, surf_intersections);
+      ERR_CHECK(result);
+
+      intersection_map[*i] = surf_intersections;
+      surf_intersections.clear();
 
     }
 
@@ -85,27 +91,86 @@ MBErrorCode create_surface_intersections( MBInterface *mbi, MBRange surfs, int a
 }
 
 
-MBErrorCode surface_intersections(MBInterface *mbi, std::vector<MBEntityHandle> tris, int axis, double coord)
+MBErrorCode surface_intersections(MBInterface *mbi, std::vector<MBEntityHandle> tris, int axis, double coord, std::vector<Loop> &surf_intersections)
 {
 
   MBErrorCode result; 
 
-  std::vector< MBCartVect[2] > lines; 
+  std::vector<Line> intersect_lines; 
 
   std::vector<MBEntityHandle>::iterator i; 
   for ( i = tris.begin(); i != tris.end(); i++)
     { 
-      MBCartVect line[2]; bool intersect;
+      Line line; bool intersect;
       result = intersection( mbi, axis, coord, *i, line, intersect);
       ERR_CHECK(result);
+      
+      if(intersect) intersect_lines.push_back(line); 
     } 
+
+  std::vector<Loop> all_surf_intersections;
+  
+  //now it is time to order these 
+  unsigned int index = 0; //index for intersection lines
+  //arbitrarily start a new intersection loop
+  Loop curr_loop; 
+
+  while (intersect_lines.size() != 0) {
+
+    curr_loop.points.clear();
+    curr_loop.points.push_back( intersect_lines.back().begin );
+    curr_loop.points.push_back( intersect_lines.back().end );
+    intersect_lines.pop_back();
+
+    while (index < intersect_lines.size() )
+      {
+
+	Line this_line = intersect_lines[index];
+
+	if ( point_match( this_line.begin, curr_loop.points.front() ) )
+	  {
+	    //insert the line into the current loop
+	    curr_loop.points.insert(curr_loop.points.begin(), this_line.end );
+	    //delete the current matched line from intersect_lines  
+	    intersect_lines.erase(intersect_lines.begin()+index);
+	    index = 0;
+	  }
+	else if ( point_match( this_line.begin, curr_loop.points.back() ) )
+	  {
+	    curr_loop.points.push_back( this_line.end );
+	    intersect_lines.erase(intersect_lines.begin()+index);
+	    index = 0;
+	  }
+	else if ( point_match( this_line.end, curr_loop.points.front() ) )
+	  {
+	    curr_loop.points.insert(curr_loop.points.begin(), this_line.begin );
+	    intersect_lines.erase(intersect_lines.begin()+index);
+	    index = 0;
+	  }
+	else if ( point_match( this_line.end, curr_loop.points.back() ) )
+	  {
+	    curr_loop.points.push_back( this_line.begin );
+	    intersect_lines.erase(intersect_lines.begin()+index);
+	    index = 0;
+	  }
+	else
+	  {
+	    index++;
+	  }
+      }
+
+    all_surf_intersections.push_back(curr_loop);
+
+  }
+
+  surf_intersections = all_surf_intersections;
 
   return result; 
 
 }
 
 
-MBErrorCode intersection( MBInterface *mbi,  int axis, double coord, MBEntityHandle tri, MBCartVect *line, bool &intersect)
+MBErrorCode intersection( MBInterface *mbi,  int axis, double coord, MBEntityHandle tri, Line &tri_intersection, bool &intersect)
 {
   MBErrorCode result;
   //get the triangle vertices
@@ -122,9 +187,13 @@ MBErrorCode intersection( MBInterface *mbi,  int axis, double coord, MBEntityHan
   result = mbi->get_coords( &(verts[2]), 1, tri_coords[2].array() );
   ERR_CHECK(result);
 
-  Line tri_intersection; 
   triangle_plane_intersect(axis, coord, tri_coords, tri_intersection);
+
+  tri_intersection.check_cap(); // update the triangle intersection's status
+  (tri_intersection.full) ? intersect = true : intersect = false;
+
   return result; 
+
 }
 
 
