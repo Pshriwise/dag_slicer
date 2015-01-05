@@ -17,6 +17,8 @@ using namespace moab;
 //global moab instance
 MBInterface *mbi = new MBCore(); 
 
+
+void line_struct_test();
 //test functions
 void create_surface_intersections_test();
 void triangle_plane_intersect_test();
@@ -35,6 +37,9 @@ int main( int /* argc */, char** /* argv */)
   
   //get_sets_by_category_test( mbi );
   int failed_tests = 0; 
+
+  failed_tests += RUN_TEST(line_struct_test);
+
   failed_tests += RUN_TEST(get_sets_by_category_test);
   failed_tests += RUN_TEST(get_surfaces_test);
   failed_tests += RUN_TEST(get_all_volumes_test);
@@ -42,6 +47,31 @@ int main( int /* argc */, char** /* argv */)
   failed_tests += RUN_TEST(create_surface_intersections_test);
   failed_tests += RUN_TEST(get_intersection_test);
   failed_tests += RUN_TEST(triangle_plane_intersect_test);
+  
+}
+
+void line_struct_test()
+{
+
+  Line test_line; 
+  
+  MBCartVect point(0,1,0);
+
+  CHECK( !test_line.started );
+  CHECK( !test_line.full );
+  
+  test_line.add_pnt(point);
+  
+  CHECK( test_line.started );
+  CHECK( !test_line.full );
+
+  test_line.add_pnt(point);
+  
+  CHECK( test_line.started );
+  CHECK( test_line.full );
+  
+  CHECK( test_line.begin == test_line.end );
+
 }
 
 void create_surface_intersections_test()
