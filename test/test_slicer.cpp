@@ -56,6 +56,34 @@ void create_surface_intersections_test()
 
 }
 
+void triangle_plane_intersect_test()
+{
+  
+  MBCartVect coords[3];
+  coords[0][0] = 1; coords[0][1] = 0; coords[0][2] = 0;
+  coords[1][0] = 0; coords[1][1] = 1; coords[1][2] = 0;
+  coords[2][0] = 0; coords[2][1] = 0; coords[2][2] = 1;
+
+  Line test_line; 
+
+  CHECK( !test_line.full );
+  triangle_plane_intersect( 0, 0.5, coords, test_line); 
+
+  test_line.check_cap();
+  CHECK( test_line.full );
+
+  //make sure the values we get back from this function are 
+  //correct
+  CHECK( test_line.begin[0] == 0 );
+  CHECK( test_line.begin[1] == 0.5 );
+  CHECK( test_line.begin[2] == 0.5 );
+
+  CHECK( test_line.end[0] == 0.5 );
+  CHECK( test_line.end[1] == 0 );
+  CHECK( test_line.end[2] == 0.5);
+
+}
+
 void get_intersection_test()
 {
 
