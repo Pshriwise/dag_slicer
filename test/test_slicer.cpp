@@ -19,6 +19,7 @@ MBInterface *mbi = new MBCore();
 
 //test functions
 void create_surface_intersections_test();
+void triangle_plane_intersect_test();
 void get_intersection_test();
 void get_sets_by_category_test();
 void get_surfaces_test();
@@ -40,6 +41,7 @@ int main( int /* argc */, char** /* argv */)
   failed_tests += RUN_TEST(test_point_match);
   failed_tests += RUN_TEST(create_surface_intersections_test);
   failed_tests += RUN_TEST(get_intersection_test);
+  failed_tests += RUN_TEST(triangle_plane_intersect_test);
 }
 
 void create_surface_intersections_test()
@@ -56,6 +58,7 @@ void create_surface_intersections_test()
 
 }
 
+
 void triangle_plane_intersect_test()
 {
   
@@ -67,9 +70,9 @@ void triangle_plane_intersect_test()
   Line test_line; 
 
   CHECK( !test_line.full );
-  triangle_plane_intersect( 0, 0.5, coords, test_line); 
+  triangle_plane_intersect( 2, 0.5, coords, test_line); 
 
-  test_line.check_cap();
+  CHECK( test_line.started );
   CHECK( test_line.full );
 
   //make sure the values we get back from this function are 
@@ -80,16 +83,15 @@ void triangle_plane_intersect_test()
 
   CHECK( test_line.end[0] == 0.5 );
   CHECK( test_line.end[1] == 0 );
-  CHECK( test_line.end[2] == 0.5);
+  CHECK( test_line.end[2] == 0.5 );
 
 }
 
 void get_intersection_test()
 {
 
-  MBCartVect point0, point1;
-  point0[0] = 1; point0[1] = 1; point0[2] = 0;
-  point1[0] = -1; point1[1] = 1; point1[2] = 0;
+  MBCartVect point0( 1, 1, 0 );
+  MBCartVect point1(-1, 1, 0 );
 
   Line test_line;
 
@@ -101,8 +103,10 @@ void get_intersection_test()
 
   point1[0] = 1; point1[1] = -1; point1[2] = 0; 
 
+  test_line.started = true; 
+
   get_intersection( point0, point1, 1 , 0.0, test_line ); 
-  
+
   CHECK( test_line.end[0] == 1.0 );
   CHECK( test_line.end[1] == 0.0 );
   CHECK( test_line.end[2] == 0.0 );

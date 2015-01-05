@@ -187,8 +187,7 @@ MBErrorCode intersection( MBInterface *mbi,  int axis, double coord, MBEntityHan
 
   triangle_plane_intersect(axis, coord, tri_coords, tri_intersection);
 
-  tri_intersection.check_cap(); // update the triangle intersection's status
-  (tri_intersection.full) ? intersect = true : intersect = false;
+  intersect = tri_intersection.full;
 
   return result; 
 
@@ -223,20 +222,24 @@ void triangle_plane_intersect( int axis, double coord, MBCartVect *coords, Line 
       p0 = coords[0];
       p1 = coords[1];
       get_intersection(p0, p1, axis, coord, line_out);
+      line_out.started = true;
     } 
   if (p3[1] * p3[2] < 0 )
     {
       p0 = coords[1];
       p1 = coords[2];
       get_intersection(p0, p1, axis, coord, line_out);
+      line_out.started = true;
     }
   if (p3[2] * p3[0] < 0 )
     {
       p0 = coords[2];
       p1 = coords[0];
       get_intersection(p0, p1, axis, coord, line_out);
+      line_out.started = true;
     }
   
+  line_out.full = true;
 
 }
 
@@ -250,5 +253,6 @@ void get_intersection( MBCartVect pnt0, MBCartVect pnt1, int axis, double coord,
 
   MBCartVect pnt_out = pnt0 + t*vec;
 
-  (line.begin[0]) ? line.begin = pnt_out : line.end = pnt_out; 
+  (line.started) ? line.end = pnt_out : line.begin = pnt_out; 
+
 }

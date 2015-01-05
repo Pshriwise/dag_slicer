@@ -26,14 +26,11 @@ inline void ERR_CHECK( moab::ErrorCode rval )
 
 //special containers for our intersection data
 struct Line {
-  Line() : full(false) {}
+  Line() : started(false), full(false) {}
   MBCartVect begin; 
   MBCartVect end; 
+  bool started;
   bool full; 
-  void check_cap ()
-  {
-    if (begin[0] != NULL && end[0] != NULL) full = true;
-  }
 };
 
 struct Loop{
