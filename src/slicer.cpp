@@ -62,12 +62,10 @@ MBErrorCode get_all_volumes( MBInterface *mbi, MBRange &vols)
   return result; 
 }
 
-MBErrorCode create_surface_intersections( MBInterface *mbi, MBRange surfs, int axis, double coord)
+MBErrorCode create_surface_intersections( MBInterface *mbi, MBRange surfs, int axis, double coord,   std::map<MBEntityHandle,std::vector<Loop> > &intersection_map)
 {
 
   MBErrorCode result; 
-
-  std::map<MBEntityHandle,std::vector<Loop> > intersection_map;
 
   MBRange::iterator i; 
   for ( i = surfs.begin(); i !=surfs.end(); i++)
@@ -249,8 +247,8 @@ void get_intersection( MBCartVect pnt0, MBCartVect pnt1, int axis, double coord,
 
   double t = (coord - pnt0[axis])/vec[axis];
 
+
   MBCartVect pnt_out = pnt0 + t*vec;
 
-  (line.begin[0] == NULL) ? line.begin = pnt_out : line.end = pnt_out; 
-  
+  (line.begin[0]) ? line.begin = pnt_out : line.end = pnt_out; 
 }

@@ -53,6 +53,9 @@ MBErrorCode get_surfaces( MBInterface* mbi, MBRange &surfs);
 
 MBErrorCode get_all_volumes( MBInterface *mbi, MBRange &vols);
 
+MBErrorCode create_surface_intersections( MBInterface *mbi, MBRange surfs, int axis, double coord,   std::map<MBEntityHandle,std::vector<Loop> > &intersection_map);
+
+
 MBErrorCode surface_intersections(MBInterface *mbi, std::vector<MBEntityHandle> tris, int axis, double coord, std::vector<Loop> &surf_intersections);
 
 MBErrorCode intersection( MBInterface *mbi,  int axis, double coord, MBEntityHandle tri, Line &tri_intersection, bool &intersect);
