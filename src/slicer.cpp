@@ -80,11 +80,172 @@ MBErrorCode slice_faceted_model( MBInterface *mbi, std::string filename, int axi
   result = get_all_volumes( mbi, volumes );
   ERR_CHECK(result);
   
+  
+  
+  return MB_SUCCESS;
+
+}
+
+MBErrorCode get_volume_paths( MBInterface *mbi, MBRange volumes, int axis, std::map<MBEntityHandle, std::vector<Loop> > intersection_dict ) 
+{
+  
+  MBErrorCode result; 
+  
+  MBRange::iterator i; 
+  for( i = volumes.begin(); i != volumes.end(); i++)
+    {
+      std::vector<Loop> this_vol_intersections;
+      result = get_volume_intersections( mbi, *i, intersection_dict, this_vol_intersections );
+      ERR_CHECK(result);
+
+      if ( 0 == this_vol_intersections.size() ) continue; 
+
+      std::cout << "Retrieved " << this_vol_intersections.size() << " intersections for this volume." << std::endl;
+
+      std::vector<Loop> vol_paths;
+      stitch( this_vol_intersections, vol_paths );
+
+      
+    }
 
   return MB_SUCCESS;
 
 }
 
+void stitch( std::vector<Loop> loops, std::vector<Loop> &paths )
+{
+
+
+  int i = 0; 
+
+  while ( i < loops.size() )
+
+    {
+
+      //check for complete loops first 
+      
+      //start with arbitrary
+      Loop this_intersection = loops[i];
+
+      // if we find a complete loop, add it to the volume paths
+      if (point_match( this_intersection.points.front(), this_intersection.points.back() ) && this_intersection.points.size() > 2 )
+	{
+	  paths.push_back(this_intersection);
+	  loops.erase( loops.begin() + i );
+	  i = 0;
+	} 
+      // if this is a line of negligible length, remove it from loops
+      else if ( point_match( this_intersection.points.front(), this_intersection.points.back() ) && 2 == this_intersection.points.size() )
+	{
+	  loops.erase( loops.begin() + i );
+	  i = 0;
+	}
+      
+      i += 1;
+
+    }
+  
+
+  //if there are no point collections left, we're done
+  if ( 0 == loops.size() ) return;
+
+  
+  //now we'll start stitching loops together
+  i = 0;
+
+  //start by adding an arbitrary surface intersection to the paths
+  paths.push_back( loops[i] );
+  loops.erase( loops.begin() + i );
+
+
+  while ( 0 != loops.size() )
+    {
+      
+      //if we have a complete loop, then move on to a new starting point
+      if ( point_match( paths.back().points.front() , paths.back().points.back() ) )
+	{
+	  paths.push_back( loops.back() );
+	}	   
+      else
+	{
+	 
+	  i = 0;
+	  
+	  while ( i < loops.size() )
+	    {
+
+	      Loop this_intersection = loops[i];
+
+	      if (point_match( paths.back().points.front(), this_intersection.points.front() ) )
+		{
+		  //reverse this_intersection and attach to the front of paths.back()
+		  std::reverse( this_intersection.points.begin(), this_intersection.points.end() );
+		  paths.back().points.insert( paths.back().points.begin(), this_intersection.points.begin(), this_intersection.points.end() );
+		  loops.erase( loops.begin() + i );
+		  i = 0;
+		}
+	      else if (point_match( paths.back().points.front(), this_intersection.points.back() ) ) 
+		{
+		  // attach to the front of paths.back()
+		  paths.back().points.insert( paths.back().points.begin(), this_intersection.points.begin(), this_intersection.points.end() );
+		  loops.erase( loops.begin() + i );
+		  i = 0;		  
+		}
+	      else if (point_match( paths.back().points.back(), this_intersection.points.front() ) ) 
+		{
+		  //attach to the back of paths.back()
+		  paths.back().points.insert( paths.back().points.end(), this_intersection.points.begin(), this_intersection.points.end() );
+		  loops.erase( loops.begin() + i );
+		  i = 0;		  
+		}
+	      else if (point_match( paths.back().points.back(), this_intersection.points.back() ) )
+		{
+		  //reverse intersection and attach to the back of paths.back()
+		  std::reverse( this_intersection.points.begin(), this_intersection.points.end() );
+		  paths.back().points.insert( paths.back().points.end(), this_intersection.points.begin(), this_intersection.points.end() );
+		  i = 0;
+		} 
+
+	      //if no match is found, move on to the next intersection 
+	      i++;
+
+	    } //end inner while
+ 
+	} // end if
+
+    } // end outer while
+
+  return;
+
+} // end stitch
+
+
+
+
+MBErrorCode get_volume_intersections( MBInterface *mbi, MBEntityHandle volume, std::map<MBEntityHandle, std::vector<Loop> > intersection_dict,   std::vector<Loop> &volume_intersections )
+{
+
+  MBErrorCode result; 
+  std::vector<MBEntityHandle> chld_surfaces;
+  result = mbi->get_child_meshsets( volume, chld_surfaces );
+  ERR_CHECK( result );
+
+
+  
+  std::vector<MBEntityHandle>::iterator i; 
+  for( i = chld_surfaces.begin(); i != chld_surfaces.end(); i++) 
+    {
+      
+      std::vector<Loop> this_set = intersection_dict[*i];
+
+      volume_intersections.insert( volume_intersections.end(), this_set.begin(), this_set.end() );
+
+    }
+
+
+  return MB_SUCCESS;
+
+}
 
 MBErrorCode create_surface_intersections( MBInterface *mbi, MBRange surfs, int axis, double coord, std::map<MBEntityHandle,std::vector<Loop> > &intersection_map)
 {
