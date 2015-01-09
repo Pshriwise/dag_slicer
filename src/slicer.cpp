@@ -4,7 +4,7 @@
 bool point_match( MBCartVect pnt1, MBCartVect pnt2) 
 {
   bool ans = false; 
-  double tolerance = 1e-6; 
+  double tolerance = 1e-4; 
 
   MBCartVect diff = pnt2-pnt1; 
 
@@ -171,7 +171,8 @@ void stitch( std::vector<Loop> loops, std::vector<Loop> &paths )
       //if we have a complete loop, then move on to a new starting point
       if ( point_match( paths.back().points.front() , paths.back().points.back() ) )
 	{
-	  paths.push_back( loops.back() );
+	  paths.push_back( loops.front() );
+	  loops.erase( loops.begin() );
 	}	   
       else
 	{
@@ -210,6 +211,7 @@ void stitch( std::vector<Loop> loops, std::vector<Loop> &paths )
 		  //reverse intersection and attach to the back of paths.back()
 		  std::reverse( this_intersection.points.begin(), this_intersection.points.end() );
 		  paths.back().points.insert( paths.back().points.end(), this_intersection.points.begin(), this_intersection.points.end() );
+		  loops.erase( loops.begin() + i );
 		  i = 0;
 		} 
 
@@ -221,7 +223,7 @@ void stitch( std::vector<Loop> loops, std::vector<Loop> &paths )
 	} // end if
 
     } // end outer while
-
+  std::cout << "Created " << paths.size() << "paths for this volume." << std::endl; 
   return;
 
 } // end stitch

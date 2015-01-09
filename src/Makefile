@@ -16,4 +16,4 @@ model_slicer: slicer
 	$(CC) $(CFLAGS) $(CPPFLAGS)  model_slicer.cpp slicer.o -o model_slicer -I slicder.hpp ${MOAB_LIBS_LINK}
 
 clean: 
-	rm -f *.o *~ mode_slicer
+	rm -f *.o *~ model_slicer slicepnts.txt

@@ -1,0 +1,5 @@
+
+
+./model_slicer "$@"
+
+gnuplot plot.gp
