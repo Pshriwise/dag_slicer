@@ -72,7 +72,7 @@ MBErrorCode create_surface_intersections( MBInterface *mbi, MBRange surfs, int a
 
 MBErrorCode get_volume_intersections( MBInterface *mbi, MBEntityHandle volume, std::map<MBEntityHandle, std::vector<Loop> > intersection_dict,   std::vector<Loop> &volume_intersections );
 
-MBErrorCode get_volume_paths( MBRange volumes, int axis, std::map<MBEntityHandle, std::vector<Loop> > intersection_dict );
+MBErrorCode get_volume_paths( MBInterface *mbi, MBRange volumes, int axis, std::map<MBEntityHandle, std::vector<Loop> > intersection_dict,   std::vector< std::vector<Loop> > &all_vol_paths );
 
 void stitch( std::vector<Loop> loops, std::vector<Loop> &paths );
 

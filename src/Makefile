@@ -10,8 +10,10 @@ CFLAGS += ${MOAB_CFLAGS}
 all: slicer 
 
 slicer: 
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c slicer.cpp -o slicer.o
+	$(CC) $(CFLAGS) $(CPPFLAGS) ${MOAB_LIBS_LINK} -c slicer.cpp -o slicer.o
 
+model_slicer: slicer
+	$(CC) $(CFLAGS) $(CPPFLAGS)  model_slicer.cpp slicer.o -o model_slicer -I slicder.hpp ${MOAB_LIBS_LINK}
 
 clean: 
-	rm -f *.o *~
+	rm -f *.o *~ mode_slicer

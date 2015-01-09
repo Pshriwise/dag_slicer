@@ -62,7 +62,7 @@ MBErrorCode get_all_volumes( MBInterface *mbi, MBRange &vols)
   return result; 
 }
 
-MBErrorCode slice_faceted_model( MBInterface *mbi, std::string filename, int axis, double coord)
+MBErrorCode slice_faceted_model( MBInterface *mbi, std::string filename, int axis, double coord )
 {
   MBErrorCode result; 
   std::map<MBEntityHandle,std::vector<Loop> > intersection_map;
@@ -75,9 +75,14 @@ MBErrorCode slice_faceted_model( MBInterface *mbi, std::string filename, int axi
   ERR_CHECK(result);
 
   result = create_surface_intersections( mbi, surfaces, axis, coord, intersection_map);
+  ERR_CHECK(result);
 
   MBRange volumes; 
   result = get_all_volumes( mbi, volumes );
+  ERR_CHECK(result);
+
+  std::vector < std::vector<Loop> > all_paths;
+  result = get_volume_paths( mbi, volumes, axis, intersection_map, all_paths);
   ERR_CHECK(result);
   
   
@@ -86,7 +91,7 @@ MBErrorCode slice_faceted_model( MBInterface *mbi, std::string filename, int axi
 
 }
 
-MBErrorCode get_volume_paths( MBInterface *mbi, MBRange volumes, int axis, std::map<MBEntityHandle, std::vector<Loop> > intersection_dict ) 
+MBErrorCode get_volume_paths( MBInterface *mbi, MBRange volumes, int axis, std::map<MBEntityHandle, std::vector<Loop> > intersection_dict,   std::vector< std::vector<Loop> > &all_vol_paths ) 
 {
   
   MBErrorCode result; 
@@ -104,9 +109,11 @@ MBErrorCode get_volume_paths( MBInterface *mbi, MBRange volumes, int axis, std::
 
       std::vector<Loop> vol_paths;
       stitch( this_vol_intersections, vol_paths );
-
+      all_vol_paths.push_back(vol_paths);
       
     }
+  
+
 
   return MB_SUCCESS;
 
