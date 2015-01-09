@@ -1,6 +1,8 @@
 
 #include "slicer.hpp"
 
+
+
 bool point_match( MBCartVect pnt1, MBCartVect pnt2) 
 {
   bool ans = false; 
@@ -62,8 +64,23 @@ MBErrorCode get_all_volumes( MBInterface *mbi, MBRange &vols)
   return result; 
 }
 
-MBErrorCode slice_faceted_model( MBInterface *mbi, std::string filename, int axis, double coord, std::vector< std::vector<Loop> > &all_paths )
+
+MBErrorCode slice_faceted_model( std::string filename, int axis, double coord,   std::vector< std::vector< std::vector< std::vector<double> > > > &valid_paths )
 {
+
+  std::vector< std::vector<Loop> > all_paths;
+  MBErrorCode result = slice_faceted_model( filename, axis, coord, all_paths);
+
+  convert_to_stl( all_paths, valid_paths );
+
+
+}
+
+MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, std::vector< std::vector<Loop> > &all_paths )
+{
+
+  MBInterface *mbi = new MBCore();
+  
   MBErrorCode result; 
   std::map<MBEntityHandle,std::vector<Loop> > intersection_map;
 
@@ -442,5 +459,29 @@ void get_intersection( MBCartVect pnt0, MBCartVect pnt1, int axis, double coord,
   MBCartVect pnt_out = pnt0 + t*vec;
 
   line.add_pnt(pnt_out);
+
+}
+
+
+void convert_to_stl( std::vector< std::vector<Loop> > a, std::vector< std::vector< std::vector< std::vector<double> > > > &b)
+{
+
+  b.resize(a.size());
+  for(unsigned int i = 0; i < a.size(); i++)
+    {
+      b[i].resize(a[i].size());
+      for(unsigned int j = 0; j < a[i].size(); j++)
+	{
+	  b[i][j].resize(a[i][j].points.size());
+	  
+	  for(unsigned int k = 0; k < a[i][j].points.size(); k++)
+	    {
+	      b[i][j][k].push_back(a[i][j].points[k][0]);
+	      b[i][j][k].push_back(a[i][j].points[k][1]);
+	      b[i][j][k].push_back(a[i][j].points[k][2]);
+	    }
+	}
+    }	      	      
+
 
 }

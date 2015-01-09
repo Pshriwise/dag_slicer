@@ -60,6 +60,7 @@ struct Loop{
 };
 
 
+
 bool point_match( MBCartVect pnt1, MBCartVect pnt2);
 
 MBErrorCode get_sets_by_category( MBInterface *mbi, MBRange &entsets, char* category);
@@ -69,7 +70,9 @@ MBErrorCode get_surfaces( MBInterface* mbi, MBRange &surfs);
 MBErrorCode get_all_volumes( MBInterface *mbi, MBRange &vols);
 
 
-MBErrorCode slice_faceted_model( MBInterface *mbi, std::string filename, int axis, double coord, std::vector< std::vector<Loop> > &all_paths );
+MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, std::vector< std::vector<Loop> > &all_paths );
+
+MBErrorCode slice_faceted_model( std::string filename, int axis, double coord,   std::vector< std::vector< std::vector< std::vector<double> > > > &valid_paths );
 
 MBErrorCode create_surface_intersections( MBInterface *mbi, MBRange surfs, int axis, double coord,   std::map<MBEntityHandle,std::vector<Loop> > &intersection_map);
 
@@ -87,3 +90,4 @@ void triangle_plane_intersect( int axis, double coord, MBCartVect *coords, Line 
 
 void get_intersection( MBCartVect pnt0, MBCartVect pnt1, int axis, double coord, Line &line );
 
+void convert_to_stl( std::vector< std::vector<Loop> > a, std::vector< std::vector< std::vector< std::vector<double> > > > &b);

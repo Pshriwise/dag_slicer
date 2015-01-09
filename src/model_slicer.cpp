@@ -1,5 +1,6 @@
 
 #include <fstream>
+#include <iomanip>
 
 #include "slicer.hpp"
 #include "moab/ProgOptions.hpp"
@@ -20,7 +21,7 @@ int main( int argc, char ** argv )
 
   po.addOpt<int>( "ax", "Axis along which to slice the model. Default is x (0).", &axis );
 
-  po.addOpt<double>( "coord", "Coordinate for the slice. Default is 0.0");
+  po.addOpt<double>( "coord", "Coordinate for the slice. Default is 0.0", &coord);
 
   po.addOpt<void>( "w", "Write slice points to file slicepnts.txt.", &write_to_file);
 
@@ -28,35 +29,43 @@ int main( int argc, char ** argv )
 
   po.parseCommandLine( argc, argv ); 
 
-  MBInterface *mbi = new MBCore();
+
 
   MBErrorCode result; 
-  std::vector< std::vector<Loop> > paths; 
 
-  result = slice_faceted_model( mbi, filename, axis, coord, paths );
+  std::vector< std::vector< std::vector< std::vector<double> > > > paths;
+  result = slice_faceted_model( filename, axis, coord, paths );
   ERR_CHECK(result);
-  std::vector< std::vector<Loop> >::iterator i; 
-  std::vector<Loop>::iterator j; 
+  std::vector< std::vector< std::vector< std::vector<double> > > >::iterator i; 
+  std::vector< std::vector< std::vector<double> > >::iterator j; 
 
   std::ofstream output; 
+  output.precision(6);
+  //output.set(std::ios::fixed);
+  //output.set(std::ios::showpoint);
+
+ 
+
+
   output.open("slicepnts.txt");
 
   for( i = paths.begin(); i != paths.end(); i++ )
     {
       for ( j = (*i).begin(); j != (*i).end(); j++ )
 	{
-	  for( unsigned int k = 0; k < (*j).points.size(); k++)
+	  for( unsigned int k = 0; k < (*j).size(); k++)
 	    {
 	    for( unsigned int ax = 0; ax <= 2; ax++)
 	      {
 		if ( ax != axis )
-		output << (*j).points[k][ax] << "\t";
+		  output << (*j)[k][ax] << std::fixed << " ";
 	      }
+	    output << std::endl;
+	    }
 	  output << std::endl;
 	}
-      output << std::endl;
-    }
     }
 
   output.close();
+
 }
