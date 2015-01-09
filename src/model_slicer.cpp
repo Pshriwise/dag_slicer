@@ -30,30 +30,11 @@ int main( int argc, char ** argv )
 
   MBInterface *mbi = new MBCore();
 
-  MBErrorCode result;
-  result = mbi->load_file( filename.c_str() );
-  ERR_CHECK(result);
-
-  MBRange vols; 
-  result = get_all_volumes( mbi, vols );
-  ERR_CHECK(result);
-
-  MBRange surfs; 
-  result = get_surfaces( mbi, surfs ); 
-  ERR_CHECK(result);
-
-  std::cout << "Creating surface intersections..." << std::endl; 
-
-  std::map<MBEntityHandle,std::vector<Loop> > surf_intersections;
-  result = create_surface_intersections( mbi, surfs, axis, coord, surf_intersections );
-  ERR_CHECK(result);
-
-  std::cout << "Stitching intersections into paths..." << std::endl; 
-
+  MBErrorCode result; 
   std::vector< std::vector<Loop> > paths; 
-  result = get_volume_paths( mbi, vols, axis, surf_intersections, paths);
-  ERR_CHECK(result);
 
+  result = slice_faceted_model( mbi, filename, axis, coord, paths );
+  ERR_CHECK(result);
   std::vector< std::vector<Loop> >::iterator i; 
   std::vector<Loop>::iterator j; 
 
@@ -76,4 +57,6 @@ int main( int argc, char ** argv )
       output << std::endl;
     }
     }
+
+  output.close();
 }
