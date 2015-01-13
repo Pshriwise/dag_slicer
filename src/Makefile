@@ -13,7 +13,7 @@ slicer:
 	$(CC) $(CFLAGS) $(CPPFLAGS) ${MOAB_LIBS_LINK} -c slicer.cpp -o slicer.o
 
 model_slicer: slicer
-	$(CC) $(CFLAGS) $(CPPFLAGS)  model_slicer.cpp slicer.o -o model_slicer -I slicder.hpp ${MOAB_LIBS_LINK}
+	$(CC) $(CFLAGS) $(CPPFLAGS)  model_slicer.cpp slicer.o -o model_slicer -I slicder.hpp ${MOAB_LIBS_LINK} -lplotter
 
 clean: 
 	rm -f *.o *~ model_slicer slicepnts.txt
