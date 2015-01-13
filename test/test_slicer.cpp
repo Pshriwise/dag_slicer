@@ -33,14 +33,13 @@ void test_point_match();
 int main( int /* argc */, char** /* argv */) 
 { 
 
-  MBErrorCode result = mbi->load_mesh("cyl.h5m");
+  MBErrorCode result = mbi->load_mesh("cube.h5m");
   ERR_CHECK(result);
   
   //get_sets_by_category_test( mbi );
   int failed_tests = 0; 
 
   failed_tests += RUN_TEST(line_struct_test);
-
   failed_tests += RUN_TEST(get_sets_by_category_test);
   failed_tests += RUN_TEST(get_surfaces_test);
   failed_tests += RUN_TEST(get_all_volumes_test);
@@ -85,7 +84,7 @@ void create_surface_intersections_test()
   MBErrorCode result = create_surface_intersections( mbi, surfs, 0, 0, int_map);
   ERR_CHECK(result);
 
-  CHECK( (int)int_map.size() == 3);
+  CHECK( (int)int_map.size() == 6);
 
 }
 
@@ -224,7 +223,7 @@ void get_sets_by_category_test()
   char category2[CATEGORY_TAG_SIZE] = "Surface";
   result = get_sets_by_category( mbi, sets, category2 );
  
-  CHECK_EQUAL(3, (int)sets.size() );
+  CHECK_EQUAL(6, (int)sets.size() );
 
 }  
   
@@ -236,7 +235,7 @@ void get_surfaces_test()
   MBErrorCode result = get_surfaces( mbi, surfaces );
   ERR_CHECK(result);
   //test file is a cylinder and should have 3 surfaces
-  CHECK_EQUAL( 3, (int)surfaces.size() );
+  CHECK_EQUAL( 6, (int)surfaces.size() );
 
 }
 
@@ -279,4 +278,3 @@ void test_point_match()
   CHECK( !point_match(a,b) );
 
 }
-
