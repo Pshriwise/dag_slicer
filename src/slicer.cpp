@@ -502,19 +502,27 @@ Section for handling loop windings and path coding as required by matplotlib
 *********************************************/
 
 
-void create_patch( std::vector<Loop> input_loops, std::vector<MBCartVect> &path_out, std::vector<int> &coding_out)
+void create_patch( int axis, std::vector<Loop> input_loops, std::vector<MBCartVect> &path_out, std::vector<int> &coding_out)
 {
+
+  std::vector<Loop>::iterator loop; 
+  for ( loop = input_loops.begin(); loop != input_loops.end(); loop++ )
+    {
+      (*loop).gen_xys(axis);
+      //(*loop).points.clear();
+    }
 
   //generate containment matrix for the loops
   std::vector< std::vector<int> > M;
   //get_containment(loops, M);
   
   //get the current windings of the loops
-  std::vector<int> windings; 
-  //get_windings(loops);
+  std::vector<int> windings;
+  //get_windings(loops, windings);
 
   //find desired windings from containment matrix, M
-  //get_fill_windings(M)
+  std::vector<int> desired_windings;
+  //get_fill_windings(M, desired_windings);
   
   //re-orient the loops
   //set_windings( current_windings, desired_windings, loops);
@@ -525,3 +533,94 @@ void create_patch( std::vector<Loop> input_loops, std::vector<MBCartVect> &path_
 }
 
 
+void get_containment( std::vector<Loop> loops, std::vector< std::vector<double> > &Mat )
+{
+  
+  Mat.resize(loops.size());
+  for( unsigned int i = 0; i < loops.size(); i++ )
+    {
+      Mat[i].resize(loops.size());
+      for( unsigned int j = 0; j < loops.size(); j++ )
+	{
+	  //Mat[i][j] = is_poly_a_in_poly_b( loops[i], loops[j]);
+	}
+    }
+  
+}
+
+// checks to see if loop a is in loop b
+// (assuming fully nested loops for now)
+bool is_poly_a_in_poly_b( Loop a, Loop b)
+{
+
+  //use the first point of a to test for now
+  double x = a.xypnts[0].x; double y = a.xypnts[0].y;
+
+  int i, j = b.xypnts.size() - 1;
+  
+  bool result = false; 
+
+  for( i = 0; i < b.xypnts.size(); i++)
+    {
+      if( (b.xypnts[i].y < y && b.xypnts[j].y >= y
+	  || b.xypnts[j].y < y && b.xypnts[i].y >= y)
+	  && (b.xypnts[i].x <= x || b.xypnts[j].x <= x))
+	{
+	  if (b.xypnts[i].x+(y-b.xypnts[i].y)/(b.xypnts[j].y-b.xypnts[i].y)
+	      *(b.xypnts[j].x-b.xypnts[i].x) < x)
+	    {
+	    result = true;
+	    }
+	}
+      j=i;
+    }
+  return result;
+}
+
+void get_windings( std::vector<Loop> loops, std::vector<int> &windings)
+{
+  std::vector<Loop>::iterator loop; 
+  windings.clear(); //JIC
+  
+  for( loop = loops.begin(); loop != loops.end(); loop++)
+    {
+      //windings.push_back(find_winding(*loop));
+    }
+
+}
+
+int find_winding( Loop loop )
+{
+  double area = 0; 
+  
+  int j = loop.xypnts.size() - 1; 
+
+  for(unsigned int i = 0; i < loop.xypnts.size(); i++)
+    {
+      area += (loop.xypnts[j].x + loop.xypnts[i].x) * (loop.xypnts[j].y - loop.xypnts[i].y);
+      j=i;
+    }
+
+  return area >= 0 ? CW : CCW;
+}
+
+
+void get_fill_windings( std::vector< std::vector<int> > fill_mat, std::vector<int> &windings)
+{
+
+  int a = fill_mat.size(); 
+  int b = fill_mat[0].size(); 
+  assert( a == b); 
+  int wind;
+  for( unsigned int i = 0; i < a; i++)
+    {
+      int dum;
+      for(std::vector<int>::iterator j = fill_mat[i].begin();
+	  j != fill_mat[i].end(); j++)
+	dum += *j;
+      wind = dum%2 == 0 ? CCW : CW;
+      windings.push_back(wind);
+    }
+
+
+}

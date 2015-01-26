@@ -11,8 +11,8 @@
 #include "MBCore.hpp"
 #include "MBTagConventions.hpp"
 
-#define CCW = 1
-#define CW = -1
+#define CCW 1
+#define CW -1
 
 inline void ERR_CHECK( moab::ErrorCode rval )
 {
@@ -51,12 +51,43 @@ struct Line {
 
 };
 
+struct xypnt{
+  double x; 
+  double y; 
+};
+
 struct Loop{
   Loop() : num_pnts(0), closed(false) {}
   std::vector<MBCartVect> points;
+  std::vector<xypnt> xypnts; 
   int num_pnts; 
   bool closed;
 
+  void gen_xys(int axis)
+  {
+    
+    xypnts.clear(); //clear out vector as precaution
+    int x,y;
+    
+    //set indices for x an y based on slice plane (provided externally)
+    switch(axis)
+      {
+      case 0:
+	x = 1; y = 2; break;
+      case 1:
+	x = 0; y = 2; break;
+      case 2:
+	x = 0; y = 1; break;
+      }
+
+    xypnts.resize(points.size());
+    for( unsigned int i = 0; i < points.size(); i++)
+      {
+	xypnts[i].x = points[i][x];
+	xypnts[i].y = points[i][y];
+      }
+  }
+  
 };
 
 
