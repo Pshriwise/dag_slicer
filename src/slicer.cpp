@@ -101,8 +101,19 @@ MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, s
   result = get_volume_paths( mbi, volumes, axis, intersection_map, all_paths);
   ERR_CHECK(result);
   
-  
-  
+  std::vector< std::vector<Loop> >::iterator i;
+
+  std::vector< std::vector<MBCartVect> > paths;
+  std::vector< std::vector<int> > codings;
+  for( i = all_paths.begin(); i != all_paths.end(); i++)
+    {
+      std::vector<MBCartVect> path;
+      std::vector<int> coding;
+      //create_patch( *i, path, coding);
+      //codings.push_back(coding);
+      //paths.push_back(path);
+    }
+
   return MB_SUCCESS;
 
 }
@@ -485,3 +496,32 @@ void convert_to_stl( std::vector< std::vector<Loop> > a, std::vector< std::vecto
 
 
 }
+
+/********************************************
+Section for handling loop windings and path coding as required by matplotlib
+*********************************************/
+
+
+void create_patch( std::vector<Loop> input_loops, std::vector<MBCartVect> &path_out, std::vector<int> &coding_out)
+{
+
+  //generate containment matrix for the loops
+  std::vector< std::vector<int> > M;
+  //get_containment(loops, M);
+  
+  //get the current windings of the loops
+  std::vector<int> windings; 
+  //get_windings(loops);
+
+  //find desired windings from containment matrix, M
+  //get_fill_windings(M)
+  
+  //re-orient the loops
+  //set_windings( current_windings, desired_windings, loops);
+
+  //create coding and paths
+  //generate_patch_path( loops, path_out, coding_out);
+
+}
+
+
