@@ -64,21 +64,30 @@ MBErrorCode get_all_volumes( MBInterface *mbi, MBRange &vols)
   return result; 
 }
 
-/*
-MBErrorCode slice_faceted_model( std::string filename, int axis, double coord,   std::vector< std::vector<xypnt> > paths, std::vector< std::vector<int> > codings)
-
+MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, std::vector< std::vector<double> > &x_pnts, std::vector< std::vector<double> > &y_pnts, std::vector< std::vector<int> > &codings)
 {
-
+  
+  std::vector< std::vector<xypnt> > paths;
   MBErrorCode result = slice_faceted_model( filename, axis, coord, paths, codings);
 
-  //convert_to_stl( all_paths, valid_paths );
+    std::vector< std::vector<xypnt> >::iterator path;
 
+  for( path = paths.begin(); path != paths.end(); path++)
+    {
+      std::vector<double> path_xs, path_ys;
+      for( unsigned int i = 0; i < (*path).size(); i++)
+	{
+	  path_xs.push_back((*path)[i].x);
+	  path_ys.push_back((*path)[i].y);
+	}
+      x_pnts.push_back(path_xs);
+      y_pnts.push_back(path_ys);
+    }
+  
   return result;
 }
-*/
-MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, std::vector< std::vector<xypnt> > &paths, std::vector< std::vector<int> > &codings)
 
-				 //std::vector< std::vector<Loop> > &all_paths )
+MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, std::vector< std::vector<xypnt> > &paths, std::vector< std::vector<int> > &codings)
 {
 
   MBInterface *mbi = new MBCore();

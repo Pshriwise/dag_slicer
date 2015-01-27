@@ -33,9 +33,9 @@ int main( int argc, char ** argv )
 
   MBErrorCode result; 
 
-  std::vector< std::vector<xypnt> > paths;
+  std::vector< std::vector<double> > xs, ys;
   std::vector< std::vector<int> > codings;
-  result = slice_faceted_model( filename, axis, coord, paths, codings );
+  result = slice_faceted_model( filename, axis, coord, xs, ys, codings );
   ERR_CHECK(result);
 
   std::ofstream output, coding; 
@@ -45,20 +45,21 @@ int main( int argc, char ** argv )
 
  
 
-  std::vector< std::vector<xypnt> >::iterator path;
-  std::vector< std::vector<int> >::iterator code;
   output.open("slicepnts.txt");
   coding.open("coding.txt");
 
-  for( path = paths.begin(), code = codings.begin(); path != paths.end(); path++, code++)
+
+  for(unsigned int i = 0; i < xs.size(); i++)
     {
-      for( unsigned int i = 0; i < (*path).size(); i++)
+      for( unsigned int j = 0; j < xs[i].size(); j++)
 	{
 	  //write x point
-	  output << (*path)[i].x << std::fixed << " ";
-	  output << (*path)[i].y << std::fixed << " ";
+	  output << xs[i][j] << std::fixed << " ";
+	  //write y point
+	  output << ys[i][j] << std::fixed << " ";
 	  output << std::endl;
-	  coding << (*code)[i] << std::endl;
+	  //write path coding
+	  coding << codings[i][j] << std::endl;
 	}
       output << std::endl;
       coding << std::endl;
