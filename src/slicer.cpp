@@ -64,19 +64,21 @@ MBErrorCode get_all_volumes( MBInterface *mbi, MBRange &vols)
   return result; 
 }
 
+/*
+MBErrorCode slice_faceted_model( std::string filename, int axis, double coord,   std::vector< std::vector<xypnt> > paths, std::vector< std::vector<int> > codings)
 
-MBErrorCode slice_faceted_model( std::string filename, int axis, double coord,   std::vector< std::vector< std::vector< std::vector<double> > > > &valid_paths )
 {
 
-  std::vector< std::vector<Loop> > all_paths;
-  MBErrorCode result = slice_faceted_model( filename, axis, coord, all_paths);
+  MBErrorCode result = slice_faceted_model( filename, axis, coord, paths, codings);
 
-  convert_to_stl( all_paths, valid_paths );
+  //convert_to_stl( all_paths, valid_paths );
 
-
+  return result;
 }
+*/
+MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, std::vector< std::vector<xypnt> > &paths, std::vector< std::vector<int> > &codings)
 
-MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, std::vector< std::vector<Loop> > &all_paths )
+				 //std::vector< std::vector<Loop> > &all_paths )
 {
 
   MBInterface *mbi = new MBCore();
@@ -98,20 +100,21 @@ MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, s
   result = get_all_volumes( mbi, volumes );
   ERR_CHECK(result);
 
+  std::vector< std::vector<Loop> > all_paths;
   result = get_volume_paths( mbi, volumes, axis, intersection_map, all_paths);
   ERR_CHECK(result);
   
   std::vector< std::vector<Loop> >::iterator i;
 
-  std::vector< std::vector<MBCartVect> > paths;
-  std::vector< std::vector<int> > codings;
+  //std::vector< std::vector<xypnt> > paths;
+  //std::vector< std::vector<int> > codings;
   for( i = all_paths.begin(); i != all_paths.end(); i++)
     {
-      std::vector<MBCartVect> path;
+      std::vector<xypnt> path;
       std::vector<int> coding;
-      //create_patch( *i, path, coding);
-      //codings.push_back(coding);
-      //paths.push_back(path);
+      create_patch(axis, *i, path, coding);
+      codings.push_back(coding);
+      paths.push_back(path);
     }
 
   return MB_SUCCESS;
@@ -502,7 +505,7 @@ Section for handling loop windings and path coding as required by matplotlib
 *********************************************/
 
 
-void create_patch( int axis, std::vector<Loop> input_loops, std::vector<MBCartVect> &path_out, std::vector<int> &coding_out)
+void create_patch( int axis, std::vector<Loop> input_loops, std::vector<xypnt> &path_out, std::vector<int> &coding_out)
 {
 
   std::vector<Loop>::iterator loop; 
@@ -514,26 +517,26 @@ void create_patch( int axis, std::vector<Loop> input_loops, std::vector<MBCartVe
 
   //generate containment matrix for the loops
   std::vector< std::vector<int> > M;
-  //get_containment(loops, M);
+  get_containment(input_loops, M);
   
   //get the current windings of the loops
   std::vector<int> windings;
-  //get_windings(loops, windings);
+  get_windings(input_loops, windings);
 
   //find desired windings from containment matrix, M
   std::vector<int> desired_windings;
-  //get_fill_windings(M, desired_windings);
+  get_fill_windings(M, desired_windings);
   
   //re-orient the loops
-  //set_windings( current_windings, desired_windings, loops);
+  set_windings( windings, desired_windings, input_loops);
 
   //create coding and paths
-  //generate_patch_path( loops, path_out, coding_out);
+  generate_patch_path( input_loops, path_out, coding_out);
 
 }
 
 
-void get_containment( std::vector<Loop> loops, std::vector< std::vector<double> > &Mat )
+void get_containment( std::vector<Loop> loops, std::vector< std::vector<int> > &Mat )
 {
   
   Mat.resize(loops.size());
@@ -542,7 +545,7 @@ void get_containment( std::vector<Loop> loops, std::vector< std::vector<double> 
       Mat[i].resize(loops.size());
       for( unsigned int j = 0; j < loops.size(); j++ )
 	{
-	  //Mat[i][j] = is_poly_a_in_poly_b( loops[i], loops[j]);
+	  Mat[i][j] = is_poly_a_in_poly_b( loops[i], loops[j]);
 	}
     }
   
@@ -584,7 +587,7 @@ void get_windings( std::vector<Loop> loops, std::vector<int> &windings)
   
   for( loop = loops.begin(); loop != loops.end(); loop++)
     {
-      //windings.push_back(find_winding(*loop));
+      windings.push_back(find_winding(*loop));
     }
 
 }
@@ -621,6 +624,43 @@ void get_fill_windings( std::vector< std::vector<int> > fill_mat, std::vector<in
       wind = dum%2 == 0 ? CCW : CW;
       windings.push_back(wind);
     }
+
+
+}
+
+void set_windings( std::vector<int> current_windings, std::vector<int> desired_windings, std::vector<Loop> loops)
+{
+
+  assert ( current_windings.size() == desired_windings.size() );
+
+  for( unsigned int i = 0; i < current_windings.size(); i++)
+    {
+      if (current_windings[i] != desired_windings[i])
+	{
+	  Loop this_loop = loops[i];
+	  std::reverse( this_loop.points.begin(), this_loop.points.end()); //JIC
+	  std::reverse( this_loop.xypnts.begin(), this_loop.xypnts.end());
+	}
+    }
+
+} 
+
+
+void generate_patch_path( std::vector<Loop> loops, std::vector<xypnt> &path, std::vector<int> &coding)
+{
+
+  std::vector<Loop>::iterator loop;
+  
+  for( loop = loops.begin(); loop != loops.end(); loop++)
+    {
+      for(unsigned int i = 0; i < (*loop).xypnts.size(); i++)
+	{
+	  path.push_back((*loop).xypnts[i]);
+	  i == 0 ? coding.push_back(1) : coding.push_back(2);
+	}
+
+    }
+
 
 
 }

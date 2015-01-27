@@ -33,11 +33,10 @@ int main( int argc, char ** argv )
 
   MBErrorCode result; 
 
-  std::vector< std::vector< std::vector< std::vector<double> > > > paths;
-  result = slice_faceted_model( filename, axis, coord, paths );
+  std::vector< std::vector<xypnt> > paths;
+  std::vector< std::vector<int> > codings;
+  result = slice_faceted_model( filename, axis, coord, paths, codings );
   ERR_CHECK(result);
-  std::vector< std::vector< std::vector< std::vector<double> > > >::iterator i; 
-  std::vector< std::vector< std::vector<double> > >::iterator j; 
 
   std::ofstream output; 
   output.precision(6);
@@ -46,24 +45,19 @@ int main( int argc, char ** argv )
 
  
 
-
+  std::vector< std::vector<xypnt> >::iterator path;
   output.open("slicepnts.txt");
 
-  for( i = paths.begin(); i != paths.end(); i++ )
+  for( path = paths.begin(); path != paths.end(); path++)
     {
-      for ( j = (*i).begin(); j != (*i).end(); j++ )
+      for( unsigned int i = 0; i < (*path).size(); i++)
 	{
-	  for( unsigned int k = 0; k < (*j).size(); k++)
-	    {
-	    for( unsigned int ax = 0; ax <= 2; ax++)
-	      {
-		if ( ax != axis )
-		  output << (*j)[k][ax] << std::fixed << " ";
-	      }
-	    output << std::endl;
-	    }
+	  //write x point
+	  output << (*path)[i].x << std::fixed << " ";
+	  output << (*path)[i].y << std::fixed << " ";
 	  output << std::endl;
 	}
+      output << std::endl;
     }
 
   output.close();

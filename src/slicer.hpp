@@ -100,10 +100,7 @@ MBErrorCode get_surfaces( MBInterface* mbi, MBRange &surfs);
 
 MBErrorCode get_all_volumes( MBInterface *mbi, MBRange &vols);
 
-
-MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, std::vector< std::vector<Loop> > &all_paths );
-
-MBErrorCode slice_faceted_model( std::string filename, int axis, double coord,   std::vector< std::vector< std::vector< std::vector<double> > > > &valid_paths );
+MBErrorCode slice_faceted_model( std::string filename, int axis, double coord,   std::vector< std::vector<xypnt> > &paths, std::vector< std::vector<int> > &codings);
 
 MBErrorCode create_surface_intersections( MBInterface *mbi, MBRange surfs, int axis, double coord,   std::map<MBEntityHandle,std::vector<Loop> > &intersection_map);
 
@@ -122,3 +119,20 @@ void triangle_plane_intersect( int axis, double coord, MBCartVect *coords, Line 
 void get_intersection( MBCartVect pnt0, MBCartVect pnt1, int axis, double coord, Line &line );
 
 void convert_to_stl( std::vector< std::vector<Loop> > a, std::vector< std::vector< std::vector< std::vector<double> > > > &b);
+
+void create_patch( int axis, std::vector<Loop> input_loops, std::vector<xypnt> &path_out, std::vector<int> &coding_out);
+
+void get_containment( std::vector<Loop> loops, std::vector< std::vector<int> > &Mat );
+
+bool is_poly_a_in_poly_b( Loop a, Loop b);
+
+void get_windings( std::vector<Loop> loops, std::vector<int> &windings);
+
+int find_winding( Loop loop );
+
+void get_fill_windings( std::vector< std::vector<int> > fill_mat, std::vector<int> &windings);
+
+void set_windings( std::vector<int> current_windings, std::vector<int> desired_windings, std::vector<Loop> loops);
+
+void generate_patch_path( std::vector<Loop> loops, std::vector<xypnt> &path, std::vector<int> &coding);
+
