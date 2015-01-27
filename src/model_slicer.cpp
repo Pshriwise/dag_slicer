@@ -2,9 +2,9 @@
 #include <fstream>
 #include <iomanip>
 
-#include "slicer.hpp"
+//#include "slicer.hpp"
 #include "moab/ProgOptions.hpp"
-
+#include "dag_slicer.hpp"
 
 int main( int argc, char ** argv )
 {
@@ -32,11 +32,17 @@ int main( int argc, char ** argv )
 
 
   MBErrorCode result; 
-
+  /*
   std::vector< std::vector<double> > xs, ys;
   std::vector< std::vector<int> > codings;
-  result = slice_faceted_model( filename, axis, coord, xs, ys, codings );
+  result = slice_faceted_model_out( filename, axis, coord, xs, ys, codings );
   ERR_CHECK(result);
+  */
+  
+  Dag_Slicer ds( filename, axis, coord);
+  ds.create_slice(); 
+  
+  
 
   std::ofstream output, coding; 
   output.precision(6);
@@ -49,17 +55,17 @@ int main( int argc, char ** argv )
   coding.open("coding.txt");
 
 
-  for(unsigned int i = 0; i < xs.size(); i++)
+  for(unsigned int i = 0; i < ds.slice_x_pnts.size(); i++)
     {
-      for( unsigned int j = 0; j < xs[i].size(); j++)
+      for( unsigned int j = 0; j < ds.slice_x_pnts[i].size(); j++)
 	{
 	  //write x point
-	  output << xs[i][j] << std::fixed << " ";
+	  output << ds.slice_x_pnts[i][j] << std::fixed << " ";
 	  //write y point
-	  output << ys[i][j] << std::fixed << " ";
+	  output << ds.slice_y_pnts[i][j] << std::fixed << " ";
 	  output << std::endl;
 	  //write path coding
-	  coding << codings[i][j] << std::endl;
+	  coding << ds.path_coding[i][j] << std::endl;
 	}
       output << std::endl;
       coding << std::endl;

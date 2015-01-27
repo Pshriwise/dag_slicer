@@ -24,6 +24,7 @@ inline void ERR_CHECK( moab::ErrorCode rval )
     }
 }
 
+
 //special containers for our intersection data
 struct Line {
   Line() : started(false), full(false) {}
