@@ -38,7 +38,7 @@ int main( int argc, char ** argv )
   result = slice_faceted_model( filename, axis, coord, paths, codings );
   ERR_CHECK(result);
 
-  std::ofstream output; 
+  std::ofstream output, coding; 
   output.precision(6);
   //output.set(std::ios::fixed);
   //output.set(std::ios::showpoint);
@@ -46,9 +46,11 @@ int main( int argc, char ** argv )
  
 
   std::vector< std::vector<xypnt> >::iterator path;
+  std::vector< std::vector<int> >::iterator code;
   output.open("slicepnts.txt");
+  coding.open("coding.txt");
 
-  for( path = paths.begin(); path != paths.end(); path++)
+  for( path = paths.begin(), code = codings.begin(); path != paths.end(); path++, code++)
     {
       for( unsigned int i = 0; i < (*path).size(); i++)
 	{
@@ -56,10 +58,12 @@ int main( int argc, char ** argv )
 	  output << (*path)[i].x << std::fixed << " ";
 	  output << (*path)[i].y << std::fixed << " ";
 	  output << std::endl;
+	  coding << (*code)[i] << std::endl;
 	}
       output << std::endl;
+      coding << std::endl;
     }
 
   output.close();
-
+  coding.close();
 }
