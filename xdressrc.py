@@ -1,12 +1,22 @@
 from xdress.utils import apiname
 
-package = 'dag_slicer'     # top-level python package name
-packagedir = 'dag_slicer'  # loation of the python package
+package = 'slicer'     # top-level python package name
+packagedir = 'slicer'  # loation of the python package
+
+plugins = ('xdress.stlwrap', 'xdress.cythongen', 
+           'xdress.autodescribe', 'xdress.autoall')
+
+'str'
+
+extra_types = 'xdress_extra_types'
 
 stlcontainers = [
+    ('vector', 'int'),
     ('vector', ('vector', 'int')),
+    ('vector', 'float64'),
     ('vector', ('vector', 'float64')),
     ]
 
-functions = [apiname('slice_faceted_model_out', ('src/slicer.cpp'),  
-                     incfiles='slicer.hpp')]
+classes = [apiname('Dag_Slicer', ('src/dag_slicer.hpp','src/dag_slicer.cpp'), incfiles = 'src/dag_slicer.hpp'),]
+
+

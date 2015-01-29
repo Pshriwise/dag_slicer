@@ -1,24 +1,28 @@
+#ifndef DAG_SLICER
+#define DAG_SLICER
 
+//#include "slicer.hpp"
+#include <string>
+#include <vector>
 
-#include "slicer.hpp"
+//namespace dag_slicer {
 
-class Dag_Slicer
-{
+class Dag_Slicer{
+  
 public:
 
   Dag_Slicer( std::string file_to_slice, int ax, double coord );
-
+  ~Dag_Slicer();
   std::string filename; 
   int axis; 
   double coord; 
-  std::vector< std::vector<double> > slice_x_pnts;
-  std::vector< std::vector<double> > slice_y_pnts;
-
-  ~Dag_Slicer();
-  
- 
-  std::vector< std::vector<int> > path_coding;
-  
+  //std::vector< std::vector<double> > slice_x_pnts;
+  //std::vector< std::vector<double> > slice_y_pnts; 
+  //std::vector< std::vector<int> > path_coding;
   void create_slice();
-
+  
 };
+
+//};  
+
+#endif
