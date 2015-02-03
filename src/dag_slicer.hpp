@@ -16,9 +16,11 @@ public:
   std::string filename; 
   int axis; 
   double coord; 
-  //std::vector< std::vector<double> > slice_x_pnts;
-  //std::vector< std::vector<double> > slice_y_pnts; 
-  //std::vector< std::vector<int> > path_coding;
+  std::vector<double> dum_pnts;
+  std::vector< std::vector<double> > slice_x_pnts;
+  std::vector< std::vector<double> > slice_y_pnts; 
+  std::vector<int> dum_ints;
+  std::vector< std::vector<int> > path_coding;
   void create_slice();
   
 };
