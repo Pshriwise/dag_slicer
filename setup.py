@@ -9,7 +9,9 @@ import numpy as np
 if not os.path.exists('slicer/xdress_extra_types.h'):
     sys.exit("please run xdress first!")
 
-incdirs = [os.path.join(os.getcwd(), 'src'), np.get_include()]
+incdirs = [os.path.join(os.getcwd(), 'src'), np.get_include(), '/home/shriwise/dagmc_blds/moabs/include']
+libdirs = ['/home/shriwise/dagmc_blds/moabs/lib']
+libs = ['MOAB']
 
 ext_modules = [
     Extension("slicer.xdress_extra_types", ["slicer/xdress_extra_types.pyx"], 
@@ -19,7 +21,7 @@ ext_modules = [
     Extension("slicer.stlcontainers", ["slicer/stlcontainers.pyx"], 
               include_dirs=incdirs, language="c++"),
     Extension("slicer.dag_slicer", ['src/dag_slicer.cpp', "slicer/dag_slicer.pyx", ],
-    	      include_dirs=incdirs, language="c++"),
+    	      include_dirs=incdirs, library_dirs=libdirs, libraries=libs, language="c++"),
     ]
 
 setup(  

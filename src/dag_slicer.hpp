@@ -1,7 +1,7 @@
 #ifndef DAG_SLICER
 #define DAG_SLICER
 
-//#include "slicer.hpp"
+#include "slicer.hpp"
 #include <string>
 #include <vector>
 
