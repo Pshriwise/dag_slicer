@@ -14,12 +14,12 @@ set( cxx_pyx_files
   dag_slicer.pyx
   dtypes.pyx
   stlcontainers.pyx
-  mypack_extra_types.pyx
+  xdress_extra_types.pyx
   )
 set_source_files_properties( ${cxx_pyx_files}
   PROPERTIES CYTHON_IS_CXX TRUE )
 
-cython_add_module( mypack_extra_types mypack_extra_types.pyx)
+cython_add_module( xdress_extra_types xdress_extra_types.pyx)
 cython_add_module( dtypes dtypes.pyx )
 cython_add_module( stlcontainers stlcontainers.pyx )
 cython_add_module( dag_slicer dag_slicer.pyx ../src/dag_slicer.cpp )
