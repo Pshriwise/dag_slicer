@@ -24,4 +24,4 @@ enable_testing()
 find_file( NOSETESTS_EXECUTABLE nosetests )
 add_test( nosetests "${NOSETESTS_EXECUTABLE}" -v --with-xunit )
 
-add_subdirectory( slicer )
+add_subdirectory( dag_slicer )

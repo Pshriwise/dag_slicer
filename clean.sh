@@ -1,17 +1,17 @@
 #!/bin/bash
 
 
-if [ -f ./slicer/CMakeLists.txt ]; then
-    mv slicer/CMakeLists.txt CMakeLists.txt.bak
+if [ -f ./dag_slicer/CMakeLists.txt ]; then
+    mv dag_slicer/CMakeLists.txt CMakeLists.txt.bak
 fi
 
 sudo rm -rf build 
-rm -rf ./slicer
+rm -rf ./dag_slicer
 rm -rf ./CMakeListsFiles
 rm -rf ./CMakeFiles
 rm CMakeCache.txt
 rm cmake_install.cmake
 rm CTestTestfile.cmake
 
-mkdir slicer 
-mv CMakeLists.txt.bak ./slicer/CMakeLists.txt
+mkdir dag_slicer 
+mv CMakeLists.txt.bak ./dag_slicer/CMakeLists.txt
