@@ -7,7 +7,7 @@ import numpy as np
 from matplotlib.path import Path
 from matplotlib.patches import PathPatch
 import matplotlib.pyplot as plt
-from slicer import slicer
+from dag_slicer import dag_slicer
 
 
 import time
@@ -53,22 +53,14 @@ def parsing():
 
     return args
 
-def main():
 
-    #parse arguments and load the file
-    args = parsing()
+def show_slice(filename, axis, coord, write_pnts=False, by_group=False):
 
-    print args.coord
-    print args.axis
-    #all_paths, group_names = slice_faceted_model(args.filename, args.coord, args.axis, args.by_group)
-
-
-
-    dag_slicer = slicer.Dag_Slicer(args.filename, args.axis, args.coord)
-    dag_slicer.create_slice()
+    slicer = dag_slicer.Dag_Slicer(filename, axis, coord)
+    slicer.create_slice()
     all_paths = []
-    for i in range(len(dag_slicer.slice_x_pnts)):
-        new_list = [ np.transpose(np.vstack((dag_slicer.slice_x_pnts[i],dag_slicer.slice_y_pnts[i]))), dag_slicer.path_coding[i]]
+    for i in range(len(slicer.slice_x_pnts)):
+        new_list = [ np.transpose(np.vstack((slicer.slice_x_pnts[i],slicer.slice_y_pnts[i]))), slicer.path_coding[i]]
         all_paths.append(new_list)
 
 
@@ -79,7 +71,7 @@ def main():
     
     patches = []
     for coord, code in all_paths:
-        if args.write_pnts: np.savetxt(file, coord, delimiter = ' ')
+        if write_pnts: np.savetxt(file, coord, delimiter = ' ')
         path = Path(coord, code)
         color = np.random.rand(3, 1)
         patches.append(PathPatch(path, color=color, ec='black', lw=1, alpha=0.4))
@@ -92,13 +84,25 @@ def main():
     for patch in patches:
         ax.add_patch(patch)
 
-    if args.by_group:
+    if by_group:
         ax.legend(patches, group_names, prop={'size':10})
     #show the plot!
     ax.autoscale_view()
     ax.set_aspect('equal')
     plt.show()  
-   
+
+def main():
+
+    #parse arguments and load the file
+    args = parsing()
+
+    print args.coord
+    print args.axis
+    #all_paths, group_names = slice_faceted_model(args.filename, args.coord, args.axis, args.by_group)
+
+    show_slice(args.filename, args.axis, args.coord, args.write_pnts)
+
+    
     
 if __name__ == "__main__":
     start = time.clock()
