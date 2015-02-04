@@ -8,10 +8,13 @@ if( NOT NUMPY_INCLUDE_DIR )
   find_path( NUMPY_INCLUDE_DIR numpy/arrayobject.h
     HINTS ${_numpy_include} )
 endif()
+
 include_directories( ${NUMPY_INCLUDE_DIR}  "/home/shriwise/dagmc_blds/moabs/include/")
+link_directories("/home/shriwise/dagmc_blds/moabs/lib")
+target_link_libraries("MOAB")
 
 set( cxx_pyx_files
-  dag_slicer.pyx
+  slicer.pyx
   dtypes.pyx
   stlcontainers.pyx
   xdress_extra_types.pyx
@@ -23,4 +26,4 @@ set_source_files_properties( ${cxx_pyx_files}
 cython_add_module( xdress_extra_types xdress_extra_types.pyx)
 cython_add_module( dtypes dtypes.pyx )
 cython_add_module( stlcontainers stlcontainers.pyx )
-cython_add_module( dag_slicer dag_slicer.pyx ../src/dag_slicer.cpp)
+cython_add_module( slicer slicer.pyx ../src/slicer.cpp )

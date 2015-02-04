@@ -9,6 +9,9 @@ CFLAGS += ${MOAB_CFLAGS}
 
 all: slicer model_slicer
 
+dag_slicer: 
+	$(CC) $(CFLAGS) $(CPPFLAGS) ${MOAB_LIBS_LINK} -c dag_slicer.cpp -o dag_slicer.o
+
 slicer: 
 	$(CC) $(CFLAGS) $(CPPFLAGS) ${MOAB_LIBS_LINK} -c slicer.cpp -o slicer.o
 

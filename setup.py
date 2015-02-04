@@ -20,7 +20,7 @@ ext_modules = [
               include_dirs=incdirs, language="c++"),
     Extension("slicer.stlcontainers", ["slicer/stlcontainers.pyx"], 
               include_dirs=incdirs, language="c++"),
-    Extension("slicer.dag_slicer", ['src/dag_slicer.cpp', "slicer/dag_slicer.pyx", ],
+    Extension("slicer.slicer", ['src/slicer.cpp', "slicer/slicer.pyx", ],
     	      include_dirs=incdirs, library_dirs=libdirs, libraries=libs, language="c++"),
     ]
 
