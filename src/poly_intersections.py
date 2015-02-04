@@ -7,6 +7,7 @@ import numpy as np
 from matplotlib.path import Path
 from matplotlib.patches import PathPatch
 import matplotlib.pyplot as plt
+from slicer import slicer
 
 
 import time
@@ -604,7 +605,17 @@ def main():
 
     print args.coord
     print args.axis
-    all_paths, group_names = slice_faceted_model(args.filename, args.coord, args.axis, args.by_group)
+    #all_paths, group_names = slice_faceted_model(args.filename, args.coord, args.axis, args.by_group)
+
+
+
+    dag_slicer = slicer.Dag_Slicer(args.filename, args.axis, args.coord)
+    dag_slicer.create_slice()
+    all_paths = []
+    for i in range(len(dag_slicer.slice_x_pnts)):
+        new_list = [ np.transpose(np.vstack((dag_slicer.slice_x_pnts[i],dag_slicer.slice_y_pnts[i]))), dag_slicer.path_coding[i]]
+        all_paths.append(new_list)
+
 
     if __name__ == "__main__":
         print "Plotting..."
