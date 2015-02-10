@@ -1,7 +1,6 @@
 
 #include "slicer.hpp"
 
-
 bool point_match( MBCartVect pnt1, MBCartVect pnt2) 
 {
   bool ans = false; 
@@ -86,7 +85,7 @@ MBErrorCode slice_faceted_model_out( std::string filename, int axis, double coor
   return result;
 }
 
-MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, std::vector< std::vector<xypnt> > &paths, std::vector< std::vector<int> > &codings)
+MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, std::vector< std::vector<xypnt> > &paths, std::vector< std::vector<int> > &codings, bool by_group)
 {
 
   MBInterface *mbi = new MBCore();
@@ -104,29 +103,131 @@ MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, s
   result = create_surface_intersections( mbi, surfaces, axis, coord, intersection_map);
   ERR_CHECK(result);
 
-  MBRange volumes; 
-  result = get_all_volumes( mbi, volumes );
-  ERR_CHECK(result);
-
+  //path container for a volume
   std::vector< std::vector<Loop> > all_paths;
-  result = get_volume_paths( mbi, volumes, axis, intersection_map, all_paths);
-  ERR_CHECK(result);
   
-  std::vector< std::vector<Loop> >::iterator i;
-
-  //std::vector< std::vector<xypnt> > paths;
-  //std::vector< std::vector<int> > codings;
-  for( i = all_paths.begin(); i != all_paths.end(); i++)
+  if (by_group)
     {
-      std::vector<xypnt> path;
-      std::vector<int> coding;
-      create_patch(axis, *i, path, coding);
-      codings.push_back(coding);
-      paths.push_back(path);
+      std::map< std::string, MBRange > group_mapping;
+      std::vector<std::string> group_names;
+      result = get_volumes_by_group( mbi, group_mapping, group_names);
+      ERR_CHECK(result);
+      
+      std::vector<std::string>::iterator group_name; 
+      for( group_name = group_names.begin(); group_name != group_names.end(); group_name++)
+	{
+       
+	  result = get_volume_paths( mbi, group_mapping[ *group_name ], axis, intersection_map, all_paths);
+	  ERR_CHECK(result);
+	  
+	  std::vector<xypnt> group_path; 
+	  std::vector<int> group_coding;
+
+	  std::vector< std::vector<Loop> >::iterator path;
+
+	  for (path = all_paths.begin(); path != all_paths.end(); path++)
+	    {
+	      std::vector<xypnt> vol_path;
+	      std::vector<int> vol_coding;
+	      create_patch(axis, *path, vol_path, vol_coding);
+	      
+	      //insert this path and coding into the group path and group coding
+	      group_path.insert(group_path.end(), vol_path.begin(), vol_path.end());
+	      group_coding.insert(group_coding.end(), vol_coding.begin(), vol_coding.end());
+
+	    }
+	  //when we're done with this group, push the path and coding into the main set of paths 
+	  codings.push_back(group_coding);
+	  paths.push_back(group_path);
+
+	}
     }
+  else
+    {
+      MBRange volumes; 
+      result = get_all_volumes( mbi, volumes );
+      ERR_CHECK(result);
+
+
+      result = get_volume_paths( mbi, volumes, axis, intersection_map, all_paths);
+      ERR_CHECK(result);
+
+      std::vector< std::vector<Loop> >::iterator i;
+
+      //std::vector< std::vector<xypnt> > paths;
+      //std::vector< std::vector<int> > codings;
+      for( i = all_paths.begin(); i != all_paths.end(); i++)
+	{
+	  std::vector<xypnt> path;
+	  std::vector<int> coding;
+	  create_patch(axis, *i, path, coding);
+	  codings.push_back(coding);
+	  paths.push_back(path);
+	}
+      
+    }
+  
 
   return MB_SUCCESS;
 
+}
+
+MBErrorCode get_volumes_by_group( MBInterface *mbi, std::map< std::string, MBRange > &group_map, std::vector<std::string> &group_names )
+{
+  MBErrorCode result;
+
+  //get all meshsets in the model 
+  std::vector<MBEntityHandle> all_entsets;
+  result = mbi->get_entities_by_type(0, MBENTITYSET, all_entsets);
+  ERR_CHECK(result);
+
+  //get the category tag
+  MBTag name_tag; 
+  result = mbi->tag_get_handle(NAME_TAG_NAME, name_tag);
+  ERR_CHECK(result);
+
+  std::vector<MBEntityHandle>::iterator i;
+  for( i = all_entsets.begin(); i != all_entsets.end(); i++)
+    {
+      
+      //get all the tags on this entity set
+      std::vector<MBTag> ent_tags;
+      result = mbi->tag_get_tags_on_entity( *i, ent_tags);
+      ERR_CHECK(result);
+
+      //check if this entity has a name_tag (is a group)
+      if ( std::find( ent_tags.begin(), ent_tags.end(), name_tag) != ent_tags.end() )
+	{
+	  std::string ent_name;
+	  ent_name.resize(NAME_TAG_SIZE);
+	  void *dum = &(ent_name[0]);
+	  //get the tag data on this entity set
+	  result = mbi->tag_get_data( name_tag, &(*i), 1, dum);
+	  ERR_CHECK(result);
+	  
+	  std::cout << ent_name << std::endl; 
+	  
+	  //get this group's children
+	  MBRange group_contents;
+	  result = mbi->get_child_meshsets( *i, group_contents);
+	  ERR_CHECK(result); 
+
+	  //add this group to the list of group names
+	  group_names.push_back( ent_name ); 
+	  
+	  //add this set of children to the map 
+	  group_map[ent_name] = group_contents;
+	    
+	}
+      
+      ent_tags.clear();
+
+    }
+  
+  
+
+
+  return MB_SUCCESS;
 }
 
 MBErrorCode get_volume_paths( MBInterface *mbi, MBRange volumes, int axis, std::map<MBEntityHandle, std::vector<Loop> > intersection_dict,   std::vector< std::vector<Loop> > &all_vol_paths ) 
