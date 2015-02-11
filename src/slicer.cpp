@@ -119,7 +119,12 @@ MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, s
        
 	  result = get_volume_paths( mbi, group_mapping[ *group_name ], axis, intersection_map, all_paths);
 	  ERR_CHECK(result);
-	  
+
+	  if (0 == all_paths.size())
+	    {
+	      group_names.erase(group_name);
+	      continue;
+	    }
 	  std::vector<xypnt> group_path; 
 	  std::vector<int> group_coding;
 
@@ -134,6 +139,7 @@ MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, s
 	      //insert this path and coding into the group path and group coding
 	      group_path.insert(group_path.end(), vol_path.begin(), vol_path.end());
 	      group_coding.insert(group_coding.end(), vol_coding.begin(), vol_coding.end());
+
 
 	    }
 	  //when we're done with this group, push the path and coding into the main set of paths 
