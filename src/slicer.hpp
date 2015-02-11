@@ -91,7 +91,7 @@ struct Loop{
 	xypnts[i].y = points[i][y];
       }
   }
-  
+  ~Loop() {}
 };
 
 
@@ -104,7 +104,7 @@ MBErrorCode get_surfaces( MBInterface* mbi, MBRange &surfs);
 
 MBErrorCode get_all_volumes( MBInterface *mbi, MBRange &vols);
 
-MBErrorCode slice_faceted_model_out( std::string filename, int axis, double coord, std::vector< std::vector<double> > &x_pnts, std::vector< std::vector<double> > &y_pnts, std::vector< std::vector<int> > &codings);
+MBErrorCode slice_faceted_model_out( std::string filename, int axis, double coord, std::vector< std::vector<double> > &x_pnts, std::vector< std::vector<double> > &y_pnts, std::vector< std::vector<int> > &codings, bool by_group=false);
 
 MBErrorCode slice_faceted_model( std::string filename, int axis, double coord,   std::vector< std::vector<xypnt> > &paths, std::vector< std::vector<int> > &codings, bool by_group = false);
 

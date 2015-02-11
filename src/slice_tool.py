@@ -57,7 +57,7 @@ def parsing():
 def show_slice(filename, axis, coord, write_pnts=False, by_group=False):
 
     slicer = dag_slicer.Dag_Slicer(filename, axis, coord)
-    slicer.create_slice()
+    slicer.create_slice(by_group)
     all_paths = []
     for i in range(len(slicer.slice_x_pnts)):
         new_list = [ np.transpose(np.vstack((slicer.slice_x_pnts[i],slicer.slice_y_pnts[i]))), slicer.path_coding[i]]
@@ -84,8 +84,8 @@ def show_slice(filename, axis, coord, write_pnts=False, by_group=False):
     for patch in patches:
         ax.add_patch(patch)
 
-    if by_group:
-        ax.legend(patches, group_names, prop={'size':10})
+   # if by_group:
+   #     ax.legend(patches, group_names, prop={'size':10})
     #show the plot!
     ax.autoscale_view()
     ax.set_aspect('equal')

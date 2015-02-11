@@ -21,7 +21,7 @@ public:
   std::vector< std::vector<double> > slice_y_pnts; 
   std::vector<int> dum_ints;
   std::vector< std::vector<int> > path_coding;
-  void create_slice();
+  void create_slice(bool by_groups = false);
   
 };
 

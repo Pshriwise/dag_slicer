@@ -62,11 +62,11 @@ MBErrorCode get_all_volumes( MBInterface *mbi, MBRange &vols)
   return result; 
 }
 
-MBErrorCode slice_faceted_model_out( std::string filename, int axis, double coord, std::vector< std::vector<double> > &x_pnts, std::vector< std::vector<double> > &y_pnts, std::vector< std::vector<int> > &codings)
+MBErrorCode slice_faceted_model_out( std::string filename, int axis, double coord, std::vector< std::vector<double> > &x_pnts, std::vector< std::vector<double> > &y_pnts, std::vector< std::vector<int> > &codings, bool by_group)
 {
   
   std::vector< std::vector<xypnt> > paths;
-  MBErrorCode result = slice_faceted_model( filename, axis, coord, paths, codings);
+  MBErrorCode result = slice_faceted_model( filename, axis, coord, paths, codings, by_group);
 
     std::vector< std::vector<xypnt> >::iterator path;
 
@@ -113,24 +113,28 @@ MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, s
       result = get_volumes_by_group( mbi, group_mapping, group_names);
       ERR_CHECK(result);
       
+      std::cout << "Size of group map: " << group_mapping.size() << std::endl;
+      std::cout << "Size of group names: " << group_names.size() << std::endl;
       std::vector<std::string>::iterator group_name; 
-      for( group_name = group_names.begin(); group_name != group_names.end(); group_name++)
+      for( group_name = group_names.begin(); group_name != group_names.end();)
 	{
-       
-	  result = get_volume_paths( mbi, group_mapping[ *group_name ], axis, intersection_map, all_paths);
+	  std::vector< std::vector<Loop> > all_group_paths;
+	  result = get_volume_paths( mbi, group_mapping[ *group_name ], axis, intersection_map, all_group_paths);
 	  ERR_CHECK(result);
 
-	  if (0 == all_paths.size())
+	  if (0 == all_group_paths.size())
 	    {
-	      group_names.erase(group_name);
+	      std::cout << "Erasing group: " << *group_name << std::endl;
+	      group_name = group_names.erase(group_name); //erase and set iterator to next item
 	      continue;
 	    }
+	  std::cout << "Getting slice for group:" << *group_name << std::endl;
 	  std::vector<xypnt> group_path; 
 	  std::vector<int> group_coding;
 
 	  std::vector< std::vector<Loop> >::iterator path;
 
-	  for (path = all_paths.begin(); path != all_paths.end(); path++)
+	  for (path = all_group_paths.begin(); path != all_group_paths.end(); path++)
 	    {
 	      std::vector<xypnt> vol_path;
 	      std::vector<int> vol_coding;
@@ -139,14 +143,16 @@ MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, s
 	      //insert this path and coding into the group path and group coding
 	      group_path.insert(group_path.end(), vol_path.begin(), vol_path.end());
 	      group_coding.insert(group_coding.end(), vol_coding.begin(), vol_coding.end());
-
+	      (*path).clear();
 
 	    }
 	  //when we're done with this group, push the path and coding into the main set of paths 
 	  codings.push_back(group_coding);
 	  paths.push_back(group_path);
-
+	  all_group_paths.clear();
+	  group_name++;
 	}
+
     }
   else
     {
@@ -193,7 +199,7 @@ MBErrorCode get_volumes_by_group( MBInterface *mbi, std::map< std::string, MBRan
   ERR_CHECK(result);
 
   std::vector<MBEntityHandle>::iterator i;
-  for( i = all_entsets.begin(); i != all_entsets.end(); i++)
+  for( i = all_entsets.begin(); i != all_entsets.end(); ++i)
     {
       
       //get all the tags on this entity set
@@ -215,15 +221,15 @@ MBErrorCode get_volumes_by_group( MBInterface *mbi, std::map< std::string, MBRan
 	  
 	  //get this group's children
 	  MBRange group_contents;
-	  result = mbi->get_child_meshsets( *i, group_contents);
+	  result = mbi->get_entities_by_type( *i, MBENTITYSET, group_contents);
 	  ERR_CHECK(result); 
 
 	  //add this group to the list of group names
 	  group_names.push_back( ent_name ); 
 	  
-	  //add this set of children to the map 
+	  //add this set of children to the map
 	  group_map[ent_name] = group_contents;
-	    
+	  group_contents.clear();
 	}
       
       ent_tags.clear();

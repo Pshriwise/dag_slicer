@@ -39,8 +39,8 @@ int main( int argc, char ** argv )
   ERR_CHECK(result);
   */
   
-  dag_slicer::Dag_Slicer ds( filename, axis, coord);
-  ds.create_slice(); 
+  Dag_Slicer ds( filename, axis, coord);
+  ds.create_slice(true); 
   
   
 

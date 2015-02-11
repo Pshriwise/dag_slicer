@@ -7,12 +7,12 @@
   {
   }
   
-  void Dag_Slicer::create_slice()
+  void Dag_Slicer::create_slice(bool by_groups)
   {
     slice_x_pnts.clear(); 
     slice_y_pnts.clear(); 
     path_coding.clear();
-    slice_faceted_model_out( filename, axis, coord, slice_x_pnts, slice_y_pnts, path_coding);
+    slice_faceted_model_out( filename, axis, coord, slice_x_pnts, slice_y_pnts, path_coding, by_groups);
     
   }  
   
