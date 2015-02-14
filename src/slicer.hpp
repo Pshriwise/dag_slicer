@@ -104,9 +104,9 @@ MBErrorCode get_surfaces( MBInterface* mbi, MBRange &surfs);
 
 MBErrorCode get_all_volumes( MBInterface *mbi, MBRange &vols);
 
-MBErrorCode slice_faceted_model_out( std::string filename, int axis, double coord, std::vector< std::vector<double> > &x_pnts, std::vector< std::vector<double> > &y_pnts, std::vector< std::vector<int> > &codings, bool by_group=false);
+MBErrorCode slice_faceted_model_out( std::string filename, int axis, double coord, std::vector< std::vector<double> > &x_pnts, std::vector< std::vector<double> > &y_pnts, std::vector< std::vector<int> > &codings, std::vector<std::string> &group_names, bool by_group=false);
 
-MBErrorCode slice_faceted_model( std::string filename, int axis, double coord,   std::vector< std::vector<xypnt> > &paths, std::vector< std::vector<int> > &codings, bool by_group = false);
+MBErrorCode slice_faceted_model( std::string filename, int axis, double coord,   std::vector< std::vector<xypnt> > &paths, std::vector< std::vector<int> > &codings,  std::vector<std::string> &group_names, bool by_group = false);
 
 MBErrorCode get_volumes_by_group( MBInterface *mbi, std::map< std::string, MBRange > &group_map, std::vector<std::string> &group_names );
 

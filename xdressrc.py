@@ -9,6 +9,7 @@ packagedir = 'dag_slicer'  # loation of the python package
 extra_types = 'xdress_extra_types'
 
 stlcontainers = [
+    ('vector', 'str'),
     ('vector', 'int'),
     ('vector', ('vector', 'int')),
     ('vector', 'float'),

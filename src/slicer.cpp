@@ -62,11 +62,11 @@ MBErrorCode get_all_volumes( MBInterface *mbi, MBRange &vols)
   return result; 
 }
 
-MBErrorCode slice_faceted_model_out( std::string filename, int axis, double coord, std::vector< std::vector<double> > &x_pnts, std::vector< std::vector<double> > &y_pnts, std::vector< std::vector<int> > &codings, bool by_group)
+MBErrorCode slice_faceted_model_out( std::string filename, int axis, double coord, std::vector< std::vector<double> > &x_pnts, std::vector< std::vector<double> > &y_pnts, std::vector< std::vector<int> > &codings, std::vector<std::string> &group_names, bool by_group)
 {
   
   std::vector< std::vector<xypnt> > paths;
-  MBErrorCode result = slice_faceted_model( filename, axis, coord, paths, codings, by_group);
+  MBErrorCode result = slice_faceted_model( filename, axis, coord, paths, codings, group_names, by_group);
 
     std::vector< std::vector<xypnt> >::iterator path;
 
@@ -85,7 +85,7 @@ MBErrorCode slice_faceted_model_out( std::string filename, int axis, double coor
   return result;
 }
 
-MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, std::vector< std::vector<xypnt> > &paths, std::vector< std::vector<int> > &codings, bool by_group)
+MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, std::vector< std::vector<xypnt> > &paths, std::vector< std::vector<int> > &codings, std::vector<std::string> &group_names, bool by_group)
 {
 
   MBInterface *mbi = new MBCore();
@@ -109,7 +109,7 @@ MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, s
   if (by_group)
     {
       std::map< std::string, MBRange > group_mapping;
-      std::vector<std::string> group_names;
+
       result = get_volumes_by_group( mbi, group_mapping, group_names);
       ERR_CHECK(result);
       

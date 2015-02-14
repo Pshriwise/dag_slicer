@@ -12,7 +12,7 @@
     slice_x_pnts.clear(); 
     slice_y_pnts.clear(); 
     path_coding.clear();
-    slice_faceted_model_out( filename, axis, coord, slice_x_pnts, slice_y_pnts, path_coding, by_groups);
+    slice_faceted_model_out( filename, axis, coord, slice_x_pnts, slice_y_pnts, path_coding, group_names, by_groups);
     
   }  
   
