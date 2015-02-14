@@ -4,7 +4,7 @@
 bool point_match( MBCartVect pnt1, MBCartVect pnt2) 
 {
   bool ans = false; 
-  double tolerance = 1e-4; 
+  double tolerance = 1e-8; 
 
   MBCartVect diff = pnt2-pnt1; 
 
