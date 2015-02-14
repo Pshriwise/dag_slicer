@@ -749,7 +749,7 @@ void get_fill_windings( std::vector< std::vector<int> > fill_mat, std::vector<in
 
 }
 
-void set_windings( std::vector<int> current_windings, std::vector<int> desired_windings, std::vector<Loop> loops)
+void set_windings( std::vector<int> current_windings, std::vector<int> desired_windings, std::vector<Loop> &loops)
 {
 
   assert ( current_windings.size() == desired_windings.size() );
@@ -758,9 +758,9 @@ void set_windings( std::vector<int> current_windings, std::vector<int> desired_w
     {
       if (current_windings[i] != desired_windings[i])
 	{
-	  Loop this_loop = loops[i];
-	  std::reverse( this_loop.points.begin(), this_loop.points.end()); //JIC
-	  std::reverse( this_loop.xypnts.begin(), this_loop.xypnts.end());
+
+	  std::reverse( loops[i].points.begin(), loops[i].points.end()); //JIC
+	  std::reverse( loops[i].xypnts.begin(), loops[i].xypnts.end());
 	}
     }
 

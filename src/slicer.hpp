@@ -140,7 +140,7 @@ int find_winding( Loop loop );
 
 void get_fill_windings( std::vector< std::vector<int> > fill_mat, std::vector<int> &windings);
 
-void set_windings( std::vector<int> current_windings, std::vector<int> desired_windings, std::vector<Loop> loops);
+void set_windings( std::vector<int> current_windings, std::vector<int> desired_windings, std::vector<Loop> &loops);
 
 void generate_patch_path( std::vector<Loop> loops, std::vector<xypnt> &path, std::vector<int> &coding);
 
