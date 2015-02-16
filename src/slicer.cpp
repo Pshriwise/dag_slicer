@@ -1,5 +1,8 @@
 
 #include "slicer.hpp"
+#include "options.hpp"
+
+struct program_option_struct opts;
 
 bool point_match( MBCartVect pnt1, MBCartVect pnt2) 
 {
@@ -42,7 +45,7 @@ MBErrorCode get_surfaces( MBInterface* mbi, MBRange &surfs)
   
   result = get_sets_by_category( mbi, surfs, category);
 
-  std::cout << "There are " << surfs.size() << " surfaces in this model." << std::endl;
+  if (OPT_VERBOSE) std::cout << "There are " << surfs.size() << " surfaces in this model." << std::endl;
 
   return result;  
 
@@ -57,14 +60,16 @@ MBErrorCode get_all_volumes( MBInterface *mbi, MBRange &vols)
   
   result = get_sets_by_category( mbi, vols, category);
   
-  std::cout << "There are " << vols.size() << " volumes in this model." << std::endl;
+  if (OPT_VERBOSE) std::cout << "There are " << vols.size() << " volumes in this model." << std::endl;
 
   return result; 
 }
 
-MBErrorCode slice_faceted_model_out( std::string filename, int axis, double coord, std::vector< std::vector<double> > &x_pnts, std::vector< std::vector<double> > &y_pnts, std::vector< std::vector<int> > &codings, std::vector<std::string> &group_names, bool by_group)
+MBErrorCode slice_faceted_model_out( std::string filename, int axis, double coord, std::vector< std::vector<double> > &x_pnts, std::vector< std::vector<double> > &y_pnts, std::vector< std::vector<int> > &codings, std::vector<std::string> &group_names, bool by_group, bool verbose, bool debug)
 {
   
+  opts.verbose = verbose;
+  opts.debug = debug;
   std::vector< std::vector<xypnt> > paths;
   MBErrorCode result = slice_faceted_model( filename, axis, coord, paths, codings, group_names, by_group);
 
@@ -113,8 +118,8 @@ MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, s
       result = get_volumes_by_group( mbi, group_mapping, group_names);
       ERR_CHECK(result);
       
-      std::cout << "Size of group map: " << group_mapping.size() << std::endl;
-      std::cout << "Size of group names: " << group_names.size() << std::endl;
+      if (OPT_VERBOSE) std::cout << "Size of group map: " << group_mapping.size() << std::endl;
+      if (OPT_VERBOSE) std::cout << "Size of group names: " << group_names.size() << std::endl;
       std::vector<std::string>::iterator group_name; 
       for( group_name = group_names.begin(); group_name != group_names.end();)
 	{
@@ -124,11 +129,11 @@ MBErrorCode slice_faceted_model( std::string filename, int axis, double coord, s
 
 	  if (0 == all_group_paths.size())
 	    {
-	      std::cout << "Erasing group: " << *group_name << std::endl;
+	      if (OPT_VERBOSE) std::cout << "Erasing group: " << *group_name << std::endl;
 	      group_name = group_names.erase(group_name); //erase and set iterator to next item
 	      continue;
 	    }
-	  std::cout << "Getting slice for group:" << *group_name << std::endl;
+	  if (OPT_DEBUG) std::cout << "Getting slice for group:" << *group_name << std::endl;
 	  std::vector<xypnt> group_path; 
 	  std::vector<int> group_coding;
 
@@ -217,7 +222,7 @@ MBErrorCode get_volumes_by_group( MBInterface *mbi, std::map< std::string, MBRan
 	  result = mbi->tag_get_data( name_tag, &(*i), 1, dum);
 	  ERR_CHECK(result);
 	  
-	  std::cout << ent_name << std::endl; 
+	  if (OPT_DEBUG) std::cout << ent_name << std::endl; 
 	  
 	  //get this group's children
 	  MBRange group_contents;
@@ -256,7 +261,7 @@ MBErrorCode get_volume_paths( MBInterface *mbi, MBRange volumes, int axis, std::
 
       if ( 0 == this_vol_intersections.size() ) continue; 
 
-      std::cout << "Retrieved " << this_vol_intersections.size() << " intersections for this volume." << std::endl;
+      if (OPT_VERBOSE) std::cout << "Retrieved " << this_vol_intersections.size() << " intersections for this volume." << std::endl;
 
       std::vector<Loop> vol_paths;
       stitch( this_vol_intersections, vol_paths );
@@ -374,7 +379,7 @@ void stitch( std::vector<Loop> loops, std::vector<Loop> &paths )
 	} // end if
 
     } // end outer while
-  std::cout << "Created " << paths.size() << "paths for this volume." << std::endl; 
+  if (OPT_VERBOSE) std::cout << "Created " << paths.size() << "paths for this volume." << std::endl; 
   return;
 
 } // end stitch
