@@ -4,16 +4,11 @@
 
 struct program_option_struct opts;
 
-bool point_match( MBCartVect pnt1, MBCartVect pnt2) 
+bool point_match( MBCartVect pnt1, MBCartVect pnt2, double tolerance ) 
 {
-  bool ans = false; 
-  double tolerance = 1e-7; 
-
   MBCartVect diff = pnt2-pnt1; 
 
-  if (diff.length() < tolerance) ans = true; 
-
-  return ans;
+  return (diff.length() < tolerance);
 }
 
 
@@ -22,11 +17,12 @@ MBErrorCode get_sets_by_category( MBInterface *mbi, MBRange &entsets, char* cate
   
   MBErrorCode result = MB_SUCCESS;
 
-  //get the name tag 
+  //get the name tag from the moab instance
   MBTag category_tag; 
   result = mbi->tag_get_handle(CATEGORY_TAG_NAME, category_tag); 
   ERR_CHECK(result); 
 
+  //create void pointer for tag data match
   const void *dum = &(category[0]);
 
   result = mbi->get_entities_by_type_and_tag(0, MBENTITYSET, &category_tag, &dum, 1, entsets);

@@ -18,6 +18,7 @@
 #define CCW 1
 #define CW -1
 
+#define MATCH_TOL 1e-7
 
 
 
@@ -100,7 +101,7 @@ struct Loop{
 
 
 
-bool point_match( MBCartVect pnt1, MBCartVect pnt2);
+bool point_match( MBCartVect pnt1, MBCartVect pnt2, double tolerance = MATCH_TOL );
 
 MBErrorCode get_sets_by_category( MBInterface *mbi, MBRange &entsets, char* category);
 

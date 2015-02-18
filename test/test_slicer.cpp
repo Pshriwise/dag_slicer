@@ -28,6 +28,7 @@ void get_sets_by_category_test();
 void get_surfaces_test();
 void get_all_volumes_test();
 void test_point_match();
+void get_volume_intersections_test(); 
 
 
 int main( int /* argc */, char** /* argv */) 
@@ -47,7 +48,8 @@ int main( int /* argc */, char** /* argv */)
   failed_tests += RUN_TEST(create_surface_intersections_test);
   failed_tests += RUN_TEST(get_intersection_test);
   failed_tests += RUN_TEST(triangle_plane_intersect_test);
-  
+  failed_tests += RUN_TEST(get_volume_intersections_test); 
+
 }
 
 void line_struct_test()
@@ -84,7 +86,16 @@ void create_surface_intersections_test()
   MBErrorCode result = create_surface_intersections( mbi, surfs, 0, 0, int_map);
   ERR_CHECK(result);
 
-  CHECK( (int)int_map.size() == 6);
+  CHECK( (int)int_map.size() == 6); // the cube should have 6 surfaces
+  
+  //check for surfaces w/ intersections
+  int num_intersections = 0;
+  std::map<MBEntityHandle, std::vector<Loop> >::iterator i; 
+  for( i = int_map.begin(); i != int_map.end() ; i++)
+    if ( (i->second).size() != 0 ) num_intersections++;
+
+  // the axis and coordinate given should slice through four surfaces
+  CHECK( 4 == num_intersections );
 
 }
 
@@ -209,6 +220,50 @@ void get_intersection_test()
   //an intentional failure case will not be created
 }
 
+void get_volume_intersections_test()
+{
+  //get the volume from the instance
+  MBRange sets;
+  char category[CATEGORY_TAG_SIZE] = "Volume";
+  MBErrorCode result = get_sets_by_category( mbi, sets, category);
+  ERR_CHECK(result);
+  
+  MBEntityHandle cube_vol = sets[0]; //there should only be one volume in the test model
+
+  //create surface intersections for the model
+  char category1[CATEGORY_TAG_SIZE] = "Surface";
+  sets.clear(); 
+  result = get_sets_by_category( mbi, sets, category1);
+  ERR_CHECK(result);
+
+  //create a fake map for this volume. 
+
+  std::map< MBEntityHandle, std::vector<Loop> > fake_map; 
+  
+  std::vector<Loop> dummy_loop;
+  dummy_loop.resize(2); 
+
+  fake_map[sets[0]] = dummy_loop; 
+
+  //check that we get this loop back
+  std::vector<Loop> intersections;
+  get_volume_intersections( mbi, cube_vol, fake_map, intersections); 
+  
+  //we should get back our dummy loop once 
+  //and insert it into the intersections vector
+  CHECK( 2 == intersections.size() );
+
+  //add a new dummy to the map
+  fake_map[sets[1]] = dummy_loop; 
+
+  intersections.clear(); 
+  get_volume_intersections( mbi, cube_vol, fake_map, intersections); 
+
+  //with this map we should get 4 values in the intersections vector
+  CHECK( 4 == intersections.size() );
+
+
+}
 void get_sets_by_category_test()
 {
 
@@ -234,7 +289,7 @@ void get_surfaces_test()
   MBRange surfaces; 
   MBErrorCode result = get_surfaces( mbi, surfaces );
   ERR_CHECK(result);
-  //test file is a cylinder and should have 3 surfaces
+  //test file is a cube and should have 6 surfaces
   CHECK_EQUAL( 6, (int)surfaces.size() );
 
 }
@@ -245,7 +300,7 @@ void get_all_volumes_test()
   MBRange volumes; 
   MBErrorCode result = get_all_volumes( mbi, volumes );
   ERR_CHECK(result);
-  //test file is a cylinder and should have 1 volume
+  //test file is a lone cube and should have 1 volume
   CHECK_EQUAL( 1, (int)volumes.size() ); 
 
 }
@@ -257,19 +312,22 @@ void test_point_match()
   MBCartVect a,b;
  
   //initialize
-  a[0] = 1.0; a[1] = 1.0; a[2] = 1-1e-8;
+  a[0] = 1.0; a[1] = 1.0; a[2] = 1.0-1e-7;
   
   //make b equal to a
   b=a; 
 
-  //These should be recognized as coincident
-  CHECK( point_match(a,b) );
+  //These should be recognized as coincident for this tolerance
+  CHECK( point_match(a,b, 1e-6) );
 
   //Now alter b a little bit
   b[2] = 1.0;
 
   //These should still be recognized as coincident
-  CHECK( point_match(a,b) );
+  CHECK( point_match(a,b,1e-6) );
+
+  // This point should not be recognized as coincident
+  CHECK( !point_match(a,b,1e-8) );
 
   //Now alter b a lot (relatively)
   b[2] = 2.0;
@@ -277,4 +335,5 @@ void test_point_match()
   //This should not be recognized as coincident
   CHECK( !point_match(a,b) );
 
+  
 }
