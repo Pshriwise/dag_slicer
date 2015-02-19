@@ -29,7 +29,7 @@ void get_surfaces_test();
 void get_all_volumes_test();
 void test_point_match();
 void get_volume_intersections_test(); 
-
+void stitch_test();
 
 int main( int /* argc */, char** /* argv */) 
 { 
@@ -49,7 +49,7 @@ int main( int /* argc */, char** /* argv */)
   failed_tests += RUN_TEST(get_intersection_test);
   failed_tests += RUN_TEST(triangle_plane_intersect_test);
   failed_tests += RUN_TEST(get_volume_intersections_test); 
-
+  failed_tests += RUN_TEST(stitch_test);
 }
 
 void line_struct_test()
@@ -262,8 +262,108 @@ void get_volume_intersections_test()
   //with this map we should get 4 values in the intersections vector
   CHECK( 4 == intersections.size() );
 
+  
 
 }
+
+void stitch_test()
+{
+
+  std::vector<Loop> dummy_intersections; 
+  std::vector<Loop> returned_paths;
+
+  Loop dummy_loop1, dummy_loop2;
+  
+  //create a fake set of intersections to hand to stitch based on points on a circle
+  
+  double x,y,z; 
+  double theta; 
+
+  //add a complete unit circle
+  for( unsigned int i = 0; i <= 10; i++)
+    {
+
+      theta = 2*M_PI * (double) i * 0.1;
+      x = cos(theta); y = sin(theta); z = 1.0; 
+      MBCartVect pnt( x, y, z); 
+
+      dummy_loop1.points.push_back(pnt); 
+
+    }
+  
+  dummy_intersections.push_back(dummy_loop1);
+
+  //this should return the circle
+  stitch( dummy_intersections, returned_paths); 
+
+  CHECK ( 1 == (int)returned_paths.size() );
+  
+  //clear some data
+  returned_paths.clear(); 
+  dummy_loop1.points.clear();
+
+  //add a circle of rad 2
+  for( unsigned int i = 0; i <= 10; i++)
+    {
+
+      theta = 2*M_PI * (double) i * 0.1;
+      x = 2*cos(theta); y = 2*sin(theta); z = 1.0; //imitating slice on z axis w/ coord = 1
+      MBCartVect pnt( x, y, z); 
+
+      dummy_loop1.points.push_back(pnt); 
+
+    }
+  
+  dummy_intersections.push_back(dummy_loop1);
+
+  stitch( dummy_intersections, returned_paths ); 
+  // there should now be two paths: the unit circle and the larger circle of rad 2
+  CHECK ( 2 == (int)returned_paths.size() );
+
+
+  //clear everything
+  returned_paths.clear();
+  dummy_intersections.clear(); 
+  dummy_loop1.points.clear(); 
+
+  MBCartVect begin_test_pnt, end_test_pnt;
+
+  //now write half the points of a circle to one loop and half to the other
+  unsigned int intervals = 10;
+
+  for( unsigned int i = 0; i <= 10; i++)
+    {
+
+      theta = 2*M_PI * (double) i * 0.1;
+      x = cos(theta); y = sin(theta); z = 1.0; 
+      MBCartVect pnt( x, y, z); 
+
+      if ( i  < intervals/2 ) 
+	dummy_loop1.points.push_back(pnt);
+      else
+	dummy_loop2.points.push_back(pnt); 
+
+
+      if ( intervals/2 == i ) begin_test_pnt = pnt;
+      if ( (intervals/2)-1 == i ) end_test_pnt = pnt;
+    }
+  
+  dummy_intersections.push_back(dummy_loop1);
+  dummy_intersections.push_back(dummy_loop2); 
+  
+  //the function should find these two sections and stitch them without a problem
+  stitch( dummy_intersections, returned_paths );
+
+  CHECK( 1 == (int)returned_paths.size() );
+   
+  //check that our end and beginning points are correct
+  CHECK( returned_paths[0].points.front() == begin_test_pnt );
+  CHECK( returned_paths[0].points.back() == end_test_pnt );
+ 
+
+
+}
+
 void get_sets_by_category_test()
 {
 
