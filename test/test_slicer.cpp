@@ -326,8 +326,6 @@ void stitch_test()
   dummy_loop2.points.clear();
 
   //now write half the points of a circle to one loop and half to the other
-  unsigned int intervals = 10;
-
   dummy_loop1 = create_circle_loop( 1.0, 10 ); 
 
   //give half of dummy_loop1's points to dummy_loop2
