@@ -266,31 +266,40 @@ void get_volume_intersections_test()
 
 }
 
+
+Loop create_circle_loop( double radius, unsigned int intervals )
+{
+
+  Loop circle_loop; 
+
+  double x,y,z; 
+  double theta; 
+
+  //add a complete unit circle
+  for( unsigned int i = 0; i <= intervals; i++)
+    {
+
+      theta = 2*M_PI * (double) i * 0.1;
+      x = radius*cos(theta); y = radius*sin(theta); z = 1.0; 
+      MBCartVect pnt( x, y, z); 
+
+      circle_loop.points.push_back(pnt); 
+
+    }
+
+  return circle_loop;
+
+}
+
+
 void stitch_test()
 {
 
   std::vector<Loop> dummy_intersections; 
   std::vector<Loop> returned_paths;
 
-  Loop dummy_loop1, dummy_loop2;
-  
-  //create a fake set of intersections to hand to stitch based on points on a circle
-  
-  double x,y,z; 
-  double theta; 
+  Loop dummy_loop1 = create_circle_loop( 1.0, 10 ); 
 
-  //add a complete unit circle
-  for( unsigned int i = 0; i <= 10; i++)
-    {
-
-      theta = 2*M_PI * (double) i * 0.1;
-      x = cos(theta); y = sin(theta); z = 1.0; 
-      MBCartVect pnt( x, y, z); 
-
-      dummy_loop1.points.push_back(pnt); 
-
-    }
-  
   dummy_intersections.push_back(dummy_loop1);
 
   //this should return the circle
@@ -302,64 +311,66 @@ void stitch_test()
   returned_paths.clear(); 
   dummy_loop1.points.clear();
 
-  //add a circle of rad 2
-  for( unsigned int i = 0; i <= 10; i++)
-    {
-
-      theta = 2*M_PI * (double) i * 0.1;
-      x = 2*cos(theta); y = 2*sin(theta); z = 1.0; //imitating slice on z axis w/ coord = 1
-      MBCartVect pnt( x, y, z); 
-
-      dummy_loop1.points.push_back(pnt); 
-
-    }
+  Loop dummy_loop2 = create_circle_loop( 2.0 , 10 );
   
-  dummy_intersections.push_back(dummy_loop1);
+  dummy_intersections.push_back(dummy_loop2);
 
   stitch( dummy_intersections, returned_paths ); 
   // there should now be two paths: the unit circle and the larger circle of rad 2
   CHECK ( 2 == (int)returned_paths.size() );
 
-
   //clear everything
   returned_paths.clear();
   dummy_intersections.clear(); 
-  dummy_loop1.points.clear(); 
-
-  MBCartVect begin_test_pnt, end_test_pnt;
+  dummy_loop1.points.clear();
+  dummy_loop2.points.clear();
 
   //now write half the points of a circle to one loop and half to the other
   unsigned int intervals = 10;
 
-  for( unsigned int i = 0; i <= 10; i++)
-    {
+  dummy_loop1 = create_circle_loop( 1.0, 10 ); 
 
-      theta = 2*M_PI * (double) i * 0.1;
-      x = cos(theta); y = sin(theta); z = 1.0; 
-      MBCartVect pnt( x, y, z); 
-
-      if ( i  < intervals/2 ) 
-	dummy_loop1.points.push_back(pnt);
-      else
-	dummy_loop2.points.push_back(pnt); 
-
-
-      if ( intervals/2 == i ) begin_test_pnt = pnt;
-      if ( (intervals/2)-1 == i ) end_test_pnt = pnt;
-    }
-  
+  //give half of dummy_loop1's points to dummy_loop2
+  dummy_loop2.points.insert(  dummy_loop2.points.begin(), dummy_loop1.points.begin()+3, dummy_loop1.points.end() );
+  dummy_loop1.points.erase( dummy_loop1.points.begin()+4, dummy_loop1.points.end() ); 
+    
   dummy_intersections.push_back(dummy_loop1);
   dummy_intersections.push_back(dummy_loop2); 
   
   //the function should find these two sections and stitch them without a problem
   stitch( dummy_intersections, returned_paths );
 
+
   CHECK( 1 == (int)returned_paths.size() );
-   
+    
   //check that our end and beginning points are correct
+
+  //if these loops stitch correctly the beginning of the path will be the beginning of dummy_loop1
+  // the end of the path will be the end of dummy_loop2
+
+  //BEFORE *- coincident point (beginning and end of circle)
+  // dummy_loop1 *-----------#
+  // dummy_loop2 #-----------*
+
+  //AFTER # - test points
+  // returned_path #-----------**-----------#
+  
+  MBCartVect begin_test_pnt = dummy_loop2.points.front(); 
+  MBCartVect end_test_pnt = dummy_loop1.points.back(); 
+
   CHECK( returned_paths[0].points.front() == begin_test_pnt );
   CHECK( returned_paths[0].points.back() == end_test_pnt );
+
+  //this function should always return a closed loop (i.e. # == # in above diagram )
+  CHECK( returned_paths[0].points.front() == returned_paths[0].points.back() );
  
+
+}
+
+void get_containment_test() 
+{
+
+  
 
 
 }
