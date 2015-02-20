@@ -85,7 +85,7 @@ def show_slice(filename, axis, coord, write_pnts=False, by_group=False):
         ax.add_patch(patch)
 
     if by_group:
-        ax.legend(patches, slicer.group_names, prop={'size':10})
+        ax.legend(patches, slicer.group_names, prop={'size':10}, loc=2, bbox_to_anchor=(1.05,1.), borderaxespad=0.)
     #show the plot!
     ax.autoscale_view()
     ax.set_aspect('equal')
