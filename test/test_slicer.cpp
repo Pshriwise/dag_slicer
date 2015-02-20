@@ -31,6 +31,7 @@ void test_point_match();
 void get_volume_intersections_test(); 
 void stitch_test();
 void get_containment_test(); 
+void is_poly_a_in_poly_b_test();
 
 int main( int /* argc */, char** /* argv */) 
 { 
@@ -52,6 +53,8 @@ int main( int /* argc */, char** /* argv */)
   failed_tests += RUN_TEST(get_volume_intersections_test); 
   failed_tests += RUN_TEST(stitch_test);
   failed_tests += RUN_TEST(get_containment_test);
+  failed_tests += RUN_TEST(is_poly_a_in_poly_b_test);
+
 }
 
 void line_struct_test()
@@ -281,7 +284,7 @@ Loop create_circle_loop( double radius, unsigned int intervals )
   for( unsigned int i = 0; i <= intervals; i++)
     {
 
-      theta = 2*M_PI * (double) i * 0.1;
+      theta = 2*M_PI * (double) i * (1/(double)intervals);
       x = radius*cos(theta); y = radius*sin(theta); z = 1.0; 
       MBCartVect pnt( x, y, z); 
 
@@ -420,6 +423,50 @@ void get_containment_test()
     }
 
 }
+
+void is_poly_a_in_poly_b_test()
+{
+  //create a few test loops
+
+  Loop test_loop1, test_loop2, test_loop3;
+  
+  double base_radius = 2.0; unsigned int intervals = 20; 
+  int axis = 2; //expecting a simulated slice along the z axis
+  test_loop1 = create_circle_loop( base_radius, intervals ); 
+  test_loop1.gen_xys(axis);
+
+  //any polygon should be contained by itself
+  CHECK( is_poly_a_in_poly_b( test_loop1, test_loop1 ) );
+
+
+  double tolerances[6] = {1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6};
+
+  for( unsigned int i = 0; i < 6; i++)
+    {
+
+      double tol = tolerances[i];
+      double larger_rad = base_radius + tol;
+      double smaller_rad = base_radius - tol;
+
+      test_loop2 = create_circle_loop( larger_rad, intervals+3 ); // one just on the outside
+      test_loop3 = create_circle_loop( smaller_rad, intervals+3 ); // one just on the inside
+      test_loop2.gen_xys(axis); test_loop3.gen_xys(axis);
+
+      CHECK( is_poly_a_in_poly_b( test_loop1, test_loop2 ) );
+      CHECK( !is_poly_a_in_poly_b( test_loop2, test_loop1 ) );
+
+      CHECK( !is_poly_a_in_poly_b( test_loop1, test_loop3 ) );
+      CHECK( is_poly_a_in_poly_b( test_loop3, test_loop1 ) );
+
+      CHECK( is_poly_a_in_poly_b( test_loop3, test_loop2 ) );
+      CHECK( !is_poly_a_in_poly_b( test_loop2, test_loop3 ) );
+
+      test_loop2.points.clear(); test_loop2.xypnts.clear();
+      test_loop3.points.clear(); test_loop3.xypnts.clear();
+
+    }
+}
+
 
 void get_sets_by_category_test()
 {
