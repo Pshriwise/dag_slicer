@@ -9,6 +9,7 @@ Requirements
 python-numpy http://www.numpy.org/
 python-xdress https://github.com/xdress/xdress/releases
 python-matplotlib http://matplotlib.org/
+MOAB http://sigma.mcs.anl.gov/moab-library/
 
 Installation
 ============
