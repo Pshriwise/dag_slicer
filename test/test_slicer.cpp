@@ -34,6 +34,7 @@ void get_containment_test();
 void is_poly_a_in_poly_b_test();
 void get_fill_windings_test();
 void find_winding_test();
+void set_windings_test();
 
 int main( int /* argc */, char** /* argv */) 
 { 
@@ -58,6 +59,7 @@ int main( int /* argc */, char** /* argv */)
   failed_tests += RUN_TEST(is_poly_a_in_poly_b_test);
   failed_tests += RUN_TEST(get_fill_windings_test);
   failed_tests += RUN_TEST(find_winding_test);
+  failed_tests += RUN_TEST(set_windings_test);
 
 }
 
@@ -516,6 +518,57 @@ void get_fill_windings_test()
     CHECK_EQUAL( expected_results[i], returned_results[i] );
 
 
+
+}
+
+void set_windings_test()
+{
+  Loop test_loop1, test_loop2;
+  std::vector<Loop> test_loops, returned_loops;
+
+  double loop_rad = 2.0;
+  unsigned int intervals = 20;
+  test_loop1 = create_circle_loop( loop_rad, intervals ); 
+
+  test_loops.push_back(test_loop1);  
+  test_loops.push_back(test_loop1);
+  returned_loops = test_loops;
+
+  
+  std::vector<int> current_windings, desired_windings; 
+  current_windings.resize(2); desired_windings.resize(2);  
+
+  //these will come back CCW from the current circle loop function
+  current_windings[0] = CCW; current_windings[1] = CCW; 
+  desired_windings[0] = CCW; desired_windings[1] = CW;
+
+  set_windings( current_windings, desired_windings, returned_loops);
+
+  //check that loop sizes are unaltered
+  CHECK_EQUAL( 2, (int)returned_loops.size() );
+  CHECK_EQUAL( test_loops[0].xypnts.size(), returned_loops[0].xypnts.size());
+  CHECK_EQUAL( test_loops[1].xypnts.size(), returned_loops[1].xypnts.size());
+
+
+  //check that the first returned loop is unaltered (matches test_loop)
+  for(unsigned int i = 0; i < test_loop1.xypnts.size(); i++)
+    {
+      CHECK( test_loop1.points[i] == returned_loops[0].points[i] );
+      CHECK( test_loop1.xypnts[i].x == returned_loops[0].xypnts[i].x );
+      CHECK( test_loop1.xypnts[i].y == returned_loops[0].xypnts[i].y );
+
+    }
+
+  //now make sure the second returned loop is reversed
+  std::reverse( test_loop1.xypnts.begin(), test_loop1.xypnts.end() );
+  std::reverse( test_loop1.points.begin(), test_loop1.points.end() );
+
+  for(unsigned int i = 0; i < test_loop1.xypnts.size(); i++)
+    {
+      CHECK( test_loop1.points[i] == returned_loops[1].points[i] );
+      CHECK( test_loop1.xypnts[i].x == returned_loops[1].xypnts[i].x );
+      CHECK( test_loop1.xypnts[i].y == returned_loops[1].xypnts[i].y );
+    }
 
 }
 
