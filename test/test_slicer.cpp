@@ -296,6 +296,8 @@ Loop create_circle_loop( double radius, unsigned int intervals )
 
     }
 
+  circle_loop.gen_xys(2); //create 2-D points for this loop (slice is along z)
+
   return circle_loop;
 
 }
@@ -384,10 +386,6 @@ void get_containment_test()
   test_loops.push_back( create_circle_loop( 3.0, 10 ) ); 
   test_loops.push_back( create_circle_loop( 4.0, 10 ) ); 
 
-  //generate the xy values for each loop
-  for( unsigned int i = 0 ; i < test_loops.size(); i++) 
-    test_loops[i].gen_xys(2);
-
   //now get the containment matrix for these loops
   std::vector< std::vector<int> > returned_mat, test_mat; 
 
@@ -435,9 +433,7 @@ void is_poly_a_in_poly_b_test()
   Loop test_loop1, test_loop2, test_loop3;
   
   double base_radius = 2.0; unsigned int intervals = 20; 
-  int axis = 2; //expecting a simulated slice along the z axis
   test_loop1 = create_circle_loop( base_radius, intervals ); 
-  test_loop1.gen_xys(axis);
 
   //any polygon should be contained by itself
   CHECK( is_poly_a_in_poly_b( test_loop1, test_loop1 ) );
@@ -454,7 +450,7 @@ void is_poly_a_in_poly_b_test()
 
       test_loop2 = create_circle_loop( larger_rad, intervals+3 ); // one just on the outside
       test_loop3 = create_circle_loop( smaller_rad, intervals+3 ); // one just on the inside
-      test_loop2.gen_xys(axis); test_loop3.gen_xys(axis);
+
 
       CHECK( is_poly_a_in_poly_b( test_loop1, test_loop2 ) );
       CHECK( !is_poly_a_in_poly_b( test_loop2, test_loop1 ) );
@@ -477,9 +473,7 @@ void find_winding_test()
   //create some test loop
   double loop_radius = 2.0;
   unsigned int intervals = 20;
-  int axis = 2; //expecting slice along z axis
   Loop test_loop = create_circle_loop( loop_radius, intervals );
-  test_loop.gen_xys(2);
   //according to the increasing angle convention used in create_circle_loop
   //this polygon should be wound CCW
   CHECK_EQUAL( CCW, find_winding(test_loop) );
