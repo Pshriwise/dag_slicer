@@ -33,6 +33,7 @@ void stitch_test();
 void get_containment_test(); 
 void is_poly_a_in_poly_b_test();
 void get_fill_windings_test();
+void find_winding_test();
 
 int main( int /* argc */, char** /* argv */) 
 { 
@@ -56,6 +57,8 @@ int main( int /* argc */, char** /* argv */)
   failed_tests += RUN_TEST(get_containment_test);
   failed_tests += RUN_TEST(is_poly_a_in_poly_b_test);
   failed_tests += RUN_TEST(get_fill_windings_test);
+  failed_tests += RUN_TEST(find_winding_test);
+
 }
 
 void line_struct_test()
@@ -467,6 +470,28 @@ void is_poly_a_in_poly_b_test()
 
     }
 }
+
+void find_winding_test()
+{
+
+  //create some test loop
+  double loop_radius = 2.0;
+  unsigned int intervals = 20;
+  int axis = 2; //expecting slice along z axis
+  Loop test_loop = create_circle_loop( loop_radius, intervals );
+  test_loop.gen_xys(2);
+  //according to the increasing angle convention used in create_circle_loop
+  //this polygon should be wound CCW
+  CHECK_EQUAL( CCW, find_winding(test_loop) );
+
+  std::reverse(test_loop.xypnts.begin(), test_loop.xypnts.end() );
+
+  //should have a reversed winding now
+  CHECK_EQUAL( CW, find_winding(test_loop) );
+
+
+}
+
 
 void get_fill_windings_test()
 {
