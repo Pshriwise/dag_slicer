@@ -30,6 +30,7 @@ void get_all_volumes_test();
 void test_point_match();
 void get_volume_intersections_test(); 
 void stitch_test();
+void get_containment_test(); 
 
 int main( int /* argc */, char** /* argv */) 
 { 
@@ -50,6 +51,7 @@ int main( int /* argc */, char** /* argv */)
   failed_tests += RUN_TEST(triangle_plane_intersect_test);
   failed_tests += RUN_TEST(get_volume_intersections_test); 
   failed_tests += RUN_TEST(stitch_test);
+  failed_tests += RUN_TEST(get_containment_test);
 }
 
 void line_struct_test()
@@ -368,8 +370,54 @@ void stitch_test()
 void get_containment_test() 
 {
 
-  
+  std::vector<Loop> test_loops;
+  //create some loops for testing containment (concentric circles)
+  test_loops.push_back( create_circle_loop( 1.0, 10 ) ); 
+  test_loops.push_back( create_circle_loop( 2.0, 10 ) ); 
+  test_loops.push_back( create_circle_loop( 3.0, 10 ) ); 
+  test_loops.push_back( create_circle_loop( 4.0, 10 ) ); 
 
+  //generate the xy values for each loop
+  for( unsigned int i = 0 ; i < test_loops.size(); i++) 
+    test_loops[i].gen_xys(2);
+
+  //now get the containment matrix for these loops
+  std::vector< std::vector<int> > returned_mat, test_mat; 
+
+  get_containment(test_loops, returned_mat); 
+
+
+  //what we expect our matrix to look like
+  std::vector<int> row(4); 
+  row[0] = 0; row[1] = 1; row[2] = 1; row[3] = 1;
+  test_mat.push_back(row); 
+  row[0] = 0; row[1] = 0; row[2] = 1; row[3] = 1;
+  test_mat.push_back(row); 
+  row[0] = 0; row[1] = 0; row[2] = 0; row[3] = 1;
+  test_mat.push_back(row); 
+  row[0] = 0; row[1] = 0; row[2] = 0; row[3] = 0;
+  test_mat.push_back(row); 
+
+  //the matrices should be of the same size
+  CHECK_EQUAL( test_mat.size(), returned_mat.size() ); 
+
+  for( unsigned int i = 0; i < test_mat.size(); i ++) 
+    {
+      CHECK_EQUAL( test_mat[i].size(),returned_mat[i].size() );
+      //the matrices should be square
+      CHECK( returned_mat.size() == returned_mat[i].size() );
+      CHECK( test_mat.size() == test_mat[i].size() );
+      
+      for( unsigned int j = 0; j < test_mat[i].size(); j++)
+	{
+
+	  //check that the values match in our test matrix
+	  CHECK_EQUAL(  test_mat[i][j], returned_mat[i][j] ); 
+
+
+	}
+      
+    }
 
 }
 

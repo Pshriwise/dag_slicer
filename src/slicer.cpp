@@ -667,14 +667,19 @@ void get_containment( std::vector<Loop> loops, std::vector< std::vector<int> > &
       Mat[i].resize(loops.size());
       for( unsigned int j = 0; j < loops.size(); j++ )
 	{
-	  Mat[i][j] = is_poly_a_in_poly_b( loops[i], loops[j]);
+	  if ( i == j) 
+	    Mat[i][j] = false; //polygons cannot contain themselves
+	  else
+	    Mat[i][j] = is_poly_a_in_poly_b( loops[i], loops[j]);
 	}
     }
   
 }
 
 // checks to see if loop a is in loop b
-// (assuming fully nested loops for now)
+// (assuming fully nested loops, no overlaps)
+// does this by ray casting to the right from the test point for each polygon edge
+// and checking the number of edge-intersections with the polygon
 bool is_poly_a_in_poly_b( Loop a, Loop b)
 {
 
@@ -694,7 +699,7 @@ bool is_poly_a_in_poly_b( Loop a, Loop b)
 	  if (b.xypnts[i].x+(y-b.xypnts[i].y)/(b.xypnts[j].y-b.xypnts[i].y)
 	      *(b.xypnts[j].x-b.xypnts[i].x) < x)
 	    {
-	    result = true;
+	    result = !result;
 	    }
 	}
       j=i;
