@@ -668,7 +668,7 @@ void get_containment( std::vector<Loop> loops, std::vector< std::vector<int> > &
       for( unsigned int j = 0; j < loops.size(); j++ )
 	{
 	  if ( i == j) 
-	    Mat[i][j] = false; //polygons cannot contain themselves
+	    Mat[i][j] = true; //polygons contain themselves
 	  else
 	    Mat[i][j] = is_poly_a_in_poly_b( loops[i], loops[j]);
 	}
@@ -744,11 +744,11 @@ void get_fill_windings( std::vector< std::vector<int> > fill_mat, std::vector<in
   int wind;
   for( unsigned int i = 0; i < a; i++)
     {
-      int dum;
+      int dum = 0;
       for(std::vector<int>::iterator j = fill_mat[i].begin();
 	  j != fill_mat[i].end(); j++)
 	dum += *j;
-      wind = dum%2 == 0 ? CCW : CW;
+      wind = dum%2 == 0 ? CW : CCW;
       windings.push_back(wind);
     }
 

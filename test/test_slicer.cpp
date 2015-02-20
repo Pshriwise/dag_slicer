@@ -32,6 +32,7 @@ void get_volume_intersections_test();
 void stitch_test();
 void get_containment_test(); 
 void is_poly_a_in_poly_b_test();
+void get_fill_windings_test();
 
 int main( int /* argc */, char** /* argv */) 
 { 
@@ -54,7 +55,7 @@ int main( int /* argc */, char** /* argv */)
   failed_tests += RUN_TEST(stitch_test);
   failed_tests += RUN_TEST(get_containment_test);
   failed_tests += RUN_TEST(is_poly_a_in_poly_b_test);
-
+  failed_tests += RUN_TEST(get_fill_windings_test);
 }
 
 void line_struct_test()
@@ -392,13 +393,13 @@ void get_containment_test()
 
   //what we expect our matrix to look like
   std::vector<int> row(4); 
+  row[0] = 1; row[1] = 1; row[2] = 1; row[3] = 1;
+  test_mat.push_back(row); 
   row[0] = 0; row[1] = 1; row[2] = 1; row[3] = 1;
   test_mat.push_back(row); 
   row[0] = 0; row[1] = 0; row[2] = 1; row[3] = 1;
   test_mat.push_back(row); 
   row[0] = 0; row[1] = 0; row[2] = 0; row[3] = 1;
-  test_mat.push_back(row); 
-  row[0] = 0; row[1] = 0; row[2] = 0; row[3] = 0;
   test_mat.push_back(row); 
 
   //the matrices should be of the same size
@@ -467,6 +468,37 @@ void is_poly_a_in_poly_b_test()
     }
 }
 
+void get_fill_windings_test()
+{
+  //create a sample matrix for this test
+  std::vector< std::vector<int> > test_mat; 
+  std::vector<int> row(4); 
+  row[0] = 1; row[1] = 1; row[2] = 1; row[3] = 1;
+  test_mat.push_back(row); 
+  row[0] = 0; row[1] = 1; row[2] = 1; row[3] = 1;
+  test_mat.push_back(row); 
+  row[0] = 0; row[1] = 0; row[2] = 1; row[3] = 1;
+  test_mat.push_back(row); 
+  row[0] = 0; row[1] = 0; row[2] = 0; row[3] = 1;
+  test_mat.push_back(row); 
+  
+  std::vector<int> expected_results, returned_results;
+  expected_results.resize(4);
+  expected_results[0] = CW; expected_results[1] = CCW;
+  expected_results[2] = CW; expected_results[3] = CCW;
+
+  get_fill_windings( test_mat, returned_results ); 
+  
+  //check that our returned matrix is the right size
+  CHECK_EQUAL( expected_results.size(), returned_results.size() );
+
+  //now make sure the values are correct
+  for( unsigned int i = 0 ; i < 4; i++)
+    CHECK_EQUAL( expected_results[i], returned_results[i] );
+
+
+
+}
 
 void get_sets_by_category_test()
 {
