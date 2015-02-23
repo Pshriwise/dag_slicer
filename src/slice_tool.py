@@ -1,8 +1,6 @@
 #!/usr/bin/python 
 
-from itaps import iMesh, iBase
 import argparse
-from yt.utilities.lib.geometry_utils import triangle_plane_intersect
 import numpy as np
 from matplotlib.path import Path
 from matplotlib.patches import PathPatch
