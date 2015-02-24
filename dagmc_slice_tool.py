@@ -1,8 +1,4 @@
 
-
-
-
-
 import numpy as np
 from matplotlib.path import Path
 from matplotlib.patches import PathPatch 
@@ -34,7 +30,7 @@ class dagmc_slicer(Dag_Slicer):
         for coord, code in all_paths:
             path = Path(coord, code)
             color = np.random.rand(3, 1)
-            patches.append(PathPatch(path, color=color, ec='black', lw=1, alpha=0.4))
+            patches.append(PathPatch(path, color=color, ec='black', lw=1))
 
                   
         #create a new figure
@@ -48,13 +44,43 @@ class dagmc_slicer(Dag_Slicer):
             ax.add_patch(patch)
 
         if self.by_group:
-            ax.legend(patches, self.group_names, prop={'size':10}, loc=2, bbox_to_anchor=(1.05,1.), borderaxespad=0.)
+            leg = ax.legend(patches, self.group_names, prop={'size':10}, loc=2, bbox_to_anchor=(1.05,1.), borderaxespad=0.)
+            #create mapping of artist to legend entry
+            self.legend_map = {}
+            for legpatch, patch in zip(leg.get_patches(), patches):
+                legpatch.set_picker(True)
+                self.legend_map[legpatch] = patch
+
         #plot axis settings
         ax.autoscale_view()
         ax.set_aspect('equal')
 
 
     def show_slice(self):        
+        cid = self.figure.canvas.mpl_connect('pick_event', self.onpick)
+        self.pick_counter = 0 #hack until new release of matplotlib
         plt.show()
 
+
+    def onpick(self,event):
+
+        self.pick_counter += 1
+        if 0 == self.pick_counter % 2: #again, part of the hack until new matplotlib release
+            # on the pick event, find the orig line corresponding to the
+            # legend proxy line, and toggle the visibility
+            print "Picked item: ", event.artist
+
+            legenditem = event.artist
+            origpatch = self.legend_map[legenditem]
+            print "This patch is : " , origpatch
+
+            vis = not origpatch.get_visible()
+            origpatch.set_visible(vis)
+        
+            if vis:
+                legenditem.set_alpha(1.0)
+            else:
+                legenditem.set_alpha(0.2)
+
+            self.figure.canvas.draw()
 
