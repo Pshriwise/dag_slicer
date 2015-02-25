@@ -90,7 +90,7 @@ class dagmc_slicer(Dag_Slicer):
         vis = self.check.lines[0][0].get_visible()
         filled = self.check.lines[1][0].get_visible()
         #Reflect the changes to the patch in the legend item
-        self.picked.set_alpha( 1.0 if vis else 0.2 )        
+        self.picked.set_alpha( 1.0 if vis else 0.6 )        
         #Make changes to the original patch
         origpatch = self.legend_map[self.picked]
         origpatch.set_visible(vis)
