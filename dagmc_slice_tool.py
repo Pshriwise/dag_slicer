@@ -62,7 +62,7 @@ class dagmc_slicer(Dag_Slicer):
             self.create_slice()
         cid = self.figure.canvas.mpl_connect('pick_event', self.onpick)
         self.pick_counter = 0 #hack until new release of matplotlib
-        cax = plt.axes([0.025, 0.5, 0.15, 0.15])
+        cax = plt.axes([0.025, 0.5, 0.12, 0.12])
         self.check = CheckButtons( cax, ('Visible',),(True,) )
         self.check.visible = False
         self.check.on_clicked(self.visiblefunc)
