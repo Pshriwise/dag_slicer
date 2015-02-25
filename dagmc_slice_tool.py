@@ -61,7 +61,8 @@ class dagmc_slicer(Dag_Slicer):
         if 0 == len(self.slice_x_pnts):
             self.create_slice()
         cid = self.figure.canvas.mpl_connect('pick_event', self.onpick)
-        self.pick_counter = 0 #hack until new release of matplotlib
+
+        #setup the check boxex
         cax = plt.axes([0.025, 0.5, 0.12, 0.12])
         self.check = CheckButtons( cax, ('Visible','Filled'),(True,True) )
         self.check.visible = False
@@ -72,20 +73,27 @@ class dagmc_slicer(Dag_Slicer):
 
     def onpick(self,event):
         self.picked = event.artist
+        #Reset all legend items to black then highlight current selection
         [a.set_edgecolor('black') for a in self.legend_map.keys()]
         event.artist.set_edgecolor('orange')
 
+        #Get the patch item through the legend map and update the checkbox settings
         origpatch = self.legend_map[event.artist]
-        [l.set_visible(origpatch.get_visible()) for l in self.check.lines[0]]
-        [l.set_visible(origpatch.get_fill()) for l in self.check.lines[1]]
+        [l.set_visible( origpatch.get_visible() ) for l in self.check.lines[0]]
+        [l.set_visible( origpatch.get_fill() ) for l in self.check.lines[1]]
         self.figure.canvas.draw()
 
     def visiblefunc(self,label):
+        #Check the current visibility/fill of the patch based
+        #on the state of the check boxes
         vis = self.check.lines[0][0].get_visible()
         filled = self.check.lines[1][0].get_visible()
-        self.picked.set_alpha( 1.0 if vis else 0.2 )            
+        #Reflect the changes to the patch in the legend item
+        self.picked.set_alpha( 1.0 if vis else 0.2 )        
+        #Make changes to the original patch
         origpatch = self.legend_map[self.picked]
         origpatch.set_visible(vis)
         origpatch.set_fill(filled)
+        #Redraw the plot
         self.figure.canvas.draw()
         
