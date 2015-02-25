@@ -63,7 +63,7 @@ class dagmc_slicer(Dag_Slicer):
         cid = self.figure.canvas.mpl_connect('pick_event', self.onpick)
         self.pick_counter = 0 #hack until new release of matplotlib
         cax = plt.axes([0.025, 0.5, 0.12, 0.12])
-        self.check = CheckButtons( cax, ('Visible',),(True,) )
+        self.check = CheckButtons( cax, ('Visible','Filled'),(True,True) )
         self.check.visible = False
         self.check.on_clicked(self.visiblefunc)
         plt.show()
@@ -76,14 +76,16 @@ class dagmc_slicer(Dag_Slicer):
         event.artist.set_edgecolor('orange')
 
         origpatch = self.legend_map[event.artist]
-        for l in self.check.lines[0]:
-            l.set_visible(origpatch.get_visible()) 
+        [l.set_visible(origpatch.get_visible()) for l in self.check.lines[0]]
+        [l.set_visible(origpatch.get_fill()) for l in self.check.lines[1]]
         self.figure.canvas.draw()
 
     def visiblefunc(self,label):
         vis = self.check.lines[0][0].get_visible()
+        filled = self.check.lines[1][0].get_visible()
         self.picked.set_alpha( 1.0 if vis else 0.2 )            
         origpatch = self.legend_map[self.picked]
         origpatch.set_visible(vis)
+        origpatch.set_fill(filled)
         self.figure.canvas.draw()
         
