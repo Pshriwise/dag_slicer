@@ -13,26 +13,19 @@ if not os.path.exists('dag_slicer/xdress_extra_types.h'):
 
 def get_moab_paths():
 
-    argv = sys.argv[2:]
+    argv = sys.argv[-2:]
     
     for a in argv:
         sys.argv.remove(a)
 
     parser = argparse.ArgumentParser()
     
-    parser.add_argument('--moab-path', type=str)
-    parser.parse_args(argv)
-
+    parser.add_argument('--moab-path', dest='moab_path', required=True, type=str)
+    args =  parser.parse_args(argv)
     
-    if 0 == len(argv):
-        sys.exit("Please set the moab path using '--moab-path=<moab_install_dir>' ")
-
-    if 2 < len(argv):
-        sys.exit("Please provide only one moab installation.")
-
     #create moab include and library dirs 
-    moab_inc = a + "/include/"
-    moab_lib = a + "/lib/"
+    moab_inc = args.moab_path + "/include/"
+    moab_lib = args.moab_path + "/lib/"
 
     return moab_inc, moab_lib
 
