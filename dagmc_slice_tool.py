@@ -66,13 +66,15 @@ class dagmc_slicer(Dag_Slicer):
         self.check = CheckButtons( cax, ('Visible',),(True,) )
         self.check.visible = False
         self.check.on_clicked(self.visiblefunc)
-
         plt.show()
 
 
 
     def onpick(self,event):
         self.picked = event.artist
+        [a.set_edgecolor('black') for a in self.legend_map.keys()]
+        event.artist.set_edgecolor('orange')
+
         origpatch = self.legend_map[event.artist]
         for l in self.check.lines[0]:
             l.set_visible(origpatch.get_visible()) 
