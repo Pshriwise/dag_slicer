@@ -5,12 +5,13 @@ from matplotlib.patches import PathPatch
 import matplotlib.pyplot as plt
 import numpy as np
 from dag_slicer.dag_slicer import Dag_Slicer 
+from matplotlib.widgets import CheckButtons, RadioButtons
 
 
 class dagmc_slicer(Dag_Slicer):
 
     def create_slice(self):
-        
+
         #clear old arrays so there isn't junk data in the way
         self.slice_x_pnts = np.array([])
         self.slice_y_pnts = np.array([])
@@ -57,30 +58,30 @@ class dagmc_slicer(Dag_Slicer):
 
 
     def show_slice(self):        
+        if 0 == len(self.slice_x_pnts):
+            self.create_slice()
         cid = self.figure.canvas.mpl_connect('pick_event', self.onpick)
         self.pick_counter = 0 #hack until new release of matplotlib
+        cax = plt.axes([0.025, 0.5, 0.15, 0.15])
+        self.check = CheckButtons( cax, ('Visible',),(True,) )
+        self.check.visible = False
+        self.check.on_clicked(self.visiblefunc)
+
         plt.show()
 
 
+
     def onpick(self,event):
+        self.picked = event.artist
+        origpatch = self.legend_map[event.artist]
+        for l in self.check.lines[0]:
+            l.set_visible(origpatch.get_visible()) 
+        self.figure.canvas.draw()
 
-        self.pick_counter += 1
-        if 0 == self.pick_counter % 2: #again, part of the hack until new matplotlib release
-            # on the pick event, find the orig line corresponding to the
-            # legend proxy line, and toggle the visibility
-            print "Picked item: ", event.artist
-
-            legenditem = event.artist
-            origpatch = self.legend_map[legenditem]
-            print "This patch is : " , origpatch
-            
-            vis = not origpatch.get_visible()
-            origpatch.set_visible(vis)
+    def visiblefunc(self,label):
+        vis = self.check.lines[0][0].get_visible()
+        self.picked.set_alpha( 1.0 if vis else 0.2 )            
+        origpatch = self.legend_map[self.picked]
+        origpatch.set_visible(vis)
+        self.figure.canvas.draw()
         
-            if vis:
-                legenditem.set_alpha(1.0)
-            else:
-                legenditem.set_alpha(0.2)
-
-            self.figure.canvas.draw()
-
