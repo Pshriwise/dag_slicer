@@ -81,6 +81,7 @@ class dagmc_slicer(Dag_Slicer):
         origpatch = self.legend_map[event.artist]
         [l.set_visible( origpatch.get_visible() ) for l in self.check.lines[0]]
         [l.set_visible( origpatch.get_fill() ) for l in self.check.lines[1]]
+        #Redraw the plot
         self.figure.canvas.draw()
 
     def visiblefunc(self,label):
