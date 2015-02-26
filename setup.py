@@ -1,5 +1,6 @@
 import os
 import sys
+from subprocess import call, Popen, PIPE, STDOUT
 import argparse
 from distutils.core import setup
 from distutils.extension import Extension
@@ -9,6 +10,14 @@ import numpy as np
 
 if not os.path.exists('dag_slicer/xdress_extra_types.h'):
     sys.exit("please run xdress first!")
+
+call(['cmake','.'])
+
+#patch xdress-generated files
+call(['patch','-p1','./dag_slicer/dag_slicer.pyx'],stdin=open('pyx_patch.txt','read'))
+call(['patch','-p1','./dag_slicer/dag_slicer.pxd'],stdin=open('pxd_patch.txt','read'))
+
+call(['make'])
 
 
 def get_moab_paths():
