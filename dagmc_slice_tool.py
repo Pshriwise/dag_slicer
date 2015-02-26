@@ -14,9 +14,21 @@ class dagmc_slicer(Dag_Slicer):
     def __init__(self, filename, axis = 0, coordinate = 0, by_group = False):
         
         super(dagmc_slicer, self).__init__( filename, axis, coordinate, by_group )
+        self.shown = False
         
         
+    def clear_slice(self):
+        #clear old arrays so there isn't junk data in the way
+        self.slice_x_pnts = np.array([])
+        self.slice_y_pnts = np.array([])
+        self.path_coding = np.array([], dtype='int')
+        self.group_names = np.array([], dtype='str')
+        self.shown = False 
+
     def create_slice(self):
+        
+        #clear out old info
+        self.clear_slice()
 
         #clear old arrays so there isn't junk data in the way
         self.slice_x_pnts = np.array([])
@@ -65,8 +77,9 @@ class dagmc_slicer(Dag_Slicer):
 
 
     def show_slice(self):        
-        if 0 == len(self.slice_x_pnts):
+        if self.shown or 0 == len(self.slice_x_pnts):
             self.create_slice()
+
         cid = self.figure.canvas.mpl_connect('pick_event', self.onpick)
 
         #setup the check boxex
@@ -75,7 +88,7 @@ class dagmc_slicer(Dag_Slicer):
         self.check.visible = False
         self.check.on_clicked(self.visiblefunc)
         plt.show()
-
+        self.shown = True
 
 
     def onpick(self,event):
