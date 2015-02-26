@@ -10,6 +10,12 @@ from matplotlib.widgets import CheckButtons, RadioButtons
 
 class dagmc_slicer(Dag_Slicer):
 
+    #wrapper for the super init 
+    def __init__(self, filename, axis = 0, coordinate = 0, by_group = False):
+        
+        super(dagmc_slicer, self).__init__( filename, axis, coordinate, by_group )
+        
+        
     def create_slice(self):
 
         #clear old arrays so there isn't junk data in the way
