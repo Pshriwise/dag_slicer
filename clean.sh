@@ -5,7 +5,7 @@ if [ -f ./dag_slicer/CMakeLists.txt ]; then
     mv dag_slicer/CMakeLists.txt CMakeLists.txt.bak
 fi
 
-sudo rm -rf build 
+rm -rf build 
 rm -rf ./dag_slicer
 rm -rf ./CMakeListsFiles
 rm -rf ./CMakeFiles
