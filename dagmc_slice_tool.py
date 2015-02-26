@@ -39,6 +39,13 @@ class dagmc_slicer(Dag_Slicer):
         #run the super function to create the slice
         super(dagmc_slicer, self).create_slice()
             
+
+    def show_slice(self):        
+
+        if 0 == len(self.slice_x_pnts):
+            self.create_slice()
+
+
         #now setup the plot object
         all_paths = []
         for i in range(len(self.slice_x_pnts)):
@@ -75,10 +82,6 @@ class dagmc_slicer(Dag_Slicer):
         ax.autoscale_view()
         ax.set_aspect('equal')
 
-
-    def show_slice(self):        
-        if self.shown or 0 == len(self.slice_x_pnts):
-            self.create_slice()
 
         cid = self.figure.canvas.mpl_connect('pick_event', self.onpick)
 
