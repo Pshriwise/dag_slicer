@@ -16,7 +16,8 @@ class dagmc_slicer(Dag_Slicer):
         self.slice_x_pnts = np.array([])
         self.slice_y_pnts = np.array([])
         self.path_coding = np.array([], dtype='int')
-        
+        self.group_names = np.array([], dtype='str')
+
         #run the super function to create the slice
         super(dagmc_slicer, self).create_slice()
             
