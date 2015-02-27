@@ -13,10 +13,6 @@ if not os.path.exists('dag_slicer/xdress_extra_types.h'):
 
 call(['cmake','.'])
 
-#patch xdress-generated files
-call(['patch','-p1','./dag_slicer/dag_slicer.pyx'],stdin=open('pyx_patch.txt','read'))
-call(['patch','-p1','./dag_slicer/dag_slicer.pxd'],stdin=open('pxd_patch.txt','read'))
-
 call(['make'])
 
 
