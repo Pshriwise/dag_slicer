@@ -10,7 +10,7 @@
 
 cimport dtypes
 cimport numpy as np
-from dag_slicer cimport cpp_dag_slicer
+cimport cpp_dag_slicer
 from libcpp.string cimport string as std_string
 from libcpp.vector cimport vector as cpp_vector
 

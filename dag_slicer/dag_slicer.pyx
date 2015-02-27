@@ -13,6 +13,7 @@ cimport numpy as np
 from libc.stdlib cimport free
 from libcpp cimport bool as cpp_bool
 from libcpp.string cimport string as std_string
+import dtypes
 from libcpp.vector cimport vector as cpp_vector
 
 import dtypes
