@@ -78,6 +78,13 @@ class dagmc_slicer(Dag_Slicer):
                 legpatch.set_picker(True)
                 self.legend_map[legpatch] = patch
 
+                #setup the check boxex
+                cax = plt.axes([0.025, 0.5, 0.12, 0.12])
+                self.check = CheckButtons( cax, ('Visible','Filled'),(True,True) )
+                self.check.visible = False
+                self.check.on_clicked(self.visiblefunc)
+
+
         #plot axis settings
         ax.autoscale_view()
         ax.set_aspect('equal')
@@ -85,11 +92,6 @@ class dagmc_slicer(Dag_Slicer):
 
         cid = self.figure.canvas.mpl_connect('pick_event', self.onpick)
 
-        #setup the check boxex
-        cax = plt.axes([0.025, 0.5, 0.12, 0.12])
-        self.check = CheckButtons( cax, ('Visible','Filled'),(True,True) )
-        self.check.visible = False
-        self.check.on_clicked(self.visiblefunc)
         plt.show()
         self.shown = True
 
