@@ -17,3 +17,9 @@ Installation
 
 2) Run `python setup.py install --user --moab-path <moab_install_path>` to install the python module. 
 
+Use
+=======
+
+Please see the example in the examples dir and this video (https://www.youtube.com/watch?v=Z3f2PFKenhw&feature=youtu.be) for examples of use. 
+
+Note: For garaunteed performance of this tool, all facet-based models should be made watertight before use.
