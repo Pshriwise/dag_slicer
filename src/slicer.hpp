@@ -6,8 +6,8 @@
 #include <string>
 
 //SIGMA includes
-#include "MBCartVect.hpp"
-#include "MBCore.hpp"
+#include "moab/CartVect.hpp"
+#include "moab/Core.hpp"
 #include "MBTagConventions.hpp"
 
 
@@ -36,11 +36,11 @@ inline void ERR_CHECK( moab::ErrorCode rval )
 //special containers for our intersection data
 struct Line {
   Line() : started(false), full(false) {}
-  MBCartVect begin; 
-  MBCartVect end; 
+  moab::CartVect begin; 
+  moab::CartVect end; 
   bool started;
   bool full; 
-  void add_pnt( MBCartVect a )
+  void add_pnt( moab::CartVect a )
   {
     
     if (full) std::cout << "Line is full. Point not added." << std::endl;
@@ -67,7 +67,7 @@ struct xypnt{
 
 struct Loop{
   Loop() : num_pnts(0), closed(false) {}
-  std::vector<MBCartVect> points;
+  std::vector<moab::CartVect> points;
   std::vector<xypnt> xypnts; 
   int num_pnts; 
   bool closed;
@@ -101,35 +101,35 @@ struct Loop{
 
 
 
-bool point_match( MBCartVect pnt1, MBCartVect pnt2, double tolerance = MATCH_TOL );
+bool point_match( moab::CartVect pnt1, moab::CartVect pnt2, double tolerance = MATCH_TOL );
 
-MBErrorCode get_sets_by_category( MBInterface *mbi, MBRange &entsets, char* category);
+moab::ErrorCode get_sets_by_category( moab::Interface *mbi, moab::Range &entsets, char* category);
 
-MBErrorCode get_surfaces( MBInterface* mbi, MBRange &surfs);
+moab::ErrorCode get_surfaces( moab::Interface* mbi, moab::Range &surfs);
 
-MBErrorCode get_all_volumes( MBInterface *mbi, MBRange &vols);
+moab::ErrorCode get_all_volumes( moab::Interface *mbi, moab::Range &vols);
 
-MBErrorCode slice_faceted_model_out( std::string filename, int axis, double coord, std::vector< std::vector<double> > &x_pnts, std::vector< std::vector<double> > &y_pnts, std::vector< std::vector<int> > &codings, std::vector<std::string> &group_names, bool by_group = false, bool verbose = false, bool debug = false);
+moab::ErrorCode slice_faceted_model_out( std::string filename, int axis, double coord, std::vector< std::vector<double> > &x_pnts, std::vector< std::vector<double> > &y_pnts, std::vector< std::vector<int> > &codings, std::vector<std::string> &group_names, bool by_group = false, bool verbose = false, bool debug = false);
 
-MBErrorCode slice_faceted_model( std::string filename, int axis, double coord,   std::vector< std::vector<xypnt> > &paths, std::vector< std::vector<int> > &codings,  std::vector<std::string> &group_names, bool by_group = false);
+moab::ErrorCode slice_faceted_model( std::string filename, int axis, double coord,   std::vector< std::vector<xypnt> > &paths, std::vector< std::vector<int> > &codings,  std::vector<std::string> &group_names, bool by_group = false);
 
-MBErrorCode get_volumes_by_group( MBInterface *mbi, std::map< std::string, MBRange > &group_map, std::vector<std::string> &group_names );
+moab::ErrorCode get_volumes_by_group( moab::Interface *mbi, std::map< std::string, moab::Range > &group_map, std::vector<std::string> &group_names );
 
-MBErrorCode create_surface_intersections( MBInterface *mbi, MBRange surfs, int axis, double coord,   std::map<MBEntityHandle,std::vector<Loop> > &intersection_map);
+moab::ErrorCode create_surface_intersections( moab::Interface *mbi, moab::Range surfs, int axis, double coord,   std::map<moab::EntityHandle,std::vector<Loop> > &intersection_map);
 
-MBErrorCode get_volume_intersections( MBInterface *mbi, MBEntityHandle volume, std::map<MBEntityHandle, std::vector<Loop> > intersection_dict,   std::vector<Loop> &volume_intersections );
+moab::ErrorCode get_volume_intersections( moab::Interface *mbi, moab::EntityHandle volume, std::map<moab::EntityHandle, std::vector<Loop> > intersection_dict,   std::vector<Loop> &volume_intersections );
 
-MBErrorCode get_volume_paths( MBInterface *mbi, MBRange volumes, int axis, std::map<MBEntityHandle, std::vector<Loop> > intersection_dict,   std::vector< std::vector<Loop> > &all_vol_paths );
+moab::ErrorCode get_volume_paths( moab::Interface *mbi, moab::Range volumes, int axis, std::map<moab::EntityHandle, std::vector<Loop> > intersection_dict,   std::vector< std::vector<Loop> > &all_vol_paths );
 
 void stitch( std::vector<Loop> loops, std::vector<Loop> &paths );
 
-MBErrorCode surface_intersections(MBInterface *mbi, std::vector<MBEntityHandle> tris, int axis, double coord, std::vector<Loop> &surf_intersections);
+moab::ErrorCode surface_intersections(moab::Interface *mbi, std::vector<moab::EntityHandle> tris, int axis, double coord, std::vector<Loop> &surf_intersections);
 
-MBErrorCode intersection( MBInterface *mbi,  int axis, double coord, MBEntityHandle tri, Line &tri_intersection, bool &intersect);
+moab::ErrorCode intersection( moab::Interface *mbi,  int axis, double coord, moab::EntityHandle tri, Line &tri_intersection, bool &intersect);
 
-void triangle_plane_intersect( int axis, double coord, MBCartVect *coords, Line &line_out);
+void triangle_plane_intersect( int axis, double coord, moab::CartVect *coords, Line &line_out);
 
-void get_intersection( MBCartVect pnt0, MBCartVect pnt1, int axis, double coord, Line &line );
+void get_intersection( moab::CartVect pnt0, moab::CartVect pnt1, int axis, double coord, Line &line );
 
 void convert_to_stl( std::vector< std::vector<Loop> > a, std::vector< std::vector< std::vector< std::vector<double> > > > &b);
 
