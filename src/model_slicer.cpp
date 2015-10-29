@@ -1,8 +1,8 @@
 
 #include <fstream>
 #include <iomanip>
+#include <string>
 
-//#include "slicer.hpp"
 #include "moab/ProgOptions.hpp"
 #include "dag_slicer.hpp"
 
@@ -31,7 +31,7 @@ int main( int argc, char ** argv )
 
 
 
-  MBErrorCode result; 
+  moab::ErrorCode result; 
   /*
   std::vector< std::vector<double> > xs, ys;
   std::vector< std::vector<int> > codings;

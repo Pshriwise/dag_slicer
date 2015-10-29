@@ -7,15 +7,15 @@
 #include "slicer.hpp"
 
 //SIGMA includes
-#include "MBCore.hpp"
-#include "MBInterface.hpp"
+#include "moab/Core.hpp"
+#include "moab/Interface.hpp"
 
 #include "testutils.hpp"
 
 using namespace moab;
 
 //global moab instance
-MBInterface *mbi = new MBCore(); 
+moab::Interface *mbi = new moab::Core(); 
 
 //structure functions
 void line_struct_test();
@@ -39,7 +39,7 @@ void set_windings_test();
 int main( int /* argc */, char** /* argv */) 
 { 
 
-  MBErrorCode result = mbi->load_mesh("cube.h5m");
+  moab::ErrorCode result = mbi->load_mesh("cube.h5m");
   ERR_CHECK(result);
   
   //get_sets_by_category_test( mbi );
@@ -68,7 +68,7 @@ void line_struct_test()
 
   Line test_line; 
   
-  MBCartVect point(0,1,0);
+  moab::CartVect point(0,1,0);
 
   CHECK( !test_line.started );
   CHECK( !test_line.full );
@@ -90,18 +90,18 @@ void line_struct_test()
 void create_surface_intersections_test()
 {
 
-  MBRange surfs;
+  moab::Range surfs;
   get_surfaces(mbi, surfs);
 
-  std::map<MBEntityHandle, std::vector<Loop> >int_map;
-  MBErrorCode result = create_surface_intersections( mbi, surfs, 0, 0, int_map);
+  std::map<moab::EntityHandle, std::vector<Loop> >int_map;
+  moab::ErrorCode result = create_surface_intersections( mbi, surfs, 0, 0, int_map);
   ERR_CHECK(result);
 
   CHECK( (int)int_map.size() == 6); // the cube should have 6 surfaces
   
   //check for surfaces w/ intersections
   int num_intersections = 0;
-  std::map<MBEntityHandle, std::vector<Loop> >::iterator i; 
+  std::map<moab::EntityHandle, std::vector<Loop> >::iterator i; 
   for( i = int_map.begin(); i != int_map.end() ; i++)
     if ( (i->second).size() != 0 ) num_intersections++;
 
@@ -112,15 +112,15 @@ void create_surface_intersections_test()
 
 void intersection_test()
 {
-  MBErrorCode result; 
+  moab::ErrorCode result; 
   
   //create a new triangle in the moab instance 
-  MBCartVect coords[3];
+  moab::CartVect coords[3];
   coords[0][0] = 1; coords[0][1] = 0; coords[0][2] = 0;
   coords[1][0] = 0; coords[1][1] = 1; coords[1][2] = 0;
   coords[2][0] = 0; coords[2][1] = 0; coords[2][2] = 1;
   
-  MBEntityHandle v0,v1,v2,tri;
+  moab::EntityHandle v0,v1,v2,tri;
  
   result = mbi->create_vertex( coords[0].array(), v0); 
   ERR_CHECK(result);
@@ -129,7 +129,7 @@ void intersection_test()
   result = mbi->create_vertex( coords[2].array(), v2); 
   ERR_CHECK(result);
 
-  MBEntityHandle verts[] = {v0,v1,v2};
+  moab::EntityHandle verts[] = {v0,v1,v2};
   result = mbi->create_element(MBTRI, verts, 3, tri);
   ERR_CHECK(result);
 
@@ -161,7 +161,7 @@ void intersection_test()
 void triangle_plane_intersect_test()
 {
   
-  MBCartVect coords[3];
+  moab::CartVect coords[3];
   coords[0][0] = 1; coords[0][1] = 0; coords[0][2] = 0;
   coords[1][0] = 0; coords[1][1] = 1; coords[1][2] = 0;
   coords[2][0] = 0; coords[2][1] = 0; coords[2][2] = 1;
@@ -196,8 +196,8 @@ void triangle_plane_intersect_test()
 void get_intersection_test()
 {
 
-  MBCartVect point0( 1, 1, 0 );
-  MBCartVect point1(-1, 1, 0 );
+  moab::CartVect point0( 1, 1, 0 );
+  moab::CartVect point1(-1, 1, 0 );
 
   Line test_line;
 
@@ -234,12 +234,12 @@ void get_intersection_test()
 void get_volume_intersections_test()
 {
   //get the volume from the instance
-  MBRange sets;
+  moab::Range sets;
   char category[CATEGORY_TAG_SIZE] = "Volume";
-  MBErrorCode result = get_sets_by_category( mbi, sets, category);
+  moab::ErrorCode result = get_sets_by_category( mbi, sets, category);
   ERR_CHECK(result);
   
-  MBEntityHandle cube_vol = sets[0]; //there should only be one volume in the test model
+  moab::EntityHandle cube_vol = sets[0]; //there should only be one volume in the test model
 
   //create surface intersections for the model
   char category1[CATEGORY_TAG_SIZE] = "Surface";
@@ -249,7 +249,7 @@ void get_volume_intersections_test()
 
   //create a fake map for this volume. 
 
-  std::map< MBEntityHandle, std::vector<Loop> > fake_map; 
+  std::map< moab::EntityHandle, std::vector<Loop> > fake_map; 
   
   std::vector<Loop> dummy_loop;
   dummy_loop.resize(2); 
@@ -292,7 +292,7 @@ Loop create_circle_loop( double radius, unsigned int intervals )
 
       theta = 2*M_PI * (double) i * (1/(double)intervals);
       x = radius*cos(theta); y = radius*sin(theta); z = 1.0; 
-      MBCartVect pnt( x, y, z); 
+      moab::CartVect pnt( x, y, z); 
 
       circle_loop.points.push_back(pnt); 
 
@@ -366,8 +366,8 @@ void stitch_test()
   //AFTER # - test points
   // returned_path #-----------**-----------#
   
-  MBCartVect begin_test_pnt = dummy_loop2.points.front(); 
-  MBCartVect end_test_pnt = dummy_loop1.points.back(); 
+  moab::CartVect begin_test_pnt = dummy_loop2.points.front(); 
+  moab::CartVect end_test_pnt = dummy_loop1.points.back(); 
 
   CHECK( returned_paths[0].points.front() == begin_test_pnt );
   CHECK( returned_paths[0].points.back() == end_test_pnt );
@@ -575,9 +575,9 @@ void set_windings_test()
 void get_sets_by_category_test()
 {
 
-  MBRange sets; 
+  moab::Range sets; 
   char category1[CATEGORY_TAG_SIZE] = "Volume";
-  MBErrorCode result = get_sets_by_category( mbi, sets, category1); 
+  moab::ErrorCode result = get_sets_by_category( mbi, sets, category1); 
   ERR_CHECK(result); 
  
   CHECK_EQUAL( 1 , (int)sets.size() ); 
@@ -594,8 +594,8 @@ void get_sets_by_category_test()
 void get_surfaces_test()
 {
 
-  MBRange surfaces; 
-  MBErrorCode result = get_surfaces( mbi, surfaces );
+  moab::Range surfaces; 
+  moab::ErrorCode result = get_surfaces( mbi, surfaces );
   ERR_CHECK(result);
   //test file is a cube and should have 6 surfaces
   CHECK_EQUAL( 6, (int)surfaces.size() );
@@ -605,8 +605,8 @@ void get_surfaces_test()
 void get_all_volumes_test()
 {
 
-  MBRange volumes; 
-  MBErrorCode result = get_all_volumes( mbi, volumes );
+  moab::Range volumes; 
+  moab::ErrorCode result = get_all_volumes( mbi, volumes );
   ERR_CHECK(result);
   //test file is a lone cube and should have 1 volume
   CHECK_EQUAL( 1, (int)volumes.size() ); 
@@ -617,7 +617,7 @@ void test_point_match()
 {
 
   //setup two cart vectors that will represent points 
-  MBCartVect a,b;
+  moab::CartVect a,b;
  
   //initialize
   a[0] = 1.0; a[1] = 1.0; a[2] = 1.0-1e-7;
