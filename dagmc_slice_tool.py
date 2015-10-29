@@ -40,7 +40,7 @@ class dagmc_slicer(Dag_Slicer):
         super(dagmc_slicer, self).create_slice()
             
 
-    def show_slice(self):        
+    def show_slice(self, colors=None):        
 
         if 0 == len(self.slice_x_pnts):
             self.create_slice()
@@ -52,12 +52,19 @@ class dagmc_slicer(Dag_Slicer):
             new_list = [ np.transpose(np.vstack((self.slice_x_pnts[i],self.slice_y_pnts[i]))), self.path_coding[i]]
             all_paths.append(new_list)
 
+        if colors == None:
+            colors = []
+            for i in range(len(all_paths)):
+                colors.append(np.random.rand(3, 1))
+        elif len(colors) != len(all_paths):
+            raise ValueError("{} colors are required, {} colors have been specified".format(
+                             len(colors), len(all_paths)))
+
         #create the patches for this plot
         patches = []
-        for coord, code in all_paths:
+        for i, (coord, code) in enumerate(all_paths):
             path = Path(coord, code)
-            color = np.random.rand(3, 1)
-            patches.append(PathPatch(path, color=color, ec='black', lw=1))
+            patches.append(PathPatch(path, color=colors[i], ec='black', lw=1))
 
                   
         #create a new figure
