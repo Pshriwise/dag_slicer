@@ -47,8 +47,6 @@ py_modules = ['dagmc_slice_tool']
 ext_modules = [
     Extension("dag_slicer.xdress_extra_types", ["dag_slicer/xdress_extra_types.pyx"], 
               include_dirs=incdirs, language="c++"),
-    Extension("dag_slicer.dtypes", ["dag_slicer/dtypes.pyx"], 
-              include_dirs=incdirs, language="c++"),
     Extension("dag_slicer.stlcontainers", ["dag_slicer/stlcontainers.pyx"], 
               include_dirs=incdirs, language="c++"),
     Extension("dag_slicer.dag_slicer", ['src/dag_slicer.cpp', 'src/slicer.cpp', "dag_slicer/dag_slicer.pyx", ],
