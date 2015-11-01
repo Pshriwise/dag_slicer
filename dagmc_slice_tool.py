@@ -55,7 +55,7 @@ class dagmc_slicer(Dag_Slicer):
         if colors == None:
             colors = []
             for i in range(len(all_paths)):
-                colors.append(np.random.rand(3, 1))
+                colors.append(np.random.rand(3,).tolist())
         elif len(colors) != len(all_paths):
             raise ValueError("{} colors are required, {} colors have been specified".format(
                              len(colors), len(all_paths)))
