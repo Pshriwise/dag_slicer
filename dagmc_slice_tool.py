@@ -15,7 +15,7 @@ class dagmc_slicer(Dag_Slicer):
         
         super(dagmc_slicer, self).__init__( filename, axis, coordinate, by_group )
         self.shown = False
-        
+        self.color_seed = 56
         
     def clear_slice(self):
         #clear old arrays so there isn't junk data in the way
@@ -54,6 +54,7 @@ class dagmc_slicer(Dag_Slicer):
 
         if colors == None:
             colors = []
+            np.random.seed(self.color_seed)
             for i in range(len(all_paths)):
                 colors.append(np.random.rand(3,).tolist())
         elif len(colors) != len(all_paths):
