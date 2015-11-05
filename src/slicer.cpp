@@ -148,7 +148,6 @@ moab::ErrorCode slice_faceted_model(std::string filename,
       codings.push_back(group_coding);
       paths.push_back(group_path);
       all_group_paths.clear();
-      group_name++;
     } //group loop
   }
   else {
