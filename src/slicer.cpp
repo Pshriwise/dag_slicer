@@ -254,7 +254,7 @@ moab::ErrorCode get_volume_paths( moab::Interface *mbi,
 
 void stitch(std::vector<Loop> loops, std::vector<Loop> &paths) {
 
-  int i = 0; 
+  unsigned int i = 0; 
 
   while (i < loops.size()) {
     //check for complete loops first 
@@ -496,7 +496,6 @@ void triangle_plane_intersect(int axis,
 			      moab::CartVect *coords,
 			      Line &line_out) {
   //check to see how many triangle edges cross the coordinate
-  int count = 0; int nlines = 0; 
   moab::CartVect p0,p1,p2,p3;
 
   //expecting three points for the triangle
@@ -604,12 +603,12 @@ void get_containment(std::vector<Loop> loops,
 bool is_poly_a_in_poly_b(Loop a, Loop b) {
   //use the first point of a to test for now
   double x = a.xypnts[0].x; double y = a.xypnts[0].y;
-  int i, j = b.xypnts.size() - 1;
+  unsigned int i, j = b.xypnts.size() - 1;
   bool result = false;
 
   for(i = 0; i < b.xypnts.size(); i++) {
-    if( (b.xypnts[i].y < y && b.xypnts[j].y >= y
-	 || b.xypnts[j].y < y && b.xypnts[i].y >= y)
+    if( ((b.xypnts[i].y < y && b.xypnts[j].y >= y)
+	 || (b.xypnts[j].y < y && b.xypnts[i].y >= y))
 	&& (b.xypnts[i].x <= x || b.xypnts[j].x <= x)) {
       if (b.xypnts[i].x+(y-b.xypnts[i].y)/(b.xypnts[j].y-b.xypnts[i].y)
 	  *(b.xypnts[j].x-b.xypnts[i].x) < x) {
@@ -647,9 +646,13 @@ int find_winding(Loop loop)
 
 void get_fill_windings(std::vector< std::vector<int> > fill_mat,
 		       std::vector<int> &windings) {
-  int a = fill_mat.size();
-  int b = fill_mat[0].size();
-  assert( a == b);
+  unsigned int a = fill_mat.size();
+  unsigned int b = fill_mat[0].size();
+  
+  if( a != b) {
+    ERR_CHECK(moab::MB_FAILURE);
+      }
+  
   int wind;
   for (unsigned int i = 0; i < a; i++) {
     int dum = 0;

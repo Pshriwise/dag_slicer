@@ -10,8 +10,8 @@ class Dag_Slicer{
 public:
   Dag_Slicer(std::string file_to_slice, int ax, double coord, bool by_grp = false);
   ~Dag_Slicer();
-  std::string filename; 
   int axis; 
+  std::string filename; 
   double coord; 
   std::vector<std::string> group_names;
   std::vector<double> dum_pnts;

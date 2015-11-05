@@ -67,7 +67,7 @@ struct Loop {
   void gen_xys(int axis) {
     
     xypnts.clear(); //clear out vector as precaution
-    int x,y;
+    int x = 0 , y = 0;
     
     //set indices for x an y based on slice plane (provided externally)
     switch(axis) {
@@ -79,6 +79,11 @@ struct Loop {
 	x = 0; y = 1; break;
       }
 
+    //this shouldn't happen
+    if ( x == 0 && y == 0 ) {
+      ERR_CHECK(moab::MB_FAILURE);
+    }
+    
     xypnts.resize(points.size());
     for (unsigned int i = 0; i < points.size(); i++) {
       xypnts[i].x = points[i][x];
