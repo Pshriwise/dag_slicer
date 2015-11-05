@@ -4,7 +4,6 @@
 struct program_option_struct{
   bool verbose;
   bool debug;
-
 };
 
 extern struct program_option_struct opts;

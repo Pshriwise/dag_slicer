@@ -10,7 +10,6 @@
 #include "moab/Core.hpp"
 #include "MBTagConventions.hpp"
 
-
 // std includes
 #include <vector>
 
@@ -20,67 +19,58 @@
 
 #define MATCH_TOL 1e-7
 
-
-
-inline void ERR_CHECK( moab::ErrorCode rval )
-{
-  if (rval)
-    {
-      assert(false);
-      std::cout << "ERROR" << std::endl; 
-      exit(1);
-    }
+inline void ERR_CHECK(moab::ErrorCode rval) {
+  if (rval) {
+    assert(false);
+    std::cout << "ERROR" << std::endl; 
+    exit(1);
+  }
 }
-
 
 //special containers for our intersection data
 struct Line {
   Line() : started(false), full(false) {}
-  moab::CartVect begin; 
-  moab::CartVect end; 
+  moab::CartVect begin;
+  moab::CartVect end;
   bool started;
-  bool full; 
-  void add_pnt( moab::CartVect a )
-  {
+  bool full;
+  void add_pnt(moab::CartVect a) {
     
-    if (full) std::cout << "Line is full. Point not added." << std::endl;
-
-    if(!started)
-      {
-	begin = a;
-	started = true; 
-      }
-    else
-      {
+    if (full) {
+      std::cout << "Line is full. Point not added." << std::endl;
+    }
+    
+    if(!started) {
+      begin = a;
+      started = true; 
+    }
+    else {
 	end = a;
 	full = true;
-      }
-
+    }
   }
-
 };
 
-struct xypnt{
+struct xypnt {
   double x; 
   double y; 
 };
 
-struct Loop{
-  Loop() : num_pnts(0), closed(false) {}
+struct Loop {
+  Loop() : num_pnts(0), closed(false) { }
+  ~Loop() { }
   std::vector<moab::CartVect> points;
-  std::vector<xypnt> xypnts; 
-  int num_pnts; 
+  std::vector<xypnt> xypnts;
+  int num_pnts;
   bool closed;
 
-  void gen_xys(int axis)
-  {
+  void gen_xys(int axis) {
     
     xypnts.clear(); //clear out vector as precaution
     int x,y;
     
     //set indices for x an y based on slice plane (provided externally)
-    switch(axis)
-      {
+    switch(axis) {
       case 0:
 	x = 1; y = 2; break;
       case 1:
@@ -90,63 +80,118 @@ struct Loop{
       }
 
     xypnts.resize(points.size());
-    for( unsigned int i = 0; i < points.size(); i++)
-      {
-	xypnts[i].x = points[i][x];
-	xypnts[i].y = points[i][y];
-      }
+    for (unsigned int i = 0; i < points.size(); i++) {
+      xypnts[i].x = points[i][x];
+      xypnts[i].y = points[i][y];
+    }
   }
-  ~Loop() {}
 };
 
+bool point_match(moab::CartVect pnt1,
+		 moab::CartVect pnt2,
+		 double tolerance = MATCH_TOL);
 
+moab::ErrorCode get_sets_by_category(moab::Interface *mbi,
+				     moab::Range &entsets,
+				     char* category);
 
-bool point_match( moab::CartVect pnt1, moab::CartVect pnt2, double tolerance = MATCH_TOL );
+moab::ErrorCode get_surfaces(moab::Interface* mbi,
+			     moab::Range &surfs);
 
-moab::ErrorCode get_sets_by_category( moab::Interface *mbi, moab::Range &entsets, char* category);
+moab::ErrorCode get_all_volumes(moab::Interface *mbi,
+				moab::Range &vols);
 
-moab::ErrorCode get_surfaces( moab::Interface* mbi, moab::Range &surfs);
+moab::ErrorCode slice_faceted_model_out(std::string filename,
+					int axis,
+					double coord,
+					std::vector< std::vector<double> > &x_pnts,
+					std::vector< std::vector<double> > &y_pnts,
+					std::vector< std::vector<int> > &codings,
+					std::vector<std::string> &group_names,
+					bool by_group = false,
+					bool verbose = false,
+					bool debug = false);
 
-moab::ErrorCode get_all_volumes( moab::Interface *mbi, moab::Range &vols);
+moab::ErrorCode slice_faceted_model(std::string filename,
+				    int axis,
+				    double coord,
+				    std::vector< std::vector<xypnt> > &paths,
+				    std::vector< std::vector<int> > &codings,
+				    std::vector<std::string> &group_names,
+				    bool by_group = false);
 
-moab::ErrorCode slice_faceted_model_out( std::string filename, int axis, double coord, std::vector< std::vector<double> > &x_pnts, std::vector< std::vector<double> > &y_pnts, std::vector< std::vector<int> > &codings, std::vector<std::string> &group_names, bool by_group = false, bool verbose = false, bool debug = false);
+moab::ErrorCode get_volumes_by_group(moab::Interface *mbi,
+				     std::map< std::string, moab::Range > &group_map,
+				     std::vector<std::string> &group_names);
 
-moab::ErrorCode slice_faceted_model( std::string filename, int axis, double coord,   std::vector< std::vector<xypnt> > &paths, std::vector< std::vector<int> > &codings,  std::vector<std::string> &group_names, bool by_group = false);
+moab::ErrorCode create_surface_intersections(moab::Interface *mbi,
+					     moab::Range surfs,
+					     int axis,
+					     double coord,
+					     std::map<moab::EntityHandle, std::vector<Loop> > &intersection_map);
 
-moab::ErrorCode get_volumes_by_group( moab::Interface *mbi, std::map< std::string, moab::Range > &group_map, std::vector<std::string> &group_names );
+moab::ErrorCode get_volume_intersections( moab::Interface *mbi,
+					  moab::EntityHandle volume,
+					  std::map<moab::EntityHandle, std::vector<Loop> > intersection_dict,
+					  std::vector<Loop> &volume_intersections);
 
-moab::ErrorCode create_surface_intersections( moab::Interface *mbi, moab::Range surfs, int axis, double coord,   std::map<moab::EntityHandle,std::vector<Loop> > &intersection_map);
+moab::ErrorCode get_volume_paths(moab::Interface *mbi,
+				 moab::Range volumes,
+				 int axis,
+				 std::map<moab::EntityHandle, std::vector<Loop> > intersection_dict,
+				 std::vector< std::vector<Loop> > &all_vol_paths);
 
-moab::ErrorCode get_volume_intersections( moab::Interface *mbi, moab::EntityHandle volume, std::map<moab::EntityHandle, std::vector<Loop> > intersection_dict,   std::vector<Loop> &volume_intersections );
+void stitch(std::vector<Loop> loops, std::vector<Loop> &paths);
 
-moab::ErrorCode get_volume_paths( moab::Interface *mbi, moab::Range volumes, int axis, std::map<moab::EntityHandle, std::vector<Loop> > intersection_dict,   std::vector< std::vector<Loop> > &all_vol_paths );
+moab::ErrorCode surface_intersections(moab::Interface *mbi,
+				      std::vector<moab::EntityHandle> tris,
+				      int axis,
+				      double coord,
+				      std::vector<Loop> &surf_intersections);
 
-void stitch( std::vector<Loop> loops, std::vector<Loop> &paths );
+moab::ErrorCode intersection(moab::Interface *mbi,
+			     int axis,
+			     double coord,
+			     moab::EntityHandle tri,
+			     Line &tri_intersection,
+			     bool &intersect);
 
-moab::ErrorCode surface_intersections(moab::Interface *mbi, std::vector<moab::EntityHandle> tris, int axis, double coord, std::vector<Loop> &surf_intersections);
+void triangle_plane_intersect(int axis,
+			      double coord,
+			      moab::CartVect *coords,
+			      Line &line_out);
 
-moab::ErrorCode intersection( moab::Interface *mbi,  int axis, double coord, moab::EntityHandle tri, Line &tri_intersection, bool &intersect);
+void get_intersection(moab::CartVect pnt0,
+		      moab::CartVect pnt1,
+		      int axis,
+		      double coord,
+		      Line &line);
 
-void triangle_plane_intersect( int axis, double coord, moab::CartVect *coords, Line &line_out);
+void convert_to_stl(std::vector< std::vector<Loop> > a,
+		    std::vector< std::vector< std::vector< std::vector<double> > > > &b);
 
-void get_intersection( moab::CartVect pnt0, moab::CartVect pnt1, int axis, double coord, Line &line );
+void create_patch(int axis,
+		  std::vector<Loop> input_loops,
+		  std::vector<xypnt> &path_out,
+		  std::vector<int> &coding_out);
 
-void convert_to_stl( std::vector< std::vector<Loop> > a, std::vector< std::vector< std::vector< std::vector<double> > > > &b);
+void get_containment(std::vector<Loop> loops,
+		     std::vector< std::vector<int> > &Mat);
 
-void create_patch( int axis, std::vector<Loop> input_loops, std::vector<xypnt> &path_out, std::vector<int> &coding_out);
+bool is_poly_a_in_poly_b(Loop a, Loop b);
 
-void get_containment( std::vector<Loop> loops, std::vector< std::vector<int> > &Mat );
+void get_windings(std::vector<Loop> loops, std::vector<int> &windings);
 
-bool is_poly_a_in_poly_b( Loop a, Loop b);
+int find_winding(Loop loop);
 
-void get_windings( std::vector<Loop> loops, std::vector<int> &windings);
+void get_fill_windings(std::vector< std::vector<int> > fill_mat, std::vector<int> &windings);
 
-int find_winding( Loop loop );
+void set_windings(std::vector<int> current_windings,
+		  std::vector<int> desired_windings,
+		  std::vector<Loop> &loops);
 
-void get_fill_windings( std::vector< std::vector<int> > fill_mat, std::vector<int> &windings);
-
-void set_windings( std::vector<int> current_windings, std::vector<int> desired_windings, std::vector<Loop> &loops);
-
-void generate_patch_path( std::vector<Loop> loops, std::vector<xypnt> &path, std::vector<int> &coding);
+void generate_patch_path(std::vector<Loop> loops,
+			 std::vector<xypnt> &path,
+			 std::vector<int> &coding);
 
 
