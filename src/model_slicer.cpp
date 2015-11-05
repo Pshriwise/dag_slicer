@@ -15,8 +15,8 @@ int main( int argc, char ** argv )
   int axis = 0;
   double coord = 0.0;
   bool write_to_file = false;
-  bool plot = false;
-
+  bool by_group = false;
+  
   po.addRequiredArg<std::string>("input_file", "Filename of the .h5m model to slice.", &filename);
 
   po.addOpt<int>("ax", "Axis along which to slice the model. Default is x (0).", &axis);
@@ -25,11 +25,11 @@ int main( int argc, char ** argv )
 
   po.addOpt<void>("w", "Write slice points to file slicepnts.txt.", &write_to_file);
 
-  po.addOpt<void>("p", "Plot the slice using gnuplot streamer.", &plot);
+  po.addOpt<void>("by-group","Write out the slice points by group.",&by_group);
 
   po.parseCommandLine(argc, argv); 
-  
-  Dag_Slicer ds(filename, axis, coord);
+
+  Dag_Slicer ds(filename, axis, coord, by_group);
   ds.create_slice(); 
   
   std::ofstream output, coding; 
@@ -37,9 +37,13 @@ int main( int argc, char ** argv )
 
   output.open("slicepnts.txt");
   coding.open("coding.txt");
-
+  
   //write the slice points to file
   for(unsigned int i = 0; i < ds.slice_x_pnts.size(); i++) {
+          if(by_group) {
+	output << ds.group_names[i] << std::endl;
+	coding << ds.group_names[i] << std::endl;
+      }
       for(unsigned int j = 0; j < ds.slice_x_pnts[i].size(); j++) {
 	  //write x point
 	output << ds.slice_x_pnts[i][j] << std::fixed << " ";
