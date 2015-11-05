@@ -1,5 +1,6 @@
 
-
+from subprocess import call,PIPE
+from os.path import isfile
 from dagmc_slice_tool import dagmc_slicer
 
 def test_simple():
@@ -56,3 +57,12 @@ def test_no_groups():
     assert(len(s.group_names) == 0)
     assert(len(s.slice_x_pnts) == 0)
     assert(len(s.slice_y_pnts) == 0)
+
+def test_src():
+
+    if isfile('test_slicer'):
+        cmd = './test_slicer'
+    else:
+        cmd = 'cd ../src/ && make && cd ../test/ && make && ./test_slicer'
+    assert(not call(cmd,shell=True, stdout=PIPE))
+    
