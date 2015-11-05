@@ -120,7 +120,7 @@ moab::ErrorCode slice_faceted_model(std::string filename,
     std::vector<std::string>::iterator group_name;
     for (group_name = group_names.begin(); group_name != group_names.end(); group_name++) {
       std::vector< std::vector<Loop> > all_group_paths;
-      result = get_volume_paths( mbi, group_mapping[*group_name], axis, intersection_map, all_group_paths);
+      result = get_volume_paths( mbi, group_mapping[*group_name], intersection_map, all_group_paths);
       ERR_CHECK(result);
 
       if (0 == all_group_paths.size()) {
@@ -156,7 +156,7 @@ moab::ErrorCode slice_faceted_model(std::string filename,
     result = get_all_volumes(mbi, volumes);
     ERR_CHECK(result);
 
-    result = get_volume_paths(mbi, volumes, axis, intersection_map, all_paths);
+    result = get_volume_paths(mbi, volumes, intersection_map, all_paths);
     ERR_CHECK(result);
 
     std::vector< std::vector<Loop> >::iterator i;
@@ -228,7 +228,6 @@ moab::ErrorCode get_volumes_by_group(moab::Interface *mbi,
 
 moab::ErrorCode get_volume_paths( moab::Interface *mbi,
 				  moab::Range volumes,
-				  int axis,
 				  std::map<moab::EntityHandle, std::vector<Loop> > intersection_dict,
 				  std::vector< std::vector<Loop> > &all_vol_paths) {
   moab::ErrorCode result; 

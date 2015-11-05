@@ -28,8 +28,6 @@ int main( int argc, char ** argv )
   po.addOpt<void>("p", "Plot the slice using gnuplot streamer.", &plot);
 
   po.parseCommandLine(argc, argv); 
-
-  moab::ErrorCode result; 
   
   Dag_Slicer ds(filename, axis, coord);
   ds.create_slice(); 

@@ -142,7 +142,6 @@ moab::ErrorCode get_volume_intersections( moab::Interface *mbi,
 
 moab::ErrorCode get_volume_paths(moab::Interface *mbi,
 				 moab::Range volumes,
-				 int axis,
 				 std::map<moab::EntityHandle, std::vector<Loop> > intersection_dict,
 				 std::vector< std::vector<Loop> > &all_vol_paths);
 
