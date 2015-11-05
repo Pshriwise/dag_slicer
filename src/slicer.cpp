@@ -366,7 +366,7 @@ moab::ErrorCode create_surface_intersections(moab::Interface *mbi,
 					     moab::Range surfs,
 					     int axis,
 					     double coord,
-					     std::map<moab::EntityHandle>, std::vector<Loop> > &intersection_map) {
+					     std::map<moab::EntityHandle, std::vector<Loop> > &intersection_map) {
   moab::ErrorCode result; 
 
   moab::Range::iterator i; 
