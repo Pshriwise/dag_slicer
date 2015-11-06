@@ -57,37 +57,37 @@ cdef class Dag_Slicer:
     property axis:
         """no docstring for axis, please file a bug report!"""
         def __get__(self):
-            return int((<cpp_dag_slicer.Dag_Slicer *> self._inst).axis)
+            return int((<cpp_dag_slicer.Dag_Slicer *> self._inst)._axis)
     
         def __set__(self, value):
-            (<cpp_dag_slicer.Dag_Slicer *> self._inst).axis = <int> value
+            (<cpp_dag_slicer.Dag_Slicer *> self._inst)._axis = <int> value
     
     
     property by_group:
         """no docstring for by_group, please file a bug report!"""
         def __get__(self):
-            return bool((<cpp_dag_slicer.Dag_Slicer *> self._inst).by_group)
+            return bool((<cpp_dag_slicer.Dag_Slicer *> self._inst)._by_group)
     
         def __set__(self, value):
-            (<cpp_dag_slicer.Dag_Slicer *> self._inst).by_group = <bint> value
+            (<cpp_dag_slicer.Dag_Slicer *> self._inst)._by_group = <bint> value
     
     
     property coord:
         """no docstring for coord, please file a bug report!"""
         def __get__(self):
-            return float((<cpp_dag_slicer.Dag_Slicer *> self._inst).coord)
+            return float((<cpp_dag_slicer.Dag_Slicer *> self._inst)._coord)
     
         def __set__(self, value):
-            (<cpp_dag_slicer.Dag_Slicer *> self._inst).coord = <double> value
+            (<cpp_dag_slicer.Dag_Slicer *> self._inst)._coord = <double> value
     
     
     property debug:
         """no docstring for debug, please file a bug report!"""
         def __get__(self):
-            return bool((<cpp_dag_slicer.Dag_Slicer *> self._inst).debug)
+            return bool((<cpp_dag_slicer.Dag_Slicer *> self._inst)._debug)
     
         def __set__(self, value):
-            (<cpp_dag_slicer.Dag_Slicer *> self._inst).debug = <bint> value
+            (<cpp_dag_slicer.Dag_Slicer *> self._inst)._debug = <bint> value
     
     
     property dum_ints:
@@ -155,12 +155,12 @@ cdef class Dag_Slicer:
     property filename:
         """no docstring for filename, please file a bug report!"""
         def __get__(self):
-            return bytes(<char *> (<cpp_dag_slicer.Dag_Slicer *> self._inst).filename.c_str()).decode()
+            return bytes(<char *> (<cpp_dag_slicer.Dag_Slicer *> self._inst)._filename.c_str()).decode()
     
         def __set__(self, value):
             cdef char * value_proxy
             value_bytes = value.encode()
-            (<cpp_dag_slicer.Dag_Slicer *> self._inst).filename = std_string(<char *> value_bytes)
+            (<cpp_dag_slicer.Dag_Slicer *> self._inst)._filename = std_string(<char *> value_bytes)
     
     
     property group_names:
@@ -290,10 +290,10 @@ cdef class Dag_Slicer:
     property verbose:
         """no docstring for verbose, please file a bug report!"""
         def __get__(self):
-            return bool((<cpp_dag_slicer.Dag_Slicer *> self._inst).verbose)
+            return bool((<cpp_dag_slicer.Dag_Slicer *> self._inst)._verbose)
     
         def __set__(self, value):
-            (<cpp_dag_slicer.Dag_Slicer *> self._inst).verbose = <bint> value
+            (<cpp_dag_slicer.Dag_Slicer *> self._inst)._verbose = <bint> value
     
     
     # methods

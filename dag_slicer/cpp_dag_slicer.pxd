@@ -23,18 +23,18 @@ cdef extern from "dag_slicer.hpp" :
         Dag_Slicer(std_string, int, double, cpp_bool) except +
 
         # attributes
-        int axis
-        cpp_bool by_group
-        double coord
-        cpp_bool debug
+        int _axis
+        cpp_bool _by_group
+        double _coord
+        cpp_bool _debug
         cpp_vector[int] dum_ints
         cpp_vector[double] dum_pnts
-        std_string filename
+        std_string _filename
         cpp_vector[std_string] group_names
         cpp_vector[cpp_vector[int]] path_coding
         cpp_vector[cpp_vector[double]] slice_x_pnts
         cpp_vector[cpp_vector[double]] slice_y_pnts
-        cpp_bool verbose
+        cpp_bool _verbose
 
         # methods
         void create_slice() except +

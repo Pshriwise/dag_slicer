@@ -1,7 +1,7 @@
 #include "dag_slicer.hpp"
 
 Dag_Slicer::Dag_Slicer( std::string file_to_slice, int ax, double coordinate, bool by_grp )
-  : axis(ax), filename(file_to_slice), coord(coordinate), by_group(by_grp), verbose(false), debug(false) { }
+  : _axis(ax), _filename(file_to_slice), _coord(coordinate), _by_group(by_grp), _verbose(false), _debug(false) { }
 
   Dag_Slicer::~Dag_Slicer() { }
   
@@ -9,15 +9,15 @@ Dag_Slicer::Dag_Slicer( std::string file_to_slice, int ax, double coordinate, bo
     slice_x_pnts.clear(); 
     slice_y_pnts.clear(); 
     path_coding.clear();
-    slice_faceted_model_out(filename,
-			    axis,
-			    coord,
+    slice_faceted_model_out(_filename,
+			    _axis,
+			    _coord,
 			    slice_x_pnts,
 			    slice_y_pnts,
 			    path_coding,
 			    group_names,
-			    by_group,
-			    verbose,
-			    debug);
+			    _by_group,
+			    _verbose,
+			    _debug);
   }  
   
