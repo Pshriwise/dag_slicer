@@ -8,9 +8,6 @@ from Cython.Distutils import build_ext
 
 import numpy as np
 
-if not os.path.exists('dag_slicer/xdress_extra_types.h'):
-    sys.exit("please run xdress first!")
-
 call(['cmake','.'])
 
 call(['make'])
@@ -32,11 +29,11 @@ def get_moab_paths():
     moab_inc = args.moab_path + "/include/"
     moab_lib = args.moab_path + "/lib/"
 
-    return moab_inc, moab_lib
+    return moab_inc,moab_lib
 
 
 
-moab_include_path,  moab_library_path = get_moab_paths()
+moab_include_path,moab_library_path = get_moab_paths()
 
 incdirs = [os.path.join(os.getcwd(), 'src'), np.get_include(), moab_include_path]
 libdirs = [moab_library_path]
