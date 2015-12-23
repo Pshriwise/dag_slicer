@@ -18,6 +18,7 @@
 #define CW -1
 
 #define MATCH_TOL 1e-7
+#define FILENAME_TAG_NAME "FILENAME"
 
 inline void ERR_CHECK(moab::ErrorCode rval) {
   if (rval) {

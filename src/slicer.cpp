@@ -96,13 +96,53 @@ moab::ErrorCode slice_faceted_model(std::string filename,
 				    std::vector< std::vector<xypnt> > &paths,
 				    std::vector< std::vector<int> > &codings,
 				    std::vector<std::string> &group_names, bool by_group) {
-  //moab::Interface *mbi = new moab::Core();
   
   moab::ErrorCode result;
+  bool new_file = true;
   std::map<moab::EntityHandle,std::vector<Loop> > intersection_map;
-  
-  result = mbi()->load_file(filename.c_str());
+
+  //get the filename_tag
+  moab::Tag filename_tag;
+  result = mbi()->tag_get_handle( FILENAME_TAG_NAME, 50, moab::MB_TYPE_OPAQUE, filename_tag, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE);
   ERR_CHECK(result);
+
+
+  //check the root_set for this tag
+  moab::EntityHandle root_set = mbi()->get_root_set();
+  std::vector<moab::Tag> root_set_tags;
+  result = mbi()->tag_get_tags_on_entity(root_set, root_set_tags);
+  ERR_CHECK(result);
+
+
+  std::vector<moab::Tag>::iterator val  = std::find(root_set_tags.begin(),root_set_tags.end(),filename_tag);
+  if(val != root_set_tags.end()) { 
+    //check that filename is the same
+    std::string current_filename;
+    current_filename.resize(50);
+    result = mbi()->tag_get_data(filename_tag, &root_set, 1, (void*)current_filename.c_str());
+    ERR_CHECK(result);
+    std::cout << "Current filename: " << current_filename << std::endl;
+    std::cout << "New Filename: " << filename << std::endl;
+    current_filename.resize(filename.size());
+    if(current_filename == filename) new_file = false;
+  }
+  
+
+  if(new_file)
+    {
+      //remove all old mesh content
+      result = mbi()->delete_mesh();
+      ERR_CHECK(result);
+      //load the new file
+      std::cout << "Loading new file..." << std::endl;
+      result = mbi()->load_file(filename.c_str());
+      ERR_CHECK(result);
+
+      //tag the root set with the filename
+      moab::EntityHandle rs = mbi()->get_root_set();
+      result = mbi()->tag_set_data(filename_tag,&rs,1,(void*)filename.c_str());
+      ERR_CHECK(result);
+    }
   
   moab::Range surfaces;
   result = get_surfaces(surfaces);
