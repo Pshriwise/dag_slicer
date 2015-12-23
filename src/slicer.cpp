@@ -2,6 +2,11 @@
 #include "slicer.hpp"
 #include "options.hpp"
 
+moab::Interface* mbi() {
+  static moab::Core instance;
+  return &instance;
+}
+
 struct program_option_struct opts;
 
 bool point_match(moab::CartVect pnt1, moab::CartVect pnt2, double tolerance) {
@@ -10,32 +15,32 @@ bool point_match(moab::CartVect pnt1, moab::CartVect pnt2, double tolerance) {
   return (diff.length() < tolerance);
 }
 
-moab::ErrorCode get_sets_by_category(moab::Interface *mbi, moab::Range &entsets, char* category) {
+moab::ErrorCode get_sets_by_category( moab::Range &entsets, char* category) {
   
   moab::ErrorCode result = moab::MB_SUCCESS;
 
   //get the name tag from the moab instance
   moab::Tag category_tag; 
-  result = mbi->tag_get_handle(CATEGORY_TAG_NAME, category_tag); 
+  result = mbi()->tag_get_handle(CATEGORY_TAG_NAME, category_tag); 
   ERR_CHECK(result); 
 
   //create void pointer for tag data match
   const void *dum = &(category[0]);
 
-  result = mbi->get_entities_by_type_and_tag(0, moab::MBENTITYSET, &category_tag, &dum, 1, entsets);
+  result = mbi()->get_entities_by_type_and_tag(0, moab::MBENTITYSET, &category_tag, &dum, 1, entsets);
   ERR_CHECK(result);
   
   return result;
 
 }
 
-moab::ErrorCode get_surfaces(moab::Interface* mbi, moab::Range &surfs) {
+moab::ErrorCode get_surfaces(moab::Range &surfs) {
 
   moab::ErrorCode result = moab::MB_SUCCESS;
 
   char category[CATEGORY_TAG_SIZE] = "Surface";
   
-  result = get_sets_by_category(mbi, surfs, category);
+  result = get_sets_by_category(surfs, category);
 
   if (OPT_VERBOSE) std::cout << "There are " << surfs.size() << " surfaces in this model." << std::endl;
 
@@ -43,13 +48,13 @@ moab::ErrorCode get_surfaces(moab::Interface* mbi, moab::Range &surfs) {
 
 }
 
-moab::ErrorCode get_all_volumes(moab::Interface *mbi, moab::Range &vols) {
+moab::ErrorCode get_all_volumes( moab::Range &vols) {
 
   moab::ErrorCode result = moab::MB_SUCCESS;
 
   char category[CATEGORY_TAG_SIZE] = "Volume";
   
-  result = get_sets_by_category(mbi, vols, category);
+  result = get_sets_by_category(vols, category);
   
   if (OPT_VERBOSE) std::cout << "There are " << vols.size() << " volumes in this model." << std::endl;
 
@@ -91,19 +96,19 @@ moab::ErrorCode slice_faceted_model(std::string filename,
 				    std::vector< std::vector<xypnt> > &paths,
 				    std::vector< std::vector<int> > &codings,
 				    std::vector<std::string> &group_names, bool by_group) {
-  moab::Interface *mbi = new moab::Core();
+  //moab::Interface *mbi = new moab::Core();
   
   moab::ErrorCode result;
   std::map<moab::EntityHandle,std::vector<Loop> > intersection_map;
   
-  result = mbi->load_file(filename.c_str());
+  result = mbi()->load_file(filename.c_str());
   ERR_CHECK(result);
   
   moab::Range surfaces;
-  result = get_surfaces(mbi, surfaces);
+  result = get_surfaces(surfaces);
   ERR_CHECK(result);
 
-  result = create_surface_intersections(mbi, surfaces, axis, coord, intersection_map);
+  result = create_surface_intersections(surfaces, axis, coord, intersection_map);
   ERR_CHECK(result);
 
   //path container for a volume
@@ -112,7 +117,7 @@ moab::ErrorCode slice_faceted_model(std::string filename,
   if (by_group) {
     std::map< std::string, moab::Range > group_mapping;
 
-    result = get_volumes_by_group(mbi, group_mapping, group_names);
+    result = get_volumes_by_group(group_mapping, group_names);
     ERR_CHECK(result);
 
     if (OPT_VERBOSE) std::cout << "Size of group map: " << group_mapping.size() << std::endl;
@@ -120,7 +125,7 @@ moab::ErrorCode slice_faceted_model(std::string filename,
     std::vector<std::string>::iterator group_name;
     for (group_name = group_names.begin(); group_name != group_names.end(); group_name++) {
       std::vector< std::vector<Loop> > all_group_paths;
-      result = get_volume_paths( mbi, group_mapping[*group_name], intersection_map, all_group_paths);
+      result = get_volume_paths(group_mapping[*group_name], intersection_map, all_group_paths);
       ERR_CHECK(result);
 
       if (0 == all_group_paths.size()) {
@@ -152,10 +157,10 @@ moab::ErrorCode slice_faceted_model(std::string filename,
   }
   else {
     moab::Range volumes;
-    result = get_all_volumes(mbi, volumes);
+    result = get_all_volumes(volumes);
     ERR_CHECK(result);
 
-    result = get_volume_paths(mbi, volumes, intersection_map, all_paths);
+    result = get_volume_paths(volumes, intersection_map, all_paths);
     ERR_CHECK(result);
 
     std::vector< std::vector<Loop> >::iterator i;
@@ -171,7 +176,7 @@ moab::ErrorCode slice_faceted_model(std::string filename,
   return moab::MB_SUCCESS;
 }
 
-moab::ErrorCode get_volumes_by_group(moab::Interface *mbi,
+moab::ErrorCode get_volumes_by_group(
 				     std::map< std::string,
 				     moab::Range > &group_map,
 				     std::vector<std::string> &group_names ) {
@@ -179,19 +184,19 @@ moab::ErrorCode get_volumes_by_group(moab::Interface *mbi,
 
   //get all meshsets in the model
   std::vector<moab::EntityHandle> all_entsets;
-  result = mbi->get_entities_by_type(0, moab::MBENTITYSET, all_entsets);
+  result = mbi()->get_entities_by_type(0, moab::MBENTITYSET, all_entsets);
   ERR_CHECK(result);
 
   //get the category tag
   moab::Tag name_tag;
-  result = mbi->tag_get_handle(NAME_TAG_NAME, name_tag);
+  result = mbi()->tag_get_handle(NAME_TAG_NAME, name_tag);
   ERR_CHECK(result);
 
   std::vector<moab::EntityHandle>::iterator i;
   for (i = all_entsets.begin(); i != all_entsets.end(); ++i) {
     //get all the tags on this entity set
     std::vector<moab::Tag> ent_tags;
-    result = mbi->tag_get_tags_on_entity(*i, ent_tags);
+    result = mbi()->tag_get_tags_on_entity(*i, ent_tags);
     ERR_CHECK(result);
 
     //check if this entity has a name_tag (is a group)
@@ -200,14 +205,14 @@ moab::ErrorCode get_volumes_by_group(moab::Interface *mbi,
       ent_name.resize(NAME_TAG_SIZE);
       void *dum = &(ent_name[0]);
       //get the tag data on this entity set
-      result = mbi->tag_get_data(name_tag, &(*i), 1, dum);
+      result = mbi()->tag_get_data(name_tag, &(*i), 1, dum);
       ERR_CHECK(result);
 
       if (OPT_DEBUG) std::cout << ent_name << std::endl;
 
       //get this group's children
       moab::Range group_contents;
-      result = mbi->get_entities_by_type(*i, moab::MBENTITYSET, group_contents);
+      result = mbi()->get_entities_by_type(*i, moab::MBENTITYSET, group_contents);
       ERR_CHECK(result);
 
       //add this group to the list of group names
@@ -225,7 +230,7 @@ moab::ErrorCode get_volumes_by_group(moab::Interface *mbi,
   return moab::MB_SUCCESS;
 }
 
-moab::ErrorCode get_volume_paths( moab::Interface *mbi,
+moab::ErrorCode get_volume_paths( 
 				  moab::Range volumes,
 				  std::map<moab::EntityHandle, std::vector<Loop> > intersection_dict,
 				  std::vector< std::vector<Loop> > &all_vol_paths) {
@@ -234,7 +239,7 @@ moab::ErrorCode get_volume_paths( moab::Interface *mbi,
   moab::Range::iterator i; 
   for (i = volumes.begin(); i != volumes.end(); i++) {
     std::vector<Loop> this_vol_intersections;
-    result = get_volume_intersections(mbi, *i, intersection_dict, this_vol_intersections);
+    result = get_volume_intersections(*i, intersection_dict, this_vol_intersections);
     ERR_CHECK(result);
 
     if (0 == this_vol_intersections.size()) continue; 
@@ -342,13 +347,13 @@ void stitch(std::vector<Loop> loops, std::vector<Loop> &paths) {
   return;
 } // end stitch
 
-moab::ErrorCode get_volume_intersections(moab::Interface *mbi,
+moab::ErrorCode get_volume_intersections(
 					 moab::EntityHandle volume,
 					 std::map<moab::EntityHandle, std::vector<Loop> > intersection_dict,
 					 std::vector<Loop> &volume_intersections) {
   moab::ErrorCode result;
   std::vector<moab::EntityHandle> chld_surfaces;
-  result = mbi->get_child_meshsets(volume, chld_surfaces);
+  result = mbi()->get_child_meshsets(volume, chld_surfaces);
   ERR_CHECK(result);
   
   std::vector<moab::EntityHandle>::iterator i;
@@ -360,7 +365,7 @@ moab::ErrorCode get_volume_intersections(moab::Interface *mbi,
   return moab::MB_SUCCESS;
 }
 
-moab::ErrorCode create_surface_intersections(moab::Interface *mbi,
+moab::ErrorCode create_surface_intersections(
 					     moab::Range surfs,
 					     int axis,
 					     double coord,
@@ -371,12 +376,12 @@ moab::ErrorCode create_surface_intersections(moab::Interface *mbi,
   for (i = surfs.begin(); i != surfs.end(); i++) {
     //get the surface triangles
     std::vector<moab::EntityHandle> surf_tris; 
-    result = mbi->get_entities_by_type(*i, moab::MBTRI, surf_tris);
+    result = mbi()->get_entities_by_type(*i, moab::MBTRI, surf_tris);
     ERR_CHECK(result); 
       
     //now create surface intersection
     std::vector<Loop> surf_intersections;
-    result = surface_intersections(mbi, surf_tris, axis, coord, surf_intersections);
+    result = surface_intersections(surf_tris, axis, coord, surf_intersections);
     ERR_CHECK(result);
 
     intersection_map[*i] = surf_intersections;
@@ -388,7 +393,7 @@ moab::ErrorCode create_surface_intersections(moab::Interface *mbi,
 }
 
 
-moab::ErrorCode surface_intersections(moab::Interface *mbi,
+moab::ErrorCode surface_intersections(
 				      std::vector<moab::EntityHandle> tris,
 				      int axis,
 				      double coord,
@@ -399,7 +404,7 @@ moab::ErrorCode surface_intersections(moab::Interface *mbi,
   std::vector<moab::EntityHandle>::iterator i; 
   for ( i = tris.begin(); i != tris.end(); i++) { 
     Line line; bool intersect;
-    result = intersection(mbi, axis, coord, *i, line, intersect);
+    result = intersection(axis, coord, *i, line, intersect);
     ERR_CHECK(result);
       
     if(intersect) intersect_lines.push_back(line);
@@ -459,7 +464,7 @@ moab::ErrorCode surface_intersections(moab::Interface *mbi,
   return result; 
 }
 
-moab::ErrorCode intersection(moab::Interface *mbi,
+moab::ErrorCode intersection(
 			     int axis,
 			     double coord,
 			     moab::EntityHandle tri,
@@ -469,15 +474,15 @@ moab::ErrorCode intersection(moab::Interface *mbi,
   //get the triangle vertices
   std::vector<moab::EntityHandle> verts;
   
-  result = mbi->get_adjacencies(&tri, 1, 0, false, verts);
+  result = mbi()->get_adjacencies(&tri, 1, 0, false, verts);
   ERR_CHECK(result);
   
   moab::CartVect tri_coords[3];
-  result = mbi->get_coords(&(verts[0]), 1, tri_coords[0].array());
+  result = mbi()->get_coords(&(verts[0]), 1, tri_coords[0].array());
   ERR_CHECK(result);
-  result = mbi->get_coords(&(verts[1]), 1, tri_coords[1].array());
+  result = mbi()->get_coords(&(verts[1]), 1, tri_coords[1].array());
   ERR_CHECK(result);
-  result = mbi->get_coords(&(verts[2]), 1, tri_coords[2].array());
+  result = mbi()->get_coords(&(verts[2]), 1, tri_coords[2].array());
   ERR_CHECK(result);
 
   triangle_plane_intersect(axis, coord, tri_coords, tri_intersection);
