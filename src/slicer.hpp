@@ -103,15 +103,13 @@ bool point_match(moab::CartVect pnt1,
 		 moab::CartVect pnt2,
 		 double tolerance = MATCH_TOL);
 
-moab::ErrorCode get_sets_by_category(
-				     moab::Range &entsets,
+moab::ErrorCode get_sets_by_category(moab::Range &entsets,
 				     char* category);
 
 moab::ErrorCode get_surfaces(moab::Interface* mbi,
 			     moab::Range &surfs);
 
-moab::ErrorCode get_all_volumes(
-				moab::Range &vols);
+moab::ErrorCode get_all_volumes(moab::Range &vols);
 
 moab::ErrorCode slice_faceted_model_out(std::string filename,
 					int axis,
@@ -132,36 +130,30 @@ moab::ErrorCode slice_faceted_model(std::string filename,
 				    std::vector<std::string> &group_names,
 				    bool by_group = false);
 
-moab::ErrorCode get_volumes_by_group(
-				     std::map< std::string, moab::Range > &group_map,
+moab::ErrorCode get_volumes_by_group(std::map< std::string, moab::Range > &group_map,
 				     std::vector<std::string> &group_names);
 
-moab::ErrorCode create_surface_intersections(
-					     moab::Range surfs,
+moab::ErrorCode create_surface_intersections(moab::Range surfs,
 					     int axis,
 					     double coord,
 					     std::map<moab::EntityHandle, std::vector<Loop> > &intersection_map);
 
-moab::ErrorCode get_volume_intersections( 
-					  moab::EntityHandle volume,
+moab::ErrorCode get_volume_intersections(moab::EntityHandle volume,
 					  std::map<moab::EntityHandle, std::vector<Loop> > intersection_dict,
 					  std::vector<Loop> &volume_intersections);
 
-moab::ErrorCode get_volume_paths(
-				 moab::Range volumes,
+moab::ErrorCode get_volume_paths(moab::Range volumes,
 				 std::map<moab::EntityHandle, std::vector<Loop> > intersection_dict,
 				 std::vector< std::vector<Loop> > &all_vol_paths);
 
 void stitch(std::vector<Loop> loops, std::vector<Loop> &paths);
 
-moab::ErrorCode surface_intersections(
-				      std::vector<moab::EntityHandle> tris,
+moab::ErrorCode surface_intersections(std::vector<moab::EntityHandle> tris,
 				      int axis,
 				      double coord,
 				      std::vector<Loop> &surf_intersections);
 
-moab::ErrorCode intersection(
-			     int axis,
+moab::ErrorCode intersection(int axis,
 			     double coord,
 			     moab::EntityHandle tri,
 			     Line &tri_intersection,

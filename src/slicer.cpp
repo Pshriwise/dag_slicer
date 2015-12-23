@@ -15,7 +15,7 @@ bool point_match(moab::CartVect pnt1, moab::CartVect pnt2, double tolerance) {
   return (diff.length() < tolerance);
 }
 
-moab::ErrorCode get_sets_by_category( moab::Range &entsets, char* category) {
+moab::ErrorCode get_sets_by_category(moab::Range &entsets, char* category) {
   
   moab::ErrorCode result = moab::MB_SUCCESS;
 
@@ -48,7 +48,7 @@ moab::ErrorCode get_surfaces(moab::Range &surfs) {
 
 }
 
-moab::ErrorCode get_all_volumes( moab::Range &vols) {
+moab::ErrorCode get_all_volumes(moab::Range &vols) {
 
   moab::ErrorCode result = moab::MB_SUCCESS;
 
@@ -176,8 +176,7 @@ moab::ErrorCode slice_faceted_model(std::string filename,
   return moab::MB_SUCCESS;
 }
 
-moab::ErrorCode get_volumes_by_group(
-				     std::map< std::string,
+moab::ErrorCode get_volumes_by_group(std::map< std::string,
 				     moab::Range > &group_map,
 				     std::vector<std::string> &group_names ) {
   moab::ErrorCode result;
@@ -230,10 +229,10 @@ moab::ErrorCode get_volumes_by_group(
   return moab::MB_SUCCESS;
 }
 
-moab::ErrorCode get_volume_paths( 
-				  moab::Range volumes,
-				  std::map<moab::EntityHandle, std::vector<Loop> > intersection_dict,
-				  std::vector< std::vector<Loop> > &all_vol_paths) {
+moab::ErrorCode get_volume_paths(moab::Range volumes,
+				 std::map<moab::EntityHandle, 
+				 std::vector<Loop> > intersection_dict,
+				 std::vector< std::vector<Loop> > &all_vol_paths) {
   moab::ErrorCode result; 
   
   moab::Range::iterator i; 
@@ -347,9 +346,9 @@ void stitch(std::vector<Loop> loops, std::vector<Loop> &paths) {
   return;
 } // end stitch
 
-moab::ErrorCode get_volume_intersections(
-					 moab::EntityHandle volume,
-					 std::map<moab::EntityHandle, std::vector<Loop> > intersection_dict,
+moab::ErrorCode get_volume_intersections(moab::EntityHandle volume,
+					 std::map<moab::EntityHandle, 
+					 std::vector<Loop> > intersection_dict,
 					 std::vector<Loop> &volume_intersections) {
   moab::ErrorCode result;
   std::vector<moab::EntityHandle> chld_surfaces;
@@ -365,11 +364,11 @@ moab::ErrorCode get_volume_intersections(
   return moab::MB_SUCCESS;
 }
 
-moab::ErrorCode create_surface_intersections(
-					     moab::Range surfs,
+moab::ErrorCode create_surface_intersections(moab::Range surfs,
 					     int axis,
 					     double coord,
-					     std::map<moab::EntityHandle, std::vector<Loop> > &intersection_map) {
+					     std::map<moab::EntityHandle,
+					     std::vector<Loop> > &intersection_map) {
   moab::ErrorCode result; 
 
   moab::Range::iterator i; 
@@ -393,8 +392,7 @@ moab::ErrorCode create_surface_intersections(
 }
 
 
-moab::ErrorCode surface_intersections(
-				      std::vector<moab::EntityHandle> tris,
+moab::ErrorCode surface_intersections(std::vector<moab::EntityHandle> tris,
 				      int axis,
 				      double coord,
 				      std::vector<Loop> &surf_intersections) {
@@ -464,8 +462,7 @@ moab::ErrorCode surface_intersections(
   return result; 
 }
 
-moab::ErrorCode intersection(
-			     int axis,
+moab::ErrorCode intersection(int axis,
 			     double coord,
 			     moab::EntityHandle tri,
 			     Line &tri_intersection,
