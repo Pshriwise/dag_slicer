@@ -4,7 +4,7 @@ Dag_Slicer::Dag_Slicer( std::string file_to_slice, int ax, double coordinate, bo
   : _axis(ax), _filename(file_to_slice), _coord(coordinate), _by_group(by_grp), _verbose(false), _debug(false) { }
 
   Dag_Slicer::~Dag_Slicer() { }
-  
+
   void Dag_Slicer::create_slice() {
     slice_x_pnts.clear(); 
     slice_y_pnts.clear(); 
@@ -19,5 +19,10 @@ Dag_Slicer::Dag_Slicer( std::string file_to_slice, int ax, double coordinate, bo
 			    _by_group,
 			    _verbose,
 			    _debug);
+
   }  
   
+void Dag_Slicer::rename_group(int group_global_id, std::string new_name) {
+  rename_group(group_global_id, new_name);
+}
+     
