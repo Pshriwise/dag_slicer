@@ -728,10 +728,10 @@ void generate_patch_path(std::vector<Loop> loops,
     }
 }
 
-void rename_group(int group_global_id, std::string new_name) {
+void rename_group_out(int group_global_id, std::string new_name) {
 
   moab::ErrorCode result;
-  
+
   //get the category tag
   moab::Tag category_tag;
   result = mbi()->tag_get_handle(CATEGORY_TAG_NAME, category_tag);

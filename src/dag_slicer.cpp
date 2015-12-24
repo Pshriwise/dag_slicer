@@ -23,6 +23,6 @@ Dag_Slicer::Dag_Slicer( std::string file_to_slice, int ax, double coordinate, bo
   }  
   
 void Dag_Slicer::rename_group(int group_global_id, std::string new_name) {
-  rename_group(group_global_id, new_name);
+  rename_group_out(group_global_id, new_name);
 }
      
