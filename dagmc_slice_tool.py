@@ -39,6 +39,8 @@ class dagmc_slicer(Dag_Slicer):
         #run the super function to create the slice
         super(dagmc_slicer, self).create_slice()
             
+    def rename_group(self, id, new_name):
+        super(dagmc_slicer, self).rename_group(id, new_name)
 
     def show_slice(self, colors=None):        
 

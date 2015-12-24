@@ -303,12 +303,18 @@ cdef class Dag_Slicer:
         (<cpp_dag_slicer.Dag_Slicer *> self._inst).create_slice()
     
     
+    def rename_group(self, id, new_name):
+        """rename_group(self, id, new_name)
+        renames a group in the underlying maob instance."""
+        cdef char * new_name_proxy
+        new_name_bytes = new_name.encode()
+        (<cpp_dag_slicer.Dag_Slicer *> self._inst).rename_group(<int> id, std_string(<char *> new_name_bytes))
     
 
     pass
 
 
-
+        
 
 
 

@@ -731,19 +731,30 @@ void generate_patch_path(std::vector<Loop> loops,
 void rename_group(int group_global_id, std::string new_name) {
 
   moab::ErrorCode result;
-
+  
+  //get the category tag
+  moab::Tag category_tag;
+  result = mbi()->tag_get_handle(CATEGORY_TAG_NAME, category_tag);
+  ERR_CHECK(result);
   //get the global id tag 
   moab::Tag global_id_tag;
   result = mbi()->tag_get_handle(GLOBAL_ID_TAG_NAME, global_id_tag);
   ERR_CHECK(result);
-
+  std::vector<moab::Tag> tags;
+  tags.push_back(category_tag);
+  tags.push_back(global_id_tag);
   moab::Range entsets;
-  const void *dum = (const void*)&group_global_id;
-  result = mbi()->get_entities_by_type_and_tag(0, moab::MBENTITYSET, &global_id_tag, &dum, 1, entsets, moab::Interface::INTERSECT, true);
+  char grp[CATEGORY_TAG_SIZE] = "Group";
+  void *grp_ptr = &grp;
+  void *id_ptr = &group_global_id;
+  void *vals[2] = {grp_ptr,id_ptr};
+  result = mbi()->get_entities_by_type_and_tag(0, moab::MBENTITYSET, &tags[0], &(vals[0]), 2, entsets, moab::Interface::INTERSECT, true);
   ERR_CHECK(result);
 
-  //global ids should be unique for entitysets, should only get one entity
-  if(1 != entsets.size()) ERR_CHECK(moab::MB_FAILURE);
+  if(1 != entsets.size() ) { 
+    std::cout << "Invalid group id." << std::endl;
+    ERR_CHECK(moab::MB_FAILURE);
+  }
   moab::EntityHandle group_to_mod = entsets[0];
   //get the name tag, because this global id should indicate a group with this tag
   moab::Tag name_tag; 
