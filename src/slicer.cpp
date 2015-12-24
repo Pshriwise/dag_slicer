@@ -729,5 +729,34 @@ void generate_patch_path(std::vector<Loop> loops,
 }
 
 void rename_group(int group_global_id, std::string new_name) {
+
+  moab::ErrorCode result;
+
+  //get the global id tag 
+  moab::Tag global_id_tag;
+  result = mbi()->tag_get_handle(GLOBAL_ID_TAG_NAME, global_id_tag);
+  ERR_CHECK(result);
+
+  moab::Range entsets;
+  const void *dum = (const void*)&group_global_id;
+  result = mbi()->get_entities_by_type_and_tag(0, moab::MBENTITYSET, &global_id_tag, &dum, 1, entsets, moab::Interface::INTERSECT, true);
+  ERR_CHECK(result);
+
+  //global ids should be unique for entitysets, should only get one entity
+  if(1 != entsets.size()) ERR_CHECK(moab::MB_FAILURE);
+  moab::EntityHandle group_to_mod = entsets[0];
+  //get the name tag, because this global id should indicate a group with this tag
+  moab::Tag name_tag; 
+  result = mbi()->tag_get_handle(NAME_TAG_NAME,name_tag);
+  ERR_CHECK(result);
+  //give warning about truncated name
+  if(NAME_TAG_SIZE < new_name.size()) {
+    std::cout << "Warning: size of name exceed standard group name size. It will be trucnated." << std::endl;
+      }
+  //now set the new name
+  new_name.resize(NAME_TAG_SIZE);
+  result = mbi()->tag_set_data(name_tag, &group_to_mod, 1, (void*)new_name.c_str());
+  ERR_CHECK(result);
+
   return;
 }
