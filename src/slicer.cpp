@@ -121,8 +121,6 @@ moab::ErrorCode slice_faceted_model(std::string filename,
     current_filename.resize(50);
     result = mbi()->tag_get_data(filename_tag, &root_set, 1, (void*)current_filename.c_str());
     ERR_CHECK(result);
-    std::cout << "Current filename: " << current_filename << std::endl;
-    std::cout << "New Filename: " << filename << std::endl;
     current_filename.resize(filename.size());
     if(current_filename == filename) new_file = false;
   }
