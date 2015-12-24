@@ -310,6 +310,13 @@ cdef class Dag_Slicer:
         new_name_bytes = new_name.encode()
         (<cpp_dag_slicer.Dag_Slicer *> self._inst).rename_group(<int> id, std_string(<char *> new_name_bytes))
     
+    def write_file(self, new_filename):
+        """write_file(self, new_filename)
+        writes a file with the name, new filename. Will warn the user if the filename is the same as the current one."""
+        cdef char * new_filename_proxy
+        new_filename_bytes = new_filename.encode()
+        (<cpp_dag_slicer.Dag_Slicer *> self._inst).write_file(std_string(<char *> new_filename_bytes))
+        
 
     pass
 

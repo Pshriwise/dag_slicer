@@ -42,6 +42,25 @@ class dagmc_slicer(Dag_Slicer):
     def rename_group(self, id, new_name):
         super(dagmc_slicer, self).rename_group(id, new_name)
 
+    def write_file(self, new_filename):
+        if new_filename == self.filename:
+            continue_result = self.continue_query("Continuing will overwrite the current file. Continue?")
+            if  not continue_result:
+                print "Ok. Doing nothing."
+                return
+        super(dagmc_slicer, self).write_file(new_filename)
+
+    def continue_query(self, question):
+        reply = str(raw_input(question + ' (y/n) :')).lower().strip()
+
+        if reply == 'y':
+            return True
+        if reply == 'n':
+            return False
+        else:
+            print "Please reply with either y or n."
+            self.continue_query(question)
+
     def show_slice(self, colors=None):        
 
         if 0 == len(self.slice_x_pnts):

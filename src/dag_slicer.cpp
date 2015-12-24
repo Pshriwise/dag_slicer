@@ -26,3 +26,6 @@ void Dag_Slicer::rename_group(int group_global_id, std::string new_name) {
   rename_group_out(group_global_id, new_name);
 }
      
+void Dag_Slicer::write_file(std::string new_filename) {
+  write_file_out(new_filename);
+}

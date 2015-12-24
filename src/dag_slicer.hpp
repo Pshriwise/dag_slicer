@@ -19,7 +19,9 @@ public:
   bool _debug;
   //creation method
   void create_slice();
+  //modify methods
   void rename_group(int group_global_id, std::string new_name);
+  void write_file(std::string new_filename);
   //data
   std::vector<std::string> group_names;
   std::vector<double> dum_pnts;

@@ -199,4 +199,10 @@ void generate_patch_path(std::vector<Loop> loops,
 			 std::vector<int> &coding);
 
 
+
 void rename_group_out(int group_global_id, std::string new_name);
+
+void write_file_out(std::string new_filename);
+
+bool is_new_filename(std::string name);
+
