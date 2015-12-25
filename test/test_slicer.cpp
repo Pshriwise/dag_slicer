@@ -14,9 +14,6 @@
 
 using namespace moab;
 
-//global moab instance
-moab::Interface *mbi = new moab::Core(); 
-
 //structure functions
 void line_struct_test();
 //test functions
@@ -38,10 +35,9 @@ void set_windings_test();
 
 int main(int /* argc */, char** /* argv */) { 
 
-  moab::ErrorCode result = mbi->load_mesh("cube.h5m");
+  moab::ErrorCode result = mbi()->load_mesh("cube.h5m");
   ERR_CHECK(result);
   
-  //get_sets_by_category_test( mbi );
   int failed_tests = 0; 
 
   failed_tests += RUN_TEST(line_struct_test);
@@ -85,10 +81,10 @@ void line_struct_test() {
 
 void create_surface_intersections_test() {
   moab::Range surfs;
-  get_surfaces(mbi, surfs);
+  get_surfaces(surfs);
 
   std::map<moab::EntityHandle, std::vector<Loop> >int_map;
-  moab::ErrorCode result = create_surface_intersections(mbi, surfs, 0, 0, int_map);
+  moab::ErrorCode result = create_surface_intersections(surfs, 0, 0, int_map);
   ERR_CHECK(result);
 
   CHECK((int)int_map.size() == 6); // the cube should have 6 surfaces
@@ -117,19 +113,19 @@ void intersection_test() {
   
   moab::EntityHandle v0,v1,v2,tri;
  
-  result = mbi->create_vertex(coords[0].array(), v0); 
+  result = mbi()->create_vertex(coords[0].array(), v0); 
   ERR_CHECK(result);
-  result = mbi->create_vertex(coords[1].array(), v1); 
+  result = mbi()->create_vertex(coords[1].array(), v1); 
   ERR_CHECK(result);
-  result = mbi->create_vertex(coords[2].array(), v2); 
+  result = mbi()->create_vertex(coords[2].array(), v2); 
   ERR_CHECK(result);
 
   moab::EntityHandle verts[] = {v0,v1,v2};
-  result = mbi->create_element(MBTRI, verts, 3, tri);
+  result = mbi()->create_element(MBTRI, verts, 3, tri);
   ERR_CHECK(result);
 
   Line test_line; bool intersect;
-  result = intersection(mbi, 2, 0.5, tri, test_line, intersect);
+  result = intersection(2, 0.5, tri, test_line, intersect);
   ERR_CHECK(result);
 
   CHECK(intersect);
@@ -146,7 +142,7 @@ void intersection_test() {
 
   Line test_line2;
   //this plane should not intersect our triangle
-  result = intersection(mbi, 2, 6, tri, test_line2, intersect);
+  result = intersection(2, 6, tri, test_line2, intersect);
   ERR_CHECK(result);
 
   CHECK(!intersect);
@@ -228,7 +224,7 @@ void get_volume_intersections_test() {
   //get the volume from the instance
   moab::Range sets;
   char category[CATEGORY_TAG_SIZE] = "Volume";
-  moab::ErrorCode result = get_sets_by_category(mbi, sets, category);
+  moab::ErrorCode result = get_sets_by_category(sets, category);
   ERR_CHECK(result);
   
   moab::EntityHandle cube_vol = sets[0]; //there should only be one volume in the test model
@@ -236,7 +232,7 @@ void get_volume_intersections_test() {
   //create surface intersections for the model
   char category1[CATEGORY_TAG_SIZE] = "Surface";
   sets.clear(); 
-  result = get_sets_by_category(mbi, sets, category1);
+  result = get_sets_by_category(sets, category1);
   ERR_CHECK(result);
 
   //create a fake map for this volume. 
@@ -248,7 +244,7 @@ void get_volume_intersections_test() {
 
   //check that we get this loop back
   std::vector<Loop> intersections;
-  get_volume_intersections(mbi, cube_vol, fake_map, intersections); 
+  get_volume_intersections(cube_vol, fake_map, intersections); 
   
   //we should get back our dummy loop once 
   //and insert it into the intersections vector
@@ -258,7 +254,7 @@ void get_volume_intersections_test() {
   fake_map[sets[1]] = dummy_loop; 
 
   intersections.clear(); 
-  get_volume_intersections(mbi, cube_vol, fake_map, intersections); 
+  get_volume_intersections(cube_vol, fake_map, intersections); 
 
   //with this map we should get 4 values in the intersections vector
   CHECK(4 == intersections.size());
@@ -519,21 +515,21 @@ void set_windings_test() {
 void get_sets_by_category_test() {
   moab::Range sets; 
   char category1[CATEGORY_TAG_SIZE] = "Volume";
-  moab::ErrorCode result = get_sets_by_category(mbi, sets, category1); 
+  moab::ErrorCode result = get_sets_by_category(sets, category1); 
   ERR_CHECK(result); 
  
   CHECK_EQUAL(1, (int)sets.size()); 
 
   sets.clear();
   char category2[CATEGORY_TAG_SIZE] = "Surface";
-  result = get_sets_by_category(mbi, sets, category2);
+  result = get_sets_by_category(sets, category2);
  
   CHECK_EQUAL(6, (int)sets.size());
 }  
 
 void get_surfaces_test() {
   moab::Range surfaces; 
-  moab::ErrorCode result = get_surfaces(mbi, surfaces);
+  moab::ErrorCode result = get_surfaces(surfaces);
   ERR_CHECK(result);
   //test file is a cube and should have 6 surfaces
   CHECK_EQUAL(6, (int)surfaces.size());
@@ -541,7 +537,7 @@ void get_surfaces_test() {
 
 void get_all_volumes_test() {
   moab::Range volumes;
-  moab::ErrorCode result = get_all_volumes(mbi, volumes);
+  moab::ErrorCode result = get_all_volumes(volumes);
   ERR_CHECK(result);
   //test file is a lone cube and should have 1 volume
   CHECK_EQUAL(1, (int)volumes.size());

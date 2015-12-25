@@ -107,8 +107,7 @@ bool point_match(moab::CartVect pnt1,
 moab::ErrorCode get_sets_by_category(moab::Range &entsets,
 				     char* category);
 
-moab::ErrorCode get_surfaces(moab::Interface* mbi,
-			     moab::Range &surfs);
+moab::ErrorCode get_surfaces(moab::Range &surfs);
 
 moab::ErrorCode get_all_volumes(moab::Range &vols);
 
