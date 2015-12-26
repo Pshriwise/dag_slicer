@@ -199,48 +199,37 @@ moab::ErrorCode get_volumes_by_group(std::map< std::string,
   moab::ErrorCode result;
 
   //get all meshsets in the model
-  std::vector<moab::EntityHandle> all_entsets;
-  result = mbi()->get_entities_by_type(0, moab::MBENTITYSET, all_entsets);
-  ERR_CHECK(result);
 
-  //get the category tag
-  moab::Tag name_tag;
+  //get all groups in the model (defined by having a name tag and category tag)
+  moab::Tag category_tag, name_tag;
+  result = mbi()->tag_get_handle(CATEGORY_TAG_NAME, category_tag);
+  ERR_CHECK(result);
   result = mbi()->tag_get_handle(NAME_TAG_NAME, name_tag);
   ERR_CHECK(result);
+  moab::Tag ths[2] = {category_tag,name_tag};
+  moab::Range group_sets;
+  result = mbi()->get_entities_by_type_and_tag(0, moab::MBENTITYSET, &ths[0], NULL, 2, group_sets);
+  ERR_CHECK(result);
 
-  std::vector<moab::EntityHandle>::iterator i;
-  for (i = all_entsets.begin(); i != all_entsets.end(); ++i) {
-    //get all the tags on this entity set
-    std::vector<moab::Tag> ent_tags;
-    result = mbi()->tag_get_tags_on_entity(*i, ent_tags);
+  moab::Range::iterator i;
+  for (i = group_sets.begin(); i != group_sets.end(); ++i) {
+
+    //get this group's children
+    std::string group_name;
+    group_name.resize(NAME_TAG_SIZE);
+    result = mbi()->tag_get_data(name_tag, &(*i), 1, (void *)group_name.c_str());
+
+    moab::Range group_contents;
+    result = mbi()->get_entities_by_type(*i, moab::MBENTITYSET, group_contents);
     ERR_CHECK(result);
 
-    //check if this entity has a name_tag (is a group)
-    if (std::find( ent_tags.begin(), ent_tags.end(), name_tag) != ent_tags.end()) {
-      std::string ent_name;
-      ent_name.resize(NAME_TAG_SIZE);
-      void *dum = &(ent_name[0]);
-      //get the tag data on this entity set
-      result = mbi()->tag_get_data(name_tag, &(*i), 1, dum);
-      ERR_CHECK(result);
+    //add this group to the list of group names
+    group_names.push_back(group_name);
 
-      if (OPT_DEBUG) std::cout << ent_name << std::endl;
-
-      //get this group's children
-      moab::Range group_contents;
-      result = mbi()->get_entities_by_type(*i, moab::MBENTITYSET, group_contents);
-      ERR_CHECK(result);
-
-      //add this group to the list of group names
-      group_names.push_back( ent_name );
-	  
-      //add this set of children to the map
-      group_map[ent_name] = group_contents;
-      group_contents.clear();
-    }
+    //add this set of children to the map
+    group_map[group_name] = group_contents;
+    group_contents.clear();
       
-    ent_tags.clear();
-
   }
 
   return moab::MB_SUCCESS;
