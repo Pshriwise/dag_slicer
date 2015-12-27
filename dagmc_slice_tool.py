@@ -6,7 +6,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from dag_slicer.dag_slicer import Dag_Slicer 
 from matplotlib.widgets import CheckButtons, RadioButtons
-
+from IPython.html import widgets
+from IPython.display import display
+from matplotlib.colors import rgb2hex
 
 class dagmc_slicer(Dag_Slicer):
 
@@ -38,7 +40,8 @@ class dagmc_slicer(Dag_Slicer):
         self.group_names = np.array([], dtype='str')
 
         #run the super function to create the slice
-        super(dagmc_slicer, self).create_slice()
+        if str(self.filename) is not "":
+            super(dagmc_slicer, self).create_slice()
             
     def rename_group(self, id, new_name):
         super(dagmc_slicer, self).rename_group(id, new_name)
@@ -99,12 +102,14 @@ class dagmc_slicer(Dag_Slicer):
         #add the patches to the plot
         for patch in patches:
             ax.add_patch(patch)
-
+            
+        self.color_map = {}
+        self.legend_map = {}
         if 0 != len(self.group_names):
             labels = ["Group " + str(group_id) +  ": " + group_name for group_id,group_name in zip(self.group_ids,self.group_names)]
+            for gid,patch in zip(self.group_ids,patches): self.color_map[gid] = patch.get_facecolor() 
             leg = ax.legend(patches, labels, prop={'size':14}, loc=2, bbox_to_anchor=(1.05,1.), borderaxespad=0.)
             #create mapping of artist to legend entry
-            self.legend_map = {}
             for legpatch, patch in zip(leg.get_patches(), patches):
                 legpatch.set_picker(True)
                 self.legend_map[legpatch] = patch
@@ -126,7 +131,32 @@ class dagmc_slicer(Dag_Slicer):
         plt.show()
         self.shown = True
 
+    def make_legend(self):
+        
+        legend_items = []
+        for leg_patch,gid,gname in zip(self.legend_map.keys(),self.group_ids,self.group_names): 
+            lb = widgets.Text(gname,description="Group " + str(gid))
+            bg_color = rgb2hex(self.color_map[gid][:-1])
+            cb = widgets.Box(background_color=bg_color,height=32,width=80)
+            cb.margin = 10
+            lb.margin = 10
+            i = widgets.HBox(children=[cb,lb])
+            legend_items.append(i)
+            
+        self.new_filename = widgets.Text(description='Filename')
+        exp_but = widgets.Button(description="Export Model")
+        exp_but.on_click(self.write_file)
+          
+        leg = widgets.Box(children=legend_items)
+        leg.children += (exp_but,self.new_filename,)
+            
+        #one more outer hozo box for the figure
+        box = widgets.HBox(children=[leg])
+        display(box)
 
+    def export(self):
+        self.write_file(self.new_filename.value)
+        
     def onpick(self,event):
         self.picked = event.artist
         #Reset all legend items to black then highlight current selection
