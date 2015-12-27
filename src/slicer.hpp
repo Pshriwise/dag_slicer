@@ -118,6 +118,7 @@ moab::ErrorCode slice_faceted_model_out(std::string filename,
 					std::vector< std::vector<double> > &y_pnts,
 					std::vector< std::vector<int> > &codings,
 					std::vector<std::string> &group_names,
+					std::vector<int> &group_ids,
 					bool by_group = false,
 					bool verbose = false,
 					bool debug = false);
@@ -128,10 +129,12 @@ moab::ErrorCode slice_faceted_model(std::string filename,
 				    std::vector< std::vector<xypnt> > &paths,
 				    std::vector< std::vector<int> > &codings,
 				    std::vector<std::string> &group_names,
+				    std::vector<int> &group_ids,
 				    bool by_group = false);
 
 moab::ErrorCode get_volumes_by_group(std::map< std::string, moab::Range > &group_map,
-				     std::vector<std::string> &group_names);
+				     std::vector<std::string> &group_names,
+				     std::vector<int> &group_ids);
 
 moab::ErrorCode create_surface_intersections(moab::Range surfs,
 					     int axis,

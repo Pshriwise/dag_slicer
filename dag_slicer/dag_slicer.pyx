@@ -34,7 +34,7 @@ cdef class Dag_Slicer:
         self._free_inst = True
 
         # cached property defaults
-        self._dum_ints = None
+        self._group_ids = None
         self._dum_pnts = None
         self._group_names = None
         self._path_coding = None
@@ -90,16 +90,16 @@ cdef class Dag_Slicer:
             (<cpp_dag_slicer.Dag_Slicer *> self._inst)._debug = <bint> value
     
     
-    property dum_ints:
-        """no docstring for dum_ints, please file a bug report!"""
+    property group_ids:
+        """no docstring for group_ids, please file a bug report!"""
         def __get__(self):
-            cdef np.ndarray dum_ints_proxy
-            cdef np.npy_intp dum_ints_proxy_shape[1]
-            if self._dum_ints is None:
-                dum_ints_proxy_shape[0] = <np.npy_intp> (<cpp_dag_slicer.Dag_Slicer *> self._inst).dum_ints.size()
-                dum_ints_proxy = np.PyArray_SimpleNewFromData(1, dum_ints_proxy_shape, np.NPY_INT32, &(<cpp_dag_slicer.Dag_Slicer *> self._inst).dum_ints[0])
-                self._dum_ints = dum_ints_proxy
-            return self._dum_ints
+            cdef np.ndarray group_ids_proxy
+            cdef np.npy_intp group_ids_proxy_shape[1]
+            if self._group_ids is None:
+                group_ids_proxy_shape[0] = <np.npy_intp> (<cpp_dag_slicer.Dag_Slicer *> self._inst).group_ids.size()
+                group_ids_proxy = np.PyArray_SimpleNewFromData(1, group_ids_proxy_shape, np.NPY_INT32, &(<cpp_dag_slicer.Dag_Slicer *> self._inst).group_ids[0])
+                self._group_ids = group_ids_proxy
+            return self._group_ids
     
         def __set__(self, value):
             cdef cpp_vector[int] value_proxy
@@ -117,8 +117,8 @@ cdef class Dag_Slicer:
                 value_proxy = cpp_vector[int](<size_t> value_size)
                 for ivalue in range(value_size):
                     value_proxy[ivalue] = <int> value[ivalue]
-            (<cpp_dag_slicer.Dag_Slicer *> self._inst).dum_ints = value_proxy
-            self._dum_ints = None
+            (<cpp_dag_slicer.Dag_Slicer *> self._inst).group_ids = value_proxy
+            self._group_ids = None
     
     
     property dum_pnts:

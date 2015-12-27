@@ -23,6 +23,7 @@ class dagmc_slicer(Dag_Slicer):
         self.slice_y_pnts = np.array([])
         self.path_coding = np.array([], dtype='int')
         self.group_names = np.array([], dtype='str')
+        self.group_ids = np.array([],dtype='int')
         self.shown = False 
 
     def create_slice(self):

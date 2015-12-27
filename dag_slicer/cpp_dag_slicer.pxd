@@ -27,7 +27,7 @@ cdef extern from "dag_slicer.hpp" :
         cpp_bool _by_group
         double _coord
         cpp_bool _debug
-        cpp_vector[int] dum_ints
+        cpp_vector[int] group_ids
         cpp_vector[double] dum_pnts
         std_string _filename
         cpp_vector[std_string] group_names

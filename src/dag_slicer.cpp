@@ -16,6 +16,7 @@ Dag_Slicer::Dag_Slicer( std::string file_to_slice, int ax, double coordinate, bo
 			    slice_y_pnts,
 			    path_coding,
 			    group_names,
+			    group_ids,
 			    _by_group,
 			    _verbose,
 			    _debug);

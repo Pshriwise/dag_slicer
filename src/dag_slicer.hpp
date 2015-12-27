@@ -27,7 +27,7 @@ public:
   std::vector<double> dum_pnts;
   std::vector< std::vector<double> > slice_x_pnts;
   std::vector< std::vector<double> > slice_y_pnts; 
-  std::vector<int> dum_ints;
+  std::vector<int> group_ids;
   std::vector< std::vector<int> > path_coding;
 };
 

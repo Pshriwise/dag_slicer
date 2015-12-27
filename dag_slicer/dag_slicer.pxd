@@ -19,7 +19,7 @@ from libcpp.vector cimport vector as cpp_vector
 cdef class Dag_Slicer:
     cdef void * _inst
     cdef public bint _free_inst
-    cdef public np.ndarray _dum_ints
+    cdef public np.ndarray _group_ids
     cdef public np.ndarray _dum_pnts
     cdef public np.ndarray _group_names
     cdef public np.ndarray _path_coding

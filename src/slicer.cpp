@@ -68,12 +68,13 @@ moab::ErrorCode slice_faceted_model_out(std::string filename,
 					std::vector< std::vector<double> > &y_pnts,
 					std::vector< std::vector<int> > &codings,
 					std::vector<std::string> &group_names,
+					std::vector<int> &group_ids,
 					bool by_group,
 					bool verbose, bool debug) {
   opts.verbose = verbose;
   opts.debug = debug;
   std::vector< std::vector<xypnt> > paths;
-  moab::ErrorCode result = slice_faceted_model(filename, axis, coord, paths, codings, group_names, by_group);
+  moab::ErrorCode result = slice_faceted_model(filename, axis, coord, paths, codings, group_names, group_ids, by_group);
 
   std::vector< std::vector<xypnt> >::iterator path;
 
@@ -95,7 +96,9 @@ moab::ErrorCode slice_faceted_model(std::string filename,
 				    double coord,
 				    std::vector< std::vector<xypnt> > &paths,
 				    std::vector< std::vector<int> > &codings,
-				    std::vector<std::string> &group_names, bool by_group) {
+				    std::vector<std::string> &group_names,
+				    std::vector<int> &group_ids,
+				    bool by_group) {
   
   moab::ErrorCode result;
   std::map<moab::EntityHandle,std::vector<Loop> > intersection_map;
@@ -134,7 +137,7 @@ moab::ErrorCode slice_faceted_model(std::string filename,
   if (by_group) {
     std::map< std::string, moab::Range > group_mapping;
 
-    result = get_volumes_by_group(group_mapping, group_names);
+    result = get_volumes_by_group(group_mapping, group_names, group_ids);
     ERR_CHECK(result);
 
     if (OPT_VERBOSE) std::cout << "Size of group map: " << group_mapping.size() << std::endl;
@@ -195,16 +198,24 @@ moab::ErrorCode slice_faceted_model(std::string filename,
 
 moab::ErrorCode get_volumes_by_group(std::map< std::string,
 				     moab::Range > &group_map,
-				     std::vector<std::string> &group_names ) {
+				     std::vector<std::string> &group_names,
+				     std::vector<int> &group_ids) {
   moab::ErrorCode result;
 
+  //clear out old data
+  group_map.clear();
+  group_names.clear();
+  group_ids.clear();
+  
   //get all meshsets in the model
 
   //get all groups in the model (defined by having a name tag and category tag)
-  moab::Tag category_tag, name_tag;
+  moab::Tag category_tag, name_tag, global_id_tag;
   result = mbi()->tag_get_handle(CATEGORY_TAG_NAME, category_tag);
   ERR_CHECK(result);
   result = mbi()->tag_get_handle(NAME_TAG_NAME, name_tag);
+  ERR_CHECK(result);
+  result = mbi()->tag_get_handle(GLOBAL_ID_TAG_NAME, global_id_tag);
   ERR_CHECK(result);
   moab::Tag ths[2] = {category_tag,name_tag};
   moab::Range group_sets;
@@ -216,15 +227,23 @@ moab::ErrorCode get_volumes_by_group(std::map< std::string,
 
     //get this group's children
     std::string group_name;
+    int group_global_id;
     group_name.resize(NAME_TAG_SIZE);
     result = mbi()->tag_get_data(name_tag, &(*i), 1, (void *)group_name.c_str());
+    ERR_CHECK(result);
 
+    result = mbi()->tag_get_data(global_id_tag, &(*i), 1, (void *)&group_global_id);
+    ERR_CHECK(result);
+    
     moab::Range group_contents;
     result = mbi()->get_entities_by_type(*i, moab::MBENTITYSET, group_contents);
     ERR_CHECK(result);
 
     //add this group to the list of group names
     group_names.push_back(group_name);
+    //add this id to the list of group ids
+    group_ids.push_back(group_global_id);
+   
 
     //add this set of children to the map
     group_map[group_name] = group_contents;
