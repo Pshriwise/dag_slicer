@@ -101,7 +101,8 @@ class dagmc_slicer(Dag_Slicer):
             ax.add_patch(patch)
 
         if 0 != len(self.group_names):
-            leg = ax.legend(patches, self.group_names, prop={'size':14}, loc=2, bbox_to_anchor=(1.05,1.), borderaxespad=0.)
+            labels = ["Group " + str(group_id) +  ": " + group_name for group_id,group_name in zip(self.group_ids,self.group_names)]
+            leg = ax.legend(patches, labels, prop={'size':14}, loc=2, bbox_to_anchor=(1.05,1.), borderaxespad=0.)
             #create mapping of artist to legend entry
             self.legend_map = {}
             for legpatch, patch in zip(leg.get_patches(), patches):
