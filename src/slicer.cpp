@@ -136,21 +136,24 @@ moab::ErrorCode slice_faceted_model(std::string filename,
 
   if (by_group) {
     std::map< std::string, moab::Range > group_mapping;
-
     result = get_volumes_by_group(group_mapping, group_names, group_ids);
     ERR_CHECK(result);
-
+    assert(group_names.size() == group_ids.size());
     if (OPT_VERBOSE) std::cout << "Size of group map: " << group_mapping.size() << std::endl;
     if (OPT_VERBOSE) std::cout << "Size of group names: " << group_names.size() << std::endl;
     std::vector<std::string>::iterator group_name;
-    for (group_name = group_names.begin(); group_name != group_names.end(); group_name++) {
+    for (group_name = group_names.begin(); group_name != group_names.end();) {
       std::vector< std::vector<Loop> > all_group_paths;
       result = get_volume_paths(group_mapping[*group_name], intersection_map, all_group_paths);
       ERR_CHECK(result);
 
+
       if (0 == all_group_paths.size()) {
 	if (OPT_VERBOSE) std::cout << "Erasing group: " << *group_name << std::endl;
-	group_name = group_names.erase(group_name); //erase and set iterator to next item
+	int val = group_name-group_names.begin();
+	std::vector<int>::iterator group_id = group_ids.begin()+val;
+	group_ids.erase(group_id);
+	group_names.erase(group_name); //erase and set iterator to next item
 	continue;
       }
 
@@ -173,6 +176,7 @@ moab::ErrorCode slice_faceted_model(std::string filename,
       codings.push_back(group_coding);
       paths.push_back(group_path);
       all_group_paths.clear();
+      group_name++;
     } //group loop
   }
   else {
@@ -182,7 +186,7 @@ moab::ErrorCode slice_faceted_model(std::string filename,
 
     result = get_volume_paths(volumes, intersection_map, all_paths);
     ERR_CHECK(result);
-
+    
     std::vector< std::vector<Loop> >::iterator i;
     for (i = all_paths.begin(); i != all_paths.end(); i++) {
       std::vector<xypnt> path;
@@ -193,6 +197,8 @@ moab::ErrorCode slice_faceted_model(std::string filename,
     }
   }
 
+  std::cout << "Size of all paths is: " << paths.size() << std::endl;
+  
   return moab::MB_SUCCESS;
 }
 
