@@ -111,7 +111,13 @@ moab::ErrorCode slice_faceted_model(std::string filename,
       //load the new file
       std::cout << "Loading new file..." << std::endl;
       result = mbi()->load_file(filename.c_str());
-      ERR_CHECK(result);
+      if (moab::MB_FILE_DOES_NOT_EXIST == result) {
+	std::cout << "Could not open specified file." << std::endl;
+	return result;
+      }
+      else {
+	ERR_CHECK(result);
+      }
 
       //get the filename_tag
       moab::Tag filename_tag;
