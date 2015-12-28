@@ -14,6 +14,7 @@
 
 using namespace moab;
 
+void group_slicing_test();
 //structure functions
 void line_struct_test();
 //test functions
@@ -56,7 +57,33 @@ int main(int /* argc */, char** /* argv */) {
   failed_tests += RUN_TEST(find_winding_test);
   failed_tests += RUN_TEST(set_windings_test);
 
+
+  result = mbi()->delete_mesh();
+  ERR_CHECK(result);
+
+  failed_tests += RUN_TEST(group_slicing_test);
+  
+  
   return failed_tests;
+}
+
+void group_slicing_test() {
+
+  std::cout << "Running gst" << std::cout;
+  std::vector< std::vector<xypnt> > paths;
+  std::vector< std::vector<int> > codes;
+  std::vector<std::string> grp_names;
+  std::vector<int> grp_ids;
+  moab::ErrorCode result = slice_faceted_model("teapot_grps_zip.h5m", 1, 0.0, paths, codes, grp_names, grp_ids, true);
+  ERR_CHECK(result);
+
+  //there should only be one path for this slice
+  assert(1 == paths.size());
+
+  //the group names, ids, and number of paths should match
+  assert(grp_names.size() == paths.size() && grp_names.size() == grp_ids.size() && grp_names.size() == codes.size());
+  
+  
 }
 
 void line_struct_test() {
