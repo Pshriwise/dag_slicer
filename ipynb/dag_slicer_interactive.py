@@ -14,6 +14,7 @@ from IPython.html import widgets
 from IPython.display import display
 from dagmc_slice_tool import dagmc_slicer
 from matplotlib.colors import rgb2hex
+from IPython.display import Javascript
 
 class slicer_gui(dagmc_slicer):
 
@@ -59,7 +60,7 @@ class slicer_gui(dagmc_slicer):
             self.legend_map = {}
                         
             legend_items = []
-            for patch,gid,gname in zip(patches,self.group_ids,self.group_names): 
+            for patch,gid,gname in zip(patches,self.group_ids,self.group_names):
                 lb = widgets.Text(gname,description="Group " + str(gid))
                 bg_color = rgb2hex(patch.get_facecolor()[:-1])
                 key = widgets.Box(background_color=bg_color,height=32,width=32)
@@ -72,11 +73,26 @@ class slicer_gui(dagmc_slicer):
                 key.margin = 5
                 lb.margin = 5
                 children = [key,lb,cb1,cb2]
-                i = widgets.HBox(children=[key,lb,cb1,cb2])
-                legend_items.append(i)
-                self.legend_box.children = legend_items
+                item = widgets.HBox(children=children)
                 self.legend_map[cb1] = patch
                 self.legend_map[cb2] = patch
+                legend_items.append(item)
+
+
+            pages = []
+            number_per_page = 5
+            while number_per_page < len(legend_items):
+                pages.append(legend_items[0:6])
+                legend_items = legend_items[6:]
+            #add the last bit (if any)
+            if len(legend_items) != 0: pages.append(legend_items)
+
+            boxes = []
+            for page in pages:
+                b = widgets.Box(children=page)
+                boxes.append(b)
+
+            self.legend_box.children=boxes
         
         #add the patches to the plot
         self.plt_ax.clear()
@@ -98,17 +114,26 @@ class slicer_gui(dagmc_slicer):
         
         params_box = widgets.Box()
         params_box.children = [filename_widget,ax_widget,coord_widget,group_widget]
+        self.export_box = widgets.Box()
+        export_button = widgets.Button(description="Save File")
+        export_button.on_click(self.export_file)
+        export_name = widgets.Text(description="Filename", margin = 5)
+        self.export_box.children = (export_name,export_button,)
         accord = widgets.Accordion()
-        accord.children = (params_box,)
+        accord.children = (params_box,self.export_box,)
         accord.set_title(0,"Slice Parameters")
+        accord.set_title(1,"Export")
+
+        
         self.slice_box = widgets.Box()
         self.slice_box.children = (accord,run_button)
-        self.legend_box = widgets.Box()
+        
+        self.legend_box = widgets.Tab()
         self.gui_box = widgets.HBox()
-        accord1 = widgets.Accordion()
-        accord1.children = (self.legend_box,)
-        accord1.set_title(0,"Legend")
-        self.gui_box.children = (self.slice_box,accord1)
+        accord2 = widgets.Accordion()
+        accord2.children = (self.legend_box,)
+        accord2.set_title(0,"Legend")
+        self.gui_box.children = (self.slice_box,accord2)
 
         #create a new figure
         fig, ax = plt.subplots()
@@ -134,3 +159,33 @@ class slicer_gui(dagmc_slicer):
         button.background_color = button_color
         patch = self.legend_map[button]
         patch.set_fill(True if button.background_color == '' else False)
+
+    def export_file(self,button):
+
+        #a decision has been made, remove confirmation
+        if button.description == "Yes" or button.description == "No":
+            self.export_box.children = self.export_box.children[:-1]
+
+        #if no, do nothing
+        if button.description == "No":
+            return
+        
+        new_filename = self.export_box.children[0].value
+
+        override = button.description == "Yes"
+
+        #if the filename is the same, confirm they want this to happen
+        if (new_filename == self.filename and not override):
+            #add buttons to the box to confirm
+            msg = widgets.Button(description = "This will overwrite the current file. Are you sure?",border_color='white')
+            y = widgets.Button(description="Yes", margin = 2)
+            y.on_click(self.export_file)
+            n = widgets.Button(description="No", margin = 2)
+            n.on_click(self.export_file)
+            resp_box = widgets.HBox(children=[y,n])
+            confirm_box = widgets.Box(children=[msg,resp_box])
+            self.export_box.children += (confirm_box,)
+            return
+
+        super(dagmc_slicer,self).write_file(new_filename)
+        return
