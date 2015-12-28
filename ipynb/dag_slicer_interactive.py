@@ -75,6 +75,7 @@ class slicer_gui(dagmc_slicer):
 
         #create a new figure
         fig, ax = plt.subplots()
+        fig.set_size_inches(8,8)
         self.figure = fig
         self.plt_ax = ax
         
