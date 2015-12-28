@@ -56,6 +56,7 @@ int main(int /* argc */, char** /* argv */) {
   failed_tests += RUN_TEST(find_winding_test);
   failed_tests += RUN_TEST(set_windings_test);
 
+  return failed_tests;
 }
 
 void line_struct_test() {
