@@ -13,7 +13,7 @@ from matplotlib.colors import rgb2hex
 class dagmc_slicer(Dag_Slicer):
 
     #wrapper for the super init 
-    def __init__(self, filename, axis = 0, coordinate = 0, by_group = False):
+    def __init__(self, filename = "", axis = 0, coordinate = 0, by_group = False):
         
         super(dagmc_slicer, self).__init__( filename, axis, coordinate, by_group )
         self.shown = False
