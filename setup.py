@@ -39,7 +39,7 @@ incdirs = [os.path.join(os.getcwd(), 'src'), np.get_include(), moab_include_path
 libdirs = [moab_library_path]
 libs = ['MOAB']
 
-py_modules = ['dagmc_slice_tool']
+py_modules = ['dagmc_slice_tool','dagmc_slicer_gui']
 
 ext_modules = [
     Extension("dag_slicer.xdress_extra_types", ["dag_slicer/xdress_extra_types.pyx"], 
