@@ -68,12 +68,16 @@ class slicer_gui(dagmc_slicer):
                 cb1.on_click(self.visiblefunc)
                 cb2 = widgets.Button(description="Fill")
                 cb2.on_click(self.filledfunc)
-                cb1.margin = 5
-                cb2.margin = 5
-                key.margin = 5
-                lb.margin = 5
-                children = [key,lb,cb1,cb2]
+                updeight = widgets.Button(description="Update")
+                updeight.on_click(self.update_group_name)
+                updeight.margin = 3
+                cb1.margin = 3
+                cb2.margin = 3
+                key.margin = 3
+                lb.margin = 3
+                children = [key,lb,cb1,cb2,updeight]
                 item = widgets.HBox(children=children)
+                updeight.parent = item
                 self.legend_map[cb1] = patch
                 self.legend_map[cb2] = patch
                 legend_items.append(item)
@@ -189,3 +193,11 @@ class slicer_gui(dagmc_slicer):
 
         super(dagmc_slicer,self).write_file(new_filename)
         return
+
+    def update_group_name(self,button):
+
+        parent = button.parent
+        new_group_name = parent.children[1].value
+        group_id = int(parent.children[1].description.strip()[-1])
+
+        self.rename_group(group_id,new_group_name)
