@@ -92,11 +92,13 @@ class slicer_gui(dagmc_slicer):
             if len(legend_items) != 0: pages.append(legend_items)
 
             boxes = []
+            t = widgets.Tab() #new object to reset page counter
+            self.legend_box.children = []
             for page in pages:
                 b = widgets.Box(children=page)
-                boxes.append(b)
+                t.children+=(b,)
 
-            self.legend_box.children=boxes
+            self.legend_box.children = (t,)
         
         #add the patches to the plot
         self.plt_ax.clear()
@@ -132,7 +134,8 @@ class slicer_gui(dagmc_slicer):
         self.slice_box = widgets.Box()
         self.slice_box.children = (accord,run_button)
         
-        self.legend_box = widgets.Tab()
+        self.legend_box = widgets.Box()
+
         self.gui_box = widgets.HBox()
         accord2 = widgets.Accordion()
         accord2.children = (self.legend_box,)
