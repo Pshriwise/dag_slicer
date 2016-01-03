@@ -134,6 +134,17 @@ moab::ErrorCode slice_faceted_model(std::string filename,
   result = get_surfaces(surfaces);
   ERR_CHECK(result);
 
+  moab::Tag aabb_tag;
+  result = mbi()->tag_get_handle("AABB", 6, moab::MB_TYPE_DOUBLE, aabb_tag, moab::MB_TAG_DENSE);
+  //  ERR_CHECK(result);
+
+  if(result == moab::MB_SUCCESS) {
+    std::cout << "Filtering surfaces." << std::endl;
+    result = filter_surfaces(surfaces, aabb_tag, axis, coord);
+    std::cout << "Got here" << std::endl;
+    ERR_CHECK(result);
+  }
+
   result = create_surface_intersections(surfaces, axis, coord, intersection_map);
   ERR_CHECK(result);
 
@@ -408,6 +419,24 @@ moab::ErrorCode create_surface_intersections(moab::Range surfs,
 					     std::vector<Loop> > &intersection_map) {
   moab::ErrorCode result; 
 
+  bool bound_surfs;
+  moab::Tag aabb_tag;
+  result = mbi()->tag_get_handle("AABB", 6, moab::MB_TYPE_DOUBLE, aabb_tag, moab::MB_TAG_DENSE);
+
+  if(moab::MB_SUCCESS == result) {
+    bound_surfs = false;
+  }
+  else if (moab::MB_TAG_NOT_FOUND == result) {
+    result = mbi()->tag_get_handle("AABB", 6, moab::MB_TYPE_DOUBLE, aabb_tag, moab::MB_TAG_CREAT|moab::MB_TAG_DENSE);
+    ERR_CHECK(result);
+    bound_surfs = true;
+  }
+  else {
+    std::cout << "Failure here" << std::endl;
+    ERR_CHECK(moab::MB_FAILURE);
+  }
+
+  
   moab::Range::iterator i; 
   for (i = surfs.begin(); i != surfs.end(); i++) {
     //get the surface triangles
@@ -417,7 +446,7 @@ moab::ErrorCode create_surface_intersections(moab::Range surfs,
       
     //now create surface intersection
     std::vector<Loop> surf_intersections;
-    result = surface_intersections(surf_tris, axis, coord, surf_intersections);
+    result = surface_intersections(*i, aabb_tag, surf_tris, axis, coord, surf_intersections, bound_surfs);
     ERR_CHECK(result);
 
     intersection_map[*i] = surf_intersections;
@@ -429,23 +458,32 @@ moab::ErrorCode create_surface_intersections(moab::Range surfs,
 }
 
 
-moab::ErrorCode surface_intersections(std::vector<moab::EntityHandle> tris,
+moab::ErrorCode surface_intersections(moab::EntityHandle surf,
+				      moab::Tag aabb_tag,
+				      std::vector<moab::EntityHandle> tris,
 				      int axis,
 				      double coord,
-				      std::vector<Loop> &surf_intersections) {
+				      std::vector<Loop> &surf_intersections,
+				      bool bound) {
   moab::ErrorCode result; 
-  std::vector<Line> intersect_lines; 
-
+  std::vector<Line> intersect_lines;
+  double myarr[6] = {1.e38,-1.e38,1.e38,-1.e38,1.e38,-1.e38};
+  std::vector<double> bounds(myarr, myarr+6);
   std::vector<moab::EntityHandle>::iterator i; 
   for ( i = tris.begin(); i != tris.end(); i++) { 
     Line line; bool intersect;
-    result = intersection(axis, coord, *i, line, intersect);
+    result = intersection(axis, coord, *i, line, intersect, bounds, bound);
     ERR_CHECK(result);
       
     if(intersect) intersect_lines.push_back(line);
       
   } 
 
+  //tag surface handle with bounds if asked
+  if (bound) {
+    result = mbi()->tag_set_data(aabb_tag, &surf, 1, (void *)(&bounds[0]));
+    ERR_CHECK(result);
+  }
   std::vector<Loop> all_surf_intersections;
   
   //now it is time to order these 
@@ -503,7 +541,9 @@ moab::ErrorCode intersection(int axis,
 			     double coord,
 			     moab::EntityHandle tri,
 			     Line &tri_intersection,
-			     bool &intersect) {
+			     bool &intersect,
+			     std::vector<double> &bounds,
+			     bool bound) {
   moab::ErrorCode result;
   //get the triangle vertices
   std::vector<moab::EntityHandle> verts;
@@ -520,9 +560,18 @@ moab::ErrorCode intersection(int axis,
   ERR_CHECK(result);
 
   triangle_plane_intersect(axis, coord, tri_coords, tri_intersection);
-
+  
   intersect = tri_intersection.full;
 
+  if (bound) {
+    for(unsigned int i = 0; i < 3; i++) {
+      for(unsigned int j = 0; j < 3; j++) {
+	if (tri_coords[i][j] < bounds[2*j]) bounds[2*j] = tri_coords[i][j];
+	if (tri_coords[i][j] > bounds[(2*j)+1]) bounds[(2*j)+1] = tri_coords[i][j];
+      }
+    }
+  }
+  
   return result; 
 }
 
@@ -811,4 +860,30 @@ bool is_new_filename(std::string name) {
   }
 
   return true;
+}
+
+moab::ErrorCode filter_surfaces(moab::Range &surfs, moab::Tag aabb_tag, int axis, double coord) {
+
+  std::cout << "Number of initial surfaces before filter: " << surfs.size() << std::endl;
+  moab::ErrorCode result;
+  std::vector<moab::EntityHandle> surfs_to_skip;
+  moab::Range::iterator i;
+  for(i = surfs.begin(); i != surfs.end(); i++) {
+    //first get the box data
+    double box[6];
+    result = mbi()->tag_get_data(aabb_tag, &(*i), 1, (void *)box);
+    ERR_CHECK(result);
+    //now check to see if this slice plane intersects with the surface
+    double min = box[2*axis], max = box[(axis*2)+1];
+    //if not, remove the surface from the range
+    if(coord > max || coord < min) {
+      surfs_to_skip.push_back(*i);
+    }
+  }
+
+  for(std::vector<moab::EntityHandle>::iterator i = surfs_to_skip.begin();
+      i != surfs_to_skip.end(); i++) surfs.erase(*i);
+  
+  std::cout << "Number of surfaces after filtering: " << surfs.size() << std::endl;
+  return result;
 }

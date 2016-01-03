@@ -151,16 +151,21 @@ moab::ErrorCode get_volume_paths(moab::Range volumes,
 
 void stitch(std::vector<Loop> loops, std::vector<Loop> &paths);
 
-moab::ErrorCode surface_intersections(std::vector<moab::EntityHandle> tris,
+moab::ErrorCode surface_intersections(moab::EntityHandle surf,
+				      moab::Tag aabb_tag,
+				      std::vector<moab::EntityHandle> tris,
 				      int axis,
 				      double coord,
-				      std::vector<Loop> &surf_intersections);
+				      std::vector<Loop> &surf_intersections,
+				      bool bound);
 
 moab::ErrorCode intersection(int axis,
 			     double coord,
 			     moab::EntityHandle tri,
 			     Line &tri_intersection,
-			     bool &intersect);
+			     bool &intersect,
+			     std::vector<double> &bounds,
+			     bool bound);
 
 void triangle_plane_intersect(int axis,
 			      double coord,
@@ -208,3 +213,4 @@ void write_file_out(std::string new_filename);
 
 bool is_new_filename(std::string name);
 
+moab::ErrorCode filter_surfaces(moab::Range &surfs, moab::Tag aabb_tag, int axis, double coord);
