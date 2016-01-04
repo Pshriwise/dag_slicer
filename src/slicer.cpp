@@ -102,12 +102,24 @@ moab::ErrorCode slice_faceted_model(std::string filename,
   
   moab::ErrorCode result;
   std::map<moab::EntityHandle,std::vector<Loop> > intersection_map;
-
+  moab::Tag aabb_tag;
+  
   if(is_new_filename(filename))
     {
       //remove all old mesh content
       result = mbi()->delete_mesh();
       ERR_CHECK(result);
+
+
+      result = mbi()->tag_get_handle("AABB", 6, moab::MB_TYPE_DOUBLE, aabb_tag, moab::MB_TAG_DENSE);
+      if (result == moab::MB_SUCCESS) {
+	result = mbi()->tag_delete(aabb_tag);
+	ERR_CHECK(result);
+      }
+	
+	
+
+      
       //load the new file
       std::cout << "Loading new file..." << std::endl;
       result = mbi()->load_file(filename.c_str());
@@ -134,7 +146,6 @@ moab::ErrorCode slice_faceted_model(std::string filename,
   result = get_surfaces(surfaces);
   ERR_CHECK(result);
 
-  moab::Tag aabb_tag;
   result = mbi()->tag_get_handle("AABB", 6, moab::MB_TYPE_DOUBLE, aabb_tag, moab::MB_TAG_DENSE);
   //  ERR_CHECK(result);
 
