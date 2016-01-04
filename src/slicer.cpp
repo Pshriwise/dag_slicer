@@ -434,11 +434,11 @@ moab::ErrorCode surface_intersections(std::vector<moab::EntityHandle> tris,
 				      double coord,
 				      std::vector<Loop> &surf_intersections) {
   moab::ErrorCode result; 
-  std::vector<Line> intersect_lines; 
+  std::vector<Loop> intersect_lines; 
 
   std::vector<moab::EntityHandle>::iterator i; 
   for ( i = tris.begin(); i != tris.end(); i++) { 
-    Line line; bool intersect;
+    Loop line; bool intersect;
     result = intersection(axis, coord, *i, line, intersect);
     ERR_CHECK(result);
       
@@ -446,55 +446,105 @@ moab::ErrorCode surface_intersections(std::vector<moab::EntityHandle> tris,
       
   } 
 
-  std::vector<Loop> all_surf_intersections;
-  
-  //now it is time to order these 
-  unsigned int index = 0; //index for intersection lines
-  //arbitrarily start a new intersection loop
-  Loop curr_loop; 
+  unsigned int index = 0;
 
-  while (intersect_lines.size() != 0) {
-
-    curr_loop.points.clear();
-    curr_loop.points.push_back( intersect_lines.back().begin);
-    curr_loop.points.push_back( intersect_lines.back().end);
+  //start with an arbitrary loop
+  if (intersect_lines.size() != 0 ) {
+    Loop curr_loop = intersect_lines.back();
     intersect_lines.pop_back();
+    while(index < intersect_lines.size()) {
 
-    while (index < intersect_lines.size()) {
-
-      Line this_line = intersect_lines[index];
-
-      if (point_match(this_line.begin, curr_loop.points.front())) {
+      Loop stack_loop = intersect_lines[index];
+    
+      if (point_match(curr_loop.points.front(), stack_loop.points.front())) {
 	//insert the line into the current loop
-	curr_loop.points.insert(curr_loop.points.begin(), this_line.end );
+	std::reverse(curr_loop.points.begin(),curr_loop.points.end());
+	stack_loop.points.insert(stack_loop.points.begin(), curr_loop.points.begin(), curr_loop.points.end()-1);
+	intersect_lines[index] = stack_loop;
 	//delete the current matched line from intersect_lines  
-	intersect_lines.erase(intersect_lines.begin()+index);
+	curr_loop = intersect_lines.back();
+	intersect_lines.pop_back();
 	index = 0;
       }
-      else if ( point_match( this_line.begin, curr_loop.points.back() ) ) {
-	curr_loop.points.push_back( this_line.end );
-	intersect_lines.erase(intersect_lines.begin()+index);
+      else if ( point_match( curr_loop.points.front(), stack_loop.points.back() ) ) {
+	stack_loop.points.insert(stack_loop.points.end(), curr_loop.points.begin()+1, curr_loop.points.end());
+	intersect_lines[index] = stack_loop;
+	curr_loop = intersect_lines.back();
+	intersect_lines.pop_back();
 	index = 0;
       }
-      else if ( point_match( this_line.end, curr_loop.points.front() ) ) {
-	curr_loop.points.insert(curr_loop.points.begin(), this_line.begin );
-	intersect_lines.erase(intersect_lines.begin()+index);
+      else if ( point_match( curr_loop.points.back(), stack_loop.points.front() ) ) {
+	stack_loop.points.insert(stack_loop.points.begin(), curr_loop.points.begin(), curr_loop.points.end()-1);
+	intersect_lines[index] = stack_loop;
+	curr_loop = intersect_lines.back();
+	intersect_lines.pop_back();
 	index = 0;
       }
-      else if ( point_match( this_line.end, curr_loop.points.back() ) ) {
-	curr_loop.points.push_back( this_line.begin );
-	intersect_lines.erase(intersect_lines.begin()+index);
+      else if ( point_match( curr_loop.points.back(), stack_loop.points.back() ) ) {
+	std::reverse(curr_loop.points.begin(),curr_loop.points.end());
+	stack_loop.points.insert(stack_loop.points.end(), curr_loop.points.begin()+1, curr_loop.points.end());
+	intersect_lines[index] = stack_loop;
+	curr_loop = intersect_lines.back();
+	intersect_lines.pop_back();
 	index = 0;
       }
       else {
 	index++;
       }
     }
-    all_surf_intersections.push_back(curr_loop);
+    //push the current loop on
+    intersect_lines.push_back(curr_loop);
   }
 
+  // std::vector<Loop> all_surf_intersections;
+  
+  // //now it is time to order these 
+  // unsigned int index = 0; //index for intersection lines
+  // //arbitrarily start a new intersection loop
+  // Loop curr_loop; 
+
+  // while (intersect_lines.size() != 0) {
+
+  //   curr_loop.points.clear();
+  //   curr_loop.points.push_back( intersect_lines.back().begin);
+  //   curr_loop.points.push_back( intersect_lines.back().end);
+  //   intersect_lines.pop_back();
+
+  //   while (index < intersect_lines.size()) {
+
+  //     Line this_line = intersect_lines[index];
+
+  //     if (point_match(this_line.begin, curr_loop.points.front())) {
+  // 	//insert the line into the current loop
+  // 	curr_loop.points.insert(curr_loop.points.begin(), this_line.end );
+  // 	//delete the current matched line from intersect_lines  
+  // 	intersect_lines.erase(intersect_lines.begin()+index);
+  // 	index = 0;
+  //     }
+  //     else if ( point_match( this_line.begin, curr_loop.points.back() ) ) {
+  // 	curr_loop.points.push_back( this_line.end );
+  // 	intersect_lines.erase(intersect_lines.begin()+index);
+  // 	index = 0;
+  //     }
+  //     else if ( point_match( this_line.end, curr_loop.points.front() ) ) {
+  // 	curr_loop.points.insert(curr_loop.points.begin(), this_line.begin );
+  // 	intersect_lines.erase(intersect_lines.begin()+index);
+  // 	index = 0;
+  //     }
+  //     else if ( point_match( this_line.end, curr_loop.points.back() ) ) {
+  // 	curr_loop.points.push_back( this_line.begin );
+  // 	intersect_lines.erase(intersect_lines.begin()+index);
+  // 	index = 0;
+  //     }
+  //     else {
+  // 	index++;
+  //     }
+  //   }
+  //   all_surf_intersections.push_back(curr_loop);
+  // }
+
   //set return var
-  surf_intersections = all_surf_intersections;
+  surf_intersections = intersect_lines;
 
   return result; 
 }
@@ -502,7 +552,7 @@ moab::ErrorCode surface_intersections(std::vector<moab::EntityHandle> tris,
 moab::ErrorCode intersection(int axis,
 			     double coord,
 			     moab::EntityHandle tri,
-			     Line &tri_intersection,
+			     Loop &tri_intersection,
 			     bool &intersect) {
   moab::ErrorCode result;
   //get the triangle vertices
@@ -521,7 +571,7 @@ moab::ErrorCode intersection(int axis,
 
   triangle_plane_intersect(axis, coord, tri_coords, tri_intersection);
 
-  intersect = tri_intersection.full;
+  intersect = (tri_intersection.points.size() == 2);
 
   return result; 
 }
@@ -531,7 +581,7 @@ moab::ErrorCode intersection(int axis,
 void triangle_plane_intersect(int axis,
 			      double coord,
 			      moab::CartVect *coords,
-			      Line &line_out) {
+			      Loop &line_out) {
   //check to see how many triangle edges cross the coordinate
   moab::CartVect p0,p1,p2,p3;
 
@@ -562,11 +612,11 @@ void get_intersection(moab::CartVect pnt0,
 		      moab::CartVect pnt1,
 		      int axis,
 		      double coord,
-		      Line &line) {
+		      Loop &line) {
   moab::CartVect vec = pnt1-pnt0;
   double t = (coord - pnt0[axis])/vec[axis];
   moab::CartVect pnt_out = pnt0 + t*vec;
-  line.add_pnt(pnt_out);
+  line.points.push_back(pnt_out);
 }
 
 void convert_to_stl(std::vector< std::vector<Loop> > a,

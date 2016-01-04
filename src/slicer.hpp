@@ -159,19 +159,19 @@ moab::ErrorCode surface_intersections(std::vector<moab::EntityHandle> tris,
 moab::ErrorCode intersection(int axis,
 			     double coord,
 			     moab::EntityHandle tri,
-			     Line &tri_intersection,
+			     Loop &tri_intersection,
 			     bool &intersect);
 
 void triangle_plane_intersect(int axis,
 			      double coord,
 			      moab::CartVect *coords,
-			      Line &line_out);
+			      Loop &line_out);
 
 void get_intersection(moab::CartVect pnt0,
 		      moab::CartVect pnt1,
 		      int axis,
 		      double coord,
-		      Line &line);
+		      Loop &line);
 
 void convert_to_stl(std::vector< std::vector<Loop> > a,
 		    std::vector< std::vector< std::vector< std::vector<double> > > > &b);
