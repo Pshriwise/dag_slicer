@@ -82,7 +82,8 @@ class slicer_gui(dagmc_slicer):
             for patch,gid,gname in zip(patches,self.group_ids,self.group_names):
                 lb = widgets.Text(gname,description="Group " + str(gid))
                 bg_color = rgb2hex(patch.get_facecolor()[:-1])
-                key = widgets.Box(background_color=bg_color,height=32,width=32)
+                key = widgets.Button(background_color=bg_color,height=32,width=32)
+                key.on_click(self.highlight)
                 cb1 = widgets.Button(description="Visible")
                 cb1.on_click(self.visiblefunc)
                 cb2 = widgets.Button(description="Fill")
@@ -99,6 +100,7 @@ class slicer_gui(dagmc_slicer):
                 updeight.parent = item
                 self.legend_map[cb1] = patch
                 self.legend_map[cb2] = patch
+                self.legend_map[key] = patch
                 legend_items.append(item)
 
 
@@ -223,3 +225,14 @@ class slicer_gui(dagmc_slicer):
         group_id = int(parent.children[1].description.strip()[-1])
 
         self.rename_group(group_id,new_group_name)
+
+    def highlight(self, button):
+        parent = button.parent
+        button_border_color = 'orange' if button.border_color == '' else ''
+        patch_edge_color = 'orange' if button.border_color == '' else 'black'
+
+        patch = self.legend_map[button]
+        patch.set_edgecolor(patch_edge_color)
+        button.border_color = button_border_color
+
+        
