@@ -548,6 +548,20 @@ moab::ErrorCode surface_intersections(moab::EntityHandle surf,
   return result; 
 }
 
+
+moab::ErrorCode intersection(int axis,
+			     double coord,
+			     moab::EntityHandle tri,
+			     Line &tri_intersection,
+			     bool &intersect){
+
+  std::vector<double> dum_bounds(6);
+  moab::ErrorCode result = intersection(axis,coord,tri,tri_intersection,intersect,dum_bounds,false);
+  ERR_CHECK(result);
+  return result;
+					
+}
+
 moab::ErrorCode intersection(int axis,
 			     double coord,
 			     moab::EntityHandle tri,
@@ -892,8 +906,8 @@ moab::ErrorCode filter_surfaces(moab::Range &surfs, moab::Tag aabb_tag, int axis
     }
   }
 
-  for(std::vector<moab::EntityHandle>::iterator i = surfs_to_skip.begin();
-      i != surfs_to_skip.end(); i++) surfs.erase(*i);
+  for(std::vector<moab::EntityHandle>::iterator s = surfs_to_skip.begin();
+      s != surfs_to_skip.end(); s++) surfs.erase(*s);
   
   std::cout << "Number of surfaces after filtering: " << surfs.size() << std::endl;
   return result;

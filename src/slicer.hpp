@@ -167,6 +167,13 @@ moab::ErrorCode intersection(int axis,
 			     std::vector<double> &bounds,
 			     bool bound);
 
+moab::ErrorCode intersection(int axis,
+			     double coord,
+			     moab::EntityHandle tri,
+			     Line &tri_intersection,
+			     bool &intersect);
+
+
 void triangle_plane_intersect(int axis,
 			      double coord,
 			      moab::CartVect *coords,
