@@ -134,10 +134,11 @@ class slicer_gui(dagmc_slicer):
 
         run_button = widgets.Button(description="Run Slice")
         run_button.on_click(self.slice)
-        ax_widget = widgets.RadioButtons(description="Axis", options = {'x':0,'y':1,'z':2})
-        coord_widget = widgets.FloatText(description="Slice Coordinate", value = 0.0)
-        group_widget = widgets.Checkbox(description="Slice by Group")
-        filename_widget = widgets.Text(description = "Filename")
+        ax_widget = widgets.RadioButtons(description="Axis", options = {'x':0,'y':1,'z':2}, value = self.axis)
+        coord_widget = widgets.FloatText(description="Slice Coordinate", value = self.coord)
+        group_widget = widgets.Checkbox(description="Slice by Group", value = self.by_group)
+        filename_widget = widgets.Text(description = "Filename", value = self.filename)
+
         
         params_box = widgets.Box()
         params_box.children = [filename_widget,ax_widget,coord_widget,group_widget]
