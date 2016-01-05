@@ -18,6 +18,15 @@ from IPython.display import Javascript
 
 class slicer_gui(dagmc_slicer):
 
+    def __init__(self, filename = "", axis = 0, coordinate = 0, by_group = False):
+        
+        super(dagmc_slicer, self).__init__( filename, axis, coordinate, by_group )
+        self.filealert = widgets.Text("Could not open specified file!")
+        self.filealert.color = 'red'
+        self.shown = False
+        self.color_seed = 56
+        
+
     def slice(self, button):
         kids = self.slice_box.children[0].children[0].children
         self.filename = kids[0].value
@@ -27,10 +36,20 @@ class slicer_gui(dagmc_slicer):
         self.create_slice()
         self.show_slice()
 
+    def create_slice(self):
+        self.clear_slice()
+        a = super(dagmc_slicer, self).create_slice()
+        if a is 7:
+            self.slice_box.children+=(self.filealert,)
+        else:
+            if self.filealert in self.slice_box.children:
+                #it should always be at the back
+                self.slice_box.children=self.slice_box.children[:-1]
+            
     def show_slice(self, colors=None):
         
-        if 0 == len(self.slice_x_pnts):
-            self.create_slice()
+        # if 0 == len(self.slice_x_pnts):
+        #     self.create_slice()
 
 
         self.legend = widgets.Box()
