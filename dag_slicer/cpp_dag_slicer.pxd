@@ -37,7 +37,7 @@ cdef extern from "dag_slicer.hpp" :
         cpp_bool _verbose
 
         # methods
-        void create_slice() except +
+        int create_slice() except +
         void rename_group(int, std_string) except +
         void write_file(std_string) except +
         pass

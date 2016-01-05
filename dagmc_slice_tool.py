@@ -41,7 +41,7 @@ class dagmc_slicer(Dag_Slicer):
 
         #run the super function to create the slice
         if str(self.filename) is not "":
-            super(dagmc_slicer, self).create_slice()
+            a = super(dagmc_slicer, self).create_slice()
             
     def rename_group(self, id, new_name):
         super(dagmc_slicer, self).rename_group(id, new_name)
@@ -68,7 +68,7 @@ class dagmc_slicer(Dag_Slicer):
     def show_slice(self, colors=None):        
 
         if 0 == len(self.slice_x_pnts):
-            self.create_slice()
+            a = self.create_slice()
 
 
         #now setup the plot object

@@ -300,7 +300,8 @@ cdef class Dag_Slicer:
     def create_slice(self, ):
         """create_slice(self, )
         no docstring for create_slice, please file a bug report!"""
-        (<cpp_dag_slicer.Dag_Slicer *> self._inst).create_slice()
+        cdef int a = (<cpp_dag_slicer.Dag_Slicer *> self._inst).create_slice()
+        return a
     
     
     def rename_group(self, id, new_name):

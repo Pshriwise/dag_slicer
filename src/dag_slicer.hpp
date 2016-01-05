@@ -18,7 +18,7 @@ public:
   bool _verbose;
   bool _debug;
   //creation method
-  void create_slice();
+  int create_slice();
   //modify methods
   void rename_group(int group_global_id, std::string new_name);
   void write_file(std::string new_filename);

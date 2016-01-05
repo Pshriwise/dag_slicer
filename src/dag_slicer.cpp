@@ -5,11 +5,11 @@ Dag_Slicer::Dag_Slicer( std::string file_to_slice, int ax, double coordinate, bo
 
   Dag_Slicer::~Dag_Slicer() { }
 
-  void Dag_Slicer::create_slice() {
+  int Dag_Slicer::create_slice() {
     slice_x_pnts.clear(); 
     slice_y_pnts.clear(); 
     path_coding.clear();
-    slice_faceted_model_out(_filename,
+    int result = slice_faceted_model_out(_filename,
 			    _axis,
 			    _coord,
 			    slice_x_pnts,
@@ -20,7 +20,7 @@ Dag_Slicer::Dag_Slicer( std::string file_to_slice, int ax, double coordinate, bo
 			    _by_group,
 			    _verbose,
 			    _debug);
-
+    return result;
   }  
   
 void Dag_Slicer::rename_group(int group_global_id, std::string new_name) {
