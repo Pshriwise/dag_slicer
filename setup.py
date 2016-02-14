@@ -8,11 +8,6 @@ from Cython.Distutils import build_ext
 
 import numpy as np
 
-call(['cmake','.'])
-
-call(['make'])
-
-
 def get_moab_paths():
 
     argv = sys.argv[-2:]
