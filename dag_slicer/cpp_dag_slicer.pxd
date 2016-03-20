@@ -21,10 +21,12 @@ cdef extern from "dag_slicer.hpp" :
         Dag_Slicer(std_string, int) except +
         Dag_Slicer(std_string, int, double) except +
         Dag_Slicer(std_string, int, double, cpp_bool) except +
+        Dag_Slicer(std_string, int, double, cpp_bool, cpp_bool) except +
 
         # attributes
         int _axis
         cpp_bool _by_group
+        cpp_bool _cast_about
         double _coord
         cpp_bool _debug
         cpp_vector[int] group_ids

@@ -41,12 +41,12 @@ cdef class Dag_Slicer:
         self._slice_x_pnts = None
         self._slice_y_pnts = None
 
-    def __init__(self, file_to_slice, ax, coordinate, by_grp=False):
+    def __init__(self, file_to_slice, ax, coordinate, by_grp=False, ca=False):
         """Dag_Slicer(self, file_to_slice, ax, coordinate, by_grp=False)
         """
         cdef char * file_to_slice_proxy
         file_to_slice_bytes = file_to_slice.encode()
-        self._inst = new cpp_dag_slicer.Dag_Slicer(std_string(<char *> file_to_slice_bytes), <int> ax, <double> coordinate, <bint> by_grp)
+        self._inst = new cpp_dag_slicer.Dag_Slicer(std_string(<char *> file_to_slice_bytes), <int> ax, <double> coordinate, <bint> by_grp, <bint> ca)
     
     
     def __dealloc__(self):
@@ -70,7 +70,15 @@ cdef class Dag_Slicer:
     
         def __set__(self, value):
             (<cpp_dag_slicer.Dag_Slicer *> self._inst)._by_group = <bint> value
+
+    property cast_about:
+        """no docstring for by_group, please file a bug report!"""
+        def __get__(self):
+            return bool((<cpp_dag_slicer.Dag_Slicer *> self._inst)._cast_about)
     
+        def __set__(self, value):
+            (<cpp_dag_slicer.Dag_Slicer *> self._inst)._cast_about = <bint> value
+            
     
     property coord:
         """no docstring for coord, please file a bug report!"""

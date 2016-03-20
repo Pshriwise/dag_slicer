@@ -8,7 +8,7 @@
 class Dag_Slicer{
   
 public:
-  Dag_Slicer(std::string file_to_slice, int ax, double coord, bool by_grp = false);
+  Dag_Slicer(std::string file_to_slice, int ax, double coord, bool by_grp = false, bool ca = false);
   ~Dag_Slicer();
   //parameters
   int _axis;
@@ -17,6 +17,7 @@ public:
   bool _by_group;
   bool _verbose;
   bool _debug;
+  bool _cast_about;
   //creation method
   int create_slice();
   //modify methods

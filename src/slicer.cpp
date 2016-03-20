@@ -70,11 +70,13 @@ moab::ErrorCode slice_faceted_model_out(std::string filename,
 					std::vector<std::string> &group_names,
 					std::vector<int> &group_ids,
 					bool by_group,
-					bool verbose, bool debug) {
+					bool verbose,
+					bool debug,
+					bool ca) {
   opts.verbose = verbose;
   opts.debug = debug;
   std::vector< std::vector<xypnt> > paths;
-  moab::ErrorCode result = slice_faceted_model(filename, axis, coord, paths, codings, group_names, group_ids, by_group);
+  moab::ErrorCode result = slice_faceted_model(filename, axis, coord, paths, codings, group_names, group_ids, by_group, ca);
 
   std::vector< std::vector<xypnt> >::iterator path;
 
@@ -98,7 +100,8 @@ moab::ErrorCode slice_faceted_model(std::string filename,
 				    std::vector< std::vector<int> > &codings,
 				    std::vector<std::string> &group_names,
 				    std::vector<int> &group_ids,
-				    bool by_group) {
+				    bool by_group,
+				    bool ca) {
   
   moab::ErrorCode result;
   std::map<moab::EntityHandle,std::vector<Loop> > intersection_map;
@@ -172,7 +175,7 @@ moab::ErrorCode slice_faceted_model(std::string filename,
     std::vector<std::string>::iterator group_name;
     for (group_name = group_names.begin(); group_name != group_names.end();) {
       std::vector< std::vector<Loop> > all_group_paths;
-      result = get_volume_paths(group_mapping[*group_name], intersection_map, all_group_paths);
+      result = get_volume_paths(group_mapping[*group_name], intersection_map, all_group_paths, ca);
       ERR_CHECK(result);
 
 
@@ -212,7 +215,7 @@ moab::ErrorCode slice_faceted_model(std::string filename,
     result = get_all_volumes(volumes);
     ERR_CHECK(result);
 
-    result = get_volume_paths(volumes, intersection_map, all_paths);
+    result = get_volume_paths(volumes, intersection_map, all_paths, ca);
     ERR_CHECK(result);
     
     std::vector< std::vector<Loop> >::iterator i;
@@ -291,7 +294,8 @@ moab::ErrorCode get_volumes_by_group(std::map< std::string,
 moab::ErrorCode get_volume_paths(moab::Range volumes,
 				 std::map<moab::EntityHandle, 
 				 std::vector<Loop> > intersection_dict,
-				 std::vector< std::vector<Loop> > &all_vol_paths) {
+				 std::vector< std::vector<Loop> > &all_vol_paths,
+				 bool cast_about) {
   moab::ErrorCode result; 
   
   moab::Range::iterator i; 
@@ -306,7 +310,7 @@ moab::ErrorCode get_volume_paths(moab::Range volumes,
 			       << " intersections for this volume." << std::endl;
 
     std::vector<Loop> vol_paths;
-    stitch( this_vol_intersections, vol_paths);
+    stitch( this_vol_intersections, vol_paths, cast_about);
     all_vol_paths.push_back(vol_paths);
   }
 
