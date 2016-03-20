@@ -149,7 +149,7 @@ moab::ErrorCode get_volume_paths(moab::Range volumes,
 				 std::map<moab::EntityHandle, std::vector<Loop> > intersection_dict,
 				 std::vector< std::vector<Loop> > &all_vol_paths);
 
-void stitch(std::vector<Loop> loops, std::vector<Loop> &paths);
+void stitch(std::vector<Loop> loops, std::vector<Loop> &paths, bool cast_about = false);
 
 moab::ErrorCode surface_intersections(moab::EntityHandle surf,
 				      moab::Tag aabb_tag,

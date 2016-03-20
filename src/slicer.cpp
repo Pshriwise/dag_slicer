@@ -313,7 +313,7 @@ moab::ErrorCode get_volume_paths(moab::Range volumes,
   return moab::MB_SUCCESS;
 }
 
-void stitch(std::vector<Loop> loops, std::vector<Loop> &paths) {
+void stitch(std::vector<Loop> loops, std::vector<Loop> &paths, bool cast_about) {
 
   unsigned int i = 0; 
 
@@ -349,41 +349,55 @@ void stitch(std::vector<Loop> loops, std::vector<Loop> &paths) {
   paths.push_back(loops[i]);
   loops.erase(loops.begin()+i);
 
-
+  double pt_match_tol = MATCH_TOL;
+  int prev_loops_size = (int) loops.size();
+  bool first_search = true;
+  
   while (0 != loops.size()) {
-      
+
+    //if we found no match fron inner while loop, increase proximity tolerance
+    if ( prev_loops_size == (int) loops.size() && !first_search && cast_about) {
+      pt_match_tol*=1.05;
+    }     
+    else {
+      pt_match_tol = MATCH_TOL;
+    }
+    first_search = false;
+    
     //if we have a complete loop, then move on to a new starting point
     if (point_match(paths.back().points.front(), paths.back().points.back())) {
       paths.push_back(loops.front());
       loops.erase(loops.begin());
-    }	   
+      pt_match_tol = MATCH_TOL;
+    }
     else {
       i = 0;
+      prev_loops_size = (int) loops.size();
 	  
       while ( i < loops.size() ) {
 
 	Loop this_intersection = loops[i];
 
-	if (point_match( paths.back().points.front(), this_intersection.points.front())) {
+	if (point_match( paths.back().points.front(), this_intersection.points.front(),pt_match_tol)) {
 	  //reverse this_intersection and attach to the front of paths.back()
 	  std::reverse( this_intersection.points.begin(), this_intersection.points.end());
 	  paths.back().points.insert(paths.back().points.begin(), this_intersection.points.begin(), this_intersection.points.end());
 	  loops.erase(loops.begin()+i);
 	  i = 0;
 	}
-	else if (point_match( paths.back().points.front(), this_intersection.points.back())) {
+	else if (point_match( paths.back().points.front(), this_intersection.points.back(), pt_match_tol)) {
 	  // attach to the front of paths.back()
 	  paths.back().points.insert(paths.back().points.begin(), this_intersection.points.begin(), this_intersection.points.end());
 	  loops.erase(loops.begin()+i);
 	  i = 0;		  
 	}
-	else if (point_match( paths.back().points.back(), this_intersection.points.front())) {
+	else if (point_match( paths.back().points.back(), this_intersection.points.front(), pt_match_tol)) {
 	  //attach to the back of paths.back()
 	  paths.back().points.insert(paths.back().points.end(), this_intersection.points.begin(), this_intersection.points.end());
 	  loops.erase(loops.begin()+i);
 	  i = 0;		  
 	}
-	else if (point_match(paths.back().points.back(), this_intersection.points.back())) {
+	else if (point_match(paths.back().points.back(), this_intersection.points.back(), pt_match_tol)) {
 	  //reverse intersection and attach to the back of paths.back()
 	  std::reverse(this_intersection.points.begin(), this_intersection.points.end());
 	  paths.back().points.insert(paths.back().points.end(), this_intersection.points.begin(), this_intersection.points.end());
