@@ -35,9 +35,15 @@ class slicer_gui(dagmc_slicer):
         self.by_group = kids[3].value
         self.cast_about = kids[4].value
         if self.cast_about:
-             print("WARNING: Cast about has been enabled. This method is intended for use as an attempt to slice unsealed meshes and isn't garaunteed to produce a valid mesh slice.")
+            if 5 == len(self.params_box.children):
+                warning = widgets.Latex("WARNING: Cast about has been enabled. This method is intended for use as an attempt to slice unsealed meshes and isn't garaunteed to produce a valid mesh slice.")
+                warning.width = 240
+                warning.color = 'red'
+                self.params_box.children = self.params_box.children + (warning,)
         else:
-            pass
+            if len(self.params_box.children) > 5:
+                self.params_box.children = self.params_box.children[:-1]
+
         self.create_slice()
         self.show_slice()
 
@@ -146,15 +152,15 @@ class slicer_gui(dagmc_slicer):
         filename_widget = widgets.Text(description = "Filename", value = self.filename)
 
         
-        params_box = widgets.Box()
-        params_box.children = [filename_widget,ax_widget,coord_widget,group_widget,ca_widget]
+        self.params_box = widgets.Box()
+        self.params_box.children = [filename_widget,ax_widget,coord_widget,group_widget,ca_widget]
         self.export_box = widgets.Box()
         export_button = widgets.Button(description="Save File")
         export_button.on_click(self.export_file)
         export_name = widgets.Text(description="Filename", margin = 5)
         self.export_box.children = (export_name,export_button,)
         accord = widgets.Accordion()
-        accord.children = (params_box,self.export_box,)
+        accord.children = (self.params_box,self.export_box,)
         accord.set_title(0,"Slice Parameters")
         accord.set_title(1,"Export")
 
@@ -212,7 +218,7 @@ class slicer_gui(dagmc_slicer):
         #if the filename is the same, confirm they want this to happen
         if (new_filename == self.filename and not override):
             #add buttons to the box to confirm
-            msg = widgets.Button(description = "This will overwrite the current file. Are you sure?",border_color='white')
+            msg = widgets.Latex(value="This will overwrite the current file. Are you sure?",border_color='white')
             y = widgets.Button(description="Yes", margin = 2)
             y.on_click(self.export_file)
             n = widgets.Button(description="No", margin = 2)
