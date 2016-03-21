@@ -295,7 +295,7 @@ moab::ErrorCode get_volume_paths(moab::Range volumes,
 				 std::map<moab::EntityHandle, 
 				 std::vector<Loop> > intersection_dict,
 				 std::vector< std::vector<Loop> > &all_vol_paths,
-				 bool cast_about) {
+				 bool roam) {
   moab::ErrorCode result; 
   
   moab::Range::iterator i; 
@@ -310,14 +310,14 @@ moab::ErrorCode get_volume_paths(moab::Range volumes,
 			       << " intersections for this volume." << std::endl;
 
     std::vector<Loop> vol_paths;
-    stitch( this_vol_intersections, vol_paths, cast_about);
+    stitch( this_vol_intersections, vol_paths, roam);
     all_vol_paths.push_back(vol_paths);
   }
 
   return moab::MB_SUCCESS;
 }
 
-void stitch(std::vector<Loop> loops, std::vector<Loop> &paths, bool cast_about) {
+void stitch(std::vector<Loop> loops, std::vector<Loop> &paths, bool roam) {
 
   unsigned int i = 0; 
 
@@ -360,7 +360,7 @@ void stitch(std::vector<Loop> loops, std::vector<Loop> &paths, bool cast_about) 
   while (0 != loops.size()) {
 
     //if we found no match fron inner while loop, increase proximity tolerance
-    if ( prev_loops_size == (int) loops.size() && !first_search && cast_about) {
+    if ( prev_loops_size == (int) loops.size() && !first_search && roam) {
       pt_match_tol*=1.05;
     }     
     else {

@@ -33,10 +33,10 @@ class slicer_gui(dagmc_slicer):
         self.axis = kids[1].value
         self.coord = kids[2].value
         self.by_group = kids[3].value
-        self.cast_about = kids[4].value
-        if self.cast_about:
+        self.roam = kids[4].value
+        if self.roam:
             if 5 == len(self.params_box.children):
-                warning = widgets.Latex("WARNING: Cast about has been enabled. This method is intended for use as an attempt to slice unsealed meshes and isn't garaunteed to produce a valid mesh slice.")
+                warning = widgets.Latex(self.roam_warning)
                 warning.width = 240
                 warning.color = 'red'
                 self.params_box.children = self.params_box.children + (warning,)
@@ -148,7 +148,7 @@ class slicer_gui(dagmc_slicer):
         ax_widget = widgets.RadioButtons(description="Axis", options = {'x':0,'y':1,'z':2}, value = self.axis)
         coord_widget = widgets.FloatText(description="Slice Coordinate", value = self.coord)
         group_widget = widgets.Checkbox(description="Slice by Group", value = self.by_group)
-        ca_widget = widgets.Checkbox(description="Cast about" , value = self.cast_about)
+        ca_widget = widgets.Checkbox(description="Roaming" , value = self.roam)
         filename_widget = widgets.Text(description = "Filename", value = self.filename)
 
         

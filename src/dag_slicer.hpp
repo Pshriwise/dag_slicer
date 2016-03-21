@@ -13,12 +13,12 @@ public:
   //parameters
   int _axis;
   std::string _filename;
-  std::string _ca_warning = "WARNING: Cast about has been enabled. This method is intended for use as an attempt to slice unsealed meshes and isn't garaunteed to produce a valid mesh slice.";
+  std::string _roam_warning = "WARNING: Roaming for unmatched stitch points has been enabled. This method is intended for use as an attempt to slice unsealed meshes and isn't garaunteed to produce a valid mesh slice.";
   double _coord;
   bool _by_group;
   bool _verbose;
   bool _debug;
-  bool _cast_about;
+  bool _roam;
   //creation method
   int create_slice();
   //modify methods

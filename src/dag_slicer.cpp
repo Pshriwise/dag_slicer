@@ -1,7 +1,7 @@
 #include "dag_slicer.hpp"
 
 Dag_Slicer::Dag_Slicer( std::string file_to_slice, int ax, double coordinate, bool by_grp, bool ca)
-  : _axis(ax), _filename(file_to_slice), _coord(coordinate), _by_group(by_grp), _verbose(false), _debug(false), _cast_about(false) { }
+  : _axis(ax), _filename(file_to_slice), _coord(coordinate), _by_group(by_grp), _verbose(false), _debug(false), _roam(false) { }
 
   Dag_Slicer::~Dag_Slicer() { }
 
@@ -20,7 +20,7 @@ Dag_Slicer::Dag_Slicer( std::string file_to_slice, int ax, double coordinate, bo
 					 _by_group,
 					 _verbose,
 					 _debug,
-					 _cast_about);
+					 _roam);
     return result;
   }  
   

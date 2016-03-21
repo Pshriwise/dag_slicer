@@ -71,13 +71,13 @@ cdef class Dag_Slicer:
         def __set__(self, value):
             (<cpp_dag_slicer.Dag_Slicer *> self._inst)._by_group = <bint> value
 
-    property cast_about:
-        """no docstring for by_group, please file a bug report!"""
+    property roam:
+        """no docstring for roam, please file a bug report!"""
         def __get__(self):
-            return bool((<cpp_dag_slicer.Dag_Slicer *> self._inst)._cast_about)
+            return bool((<cpp_dag_slicer.Dag_Slicer *> self._inst)._roam)
     
         def __set__(self, value):
-            (<cpp_dag_slicer.Dag_Slicer *> self._inst)._cast_about = <bint> value
+            (<cpp_dag_slicer.Dag_Slicer *> self._inst)._roam = <bint> value
             
     
     property coord:
@@ -170,15 +170,15 @@ cdef class Dag_Slicer:
             value_bytes = value.encode()
             (<cpp_dag_slicer.Dag_Slicer *> self._inst)._filename = std_string(<char *> value_bytes)
 
-    property ca_warning:
-        """no docstring for ca_warning, please file a bug report!"""
+    property roam_warning:
+        """no docstring for roam_warning, please file a bug report!"""
         def __get__(self):
-            return bytes(<char *> (<cpp_dag_slicer.Dag_Slicer *> self._inst)._ca_warning.c_str()).decode()
+            return bytes(<char *> (<cpp_dag_slicer.Dag_Slicer *> self._inst)._roam_warning.c_str()).decode()
     
         def __set__(self, value):
             cdef char * value_proxy
             value_bytes = value.encode()
-            (<cpp_dag_slicer.Dag_Slicer *> self._inst)._ca_warning = std_string(<char *> value_bytes)            
+            (<cpp_dag_slicer.Dag_Slicer *> self._inst)._roam_warning = std_string(<char *> value_bytes)            
     
     property group_names:
         """no docstring for group_names, please file a bug report!"""
