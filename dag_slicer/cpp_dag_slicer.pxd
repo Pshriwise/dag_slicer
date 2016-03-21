@@ -32,6 +32,7 @@ cdef extern from "dag_slicer.hpp" :
         cpp_vector[int] group_ids
         cpp_vector[double] dum_pnts
         std_string _filename
+        std_string _ca_warning
         cpp_vector[std_string] group_names
         cpp_vector[cpp_vector[int]] path_coding
         cpp_vector[cpp_vector[double]] slice_x_pnts

@@ -169,7 +169,16 @@ cdef class Dag_Slicer:
             cdef char * value_proxy
             value_bytes = value.encode()
             (<cpp_dag_slicer.Dag_Slicer *> self._inst)._filename = std_string(<char *> value_bytes)
+
+    property ca_warning:
+        """no docstring for ca_warning, please file a bug report!"""
+        def __get__(self):
+            return bytes(<char *> (<cpp_dag_slicer.Dag_Slicer *> self._inst)._ca_warning.c_str()).decode()
     
+        def __set__(self, value):
+            cdef char * value_proxy
+            value_bytes = value.encode()
+            (<cpp_dag_slicer.Dag_Slicer *> self._inst)._ca_warning = std_string(<char *> value_bytes)            
     
     property group_names:
         """no docstring for group_names, please file a bug report!"""
