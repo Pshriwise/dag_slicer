@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from dag_slicer.dag_slicer import Dag_Slicer 
 from matplotlib.widgets import CheckButtons, RadioButtons
-from IPython.html import widgets
-from IPython.display import display
 from matplotlib.colors import rgb2hex
 
 class dagmc_slicer(Dag_Slicer):
