@@ -33,6 +33,11 @@ class slicer_gui(dagmc_slicer):
         self.axis = kids[1].value
         self.coord = kids[2].value
         self.by_group = kids[3].value
+        self.cast_about = kids[4].value
+        if self.cast_about:
+             print("WARNING: Cast about has been enabled. This method is intended for use as an attempt to slice unsealed meshes and isn't garaunteed to produce a valid mesh slice.")
+        else:
+            pass
         self.create_slice()
         self.show_slice()
 
@@ -137,11 +142,12 @@ class slicer_gui(dagmc_slicer):
         ax_widget = widgets.RadioButtons(description="Axis", options = {'x':0,'y':1,'z':2}, value = self.axis)
         coord_widget = widgets.FloatText(description="Slice Coordinate", value = self.coord)
         group_widget = widgets.Checkbox(description="Slice by Group", value = self.by_group)
+        ca_widget = widgets.Checkbox(description="Cast about" , value = self.cast_about)
         filename_widget = widgets.Text(description = "Filename", value = self.filename)
 
         
         params_box = widgets.Box()
-        params_box.children = [filename_widget,ax_widget,coord_widget,group_widget]
+        params_box.children = [filename_widget,ax_widget,coord_widget,group_widget,ca_widget]
         self.export_box = widgets.Box()
         export_button = widgets.Button(description="Save File")
         export_button.on_click(self.export_file)
