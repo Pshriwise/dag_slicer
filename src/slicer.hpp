@@ -121,7 +121,8 @@ moab::ErrorCode slice_faceted_model_out(std::string filename,
 					std::vector<int> &group_ids,
 					bool by_group = false,
 					bool verbose = false,
-					bool debug = false);
+					bool debug = false,
+					bool ca = false);
 
 moab::ErrorCode slice_faceted_model(std::string filename,
 				    int axis,
@@ -130,7 +131,8 @@ moab::ErrorCode slice_faceted_model(std::string filename,
 				    std::vector< std::vector<int> > &codings,
 				    std::vector<std::string> &group_names,
 				    std::vector<int> &group_ids,
-				    bool by_group = false);
+				    bool by_group = false,
+				    bool ca = false);
 
 moab::ErrorCode get_volumes_by_group(std::map< std::string, moab::Range > &group_map,
 				     std::vector<std::string> &group_names,
@@ -147,9 +149,9 @@ moab::ErrorCode get_volume_intersections(moab::EntityHandle volume,
 
 moab::ErrorCode get_volume_paths(moab::Range volumes,
 				 std::map<moab::EntityHandle, std::vector<Loop> > intersection_dict,
-				 std::vector< std::vector<Loop> > &all_vol_paths);
+				 std::vector< std::vector<Loop> > &all_vol_paths, bool roam = false);
 
-void stitch(std::vector<Loop> loops, std::vector<Loop> &paths);
+void stitch(std::vector<Loop> loops, std::vector<Loop> &paths, bool roam = false);
 
 moab::ErrorCode surface_intersections(moab::EntityHandle surf,
 				      moab::Tag aabb_tag,

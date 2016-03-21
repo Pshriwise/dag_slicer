@@ -33,6 +33,17 @@ class slicer_gui(dagmc_slicer):
         self.axis = kids[1].value
         self.coord = kids[2].value
         self.by_group = kids[3].value
+        self.roam = kids[4].value
+        if self.roam:
+            if 5 == len(self.params_box.children):
+                warning = widgets.Latex(self.roam_warning)
+                warning.width = 240
+                warning.color = 'red'
+                self.params_box.children = self.params_box.children + (warning,)
+        else:
+            if len(self.params_box.children) > 5:
+                self.params_box.children = self.params_box.children[:-1]
+
         self.create_slice()
         self.show_slice()
 
@@ -137,18 +148,19 @@ class slicer_gui(dagmc_slicer):
         ax_widget = widgets.RadioButtons(description="Axis", options = {'x':0,'y':1,'z':2}, value = self.axis)
         coord_widget = widgets.FloatText(description="Slice Coordinate", value = self.coord)
         group_widget = widgets.Checkbox(description="Slice by Group", value = self.by_group)
+        ca_widget = widgets.Checkbox(description="Roaming" , value = self.roam)
         filename_widget = widgets.Text(description = "Filename", value = self.filename)
 
         
-        params_box = widgets.Box()
-        params_box.children = [filename_widget,ax_widget,coord_widget,group_widget]
+        self.params_box = widgets.Box()
+        self.params_box.children = [filename_widget,ax_widget,coord_widget,group_widget,ca_widget]
         self.export_box = widgets.Box()
         export_button = widgets.Button(description="Save File")
         export_button.on_click(self.export_file)
         export_name = widgets.Text(description="Filename", margin = 5)
         self.export_box.children = (export_name,export_button,)
         accord = widgets.Accordion()
-        accord.children = (params_box,self.export_box,)
+        accord.children = (self.params_box,self.export_box,)
         accord.set_title(0,"Slice Parameters")
         accord.set_title(1,"Export")
 
@@ -206,7 +218,7 @@ class slicer_gui(dagmc_slicer):
         #if the filename is the same, confirm they want this to happen
         if (new_filename == self.filename and not override):
             #add buttons to the box to confirm
-            msg = widgets.Button(description = "This will overwrite the current file. Are you sure?",border_color='white')
+            msg = widgets.Latex(value="This will overwrite the current file. Are you sure?",border_color='white')
             y = widgets.Button(description="Yes", margin = 2)
             y.on_click(self.export_file)
             n = widgets.Button(description="No", margin = 2)

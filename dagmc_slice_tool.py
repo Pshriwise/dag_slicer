@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from dag_slicer.dag_slicer import Dag_Slicer 
 from matplotlib.widgets import CheckButtons, RadioButtons
-from IPython.html import widgets
-from IPython.display import display
 from matplotlib.colors import rgb2hex
 
 class dagmc_slicer(Dag_Slicer):
@@ -39,6 +37,8 @@ class dagmc_slicer(Dag_Slicer):
         self.path_coding = np.array([], dtype='int')
         self.group_names = np.array([], dtype='str')
 
+        if self.roam:
+            print("\033[93m"+self.roam_warning+"\033[0m")
         #run the super function to create the slice
         if str(self.filename) is not "":
             a = super(dagmc_slicer, self).create_slice()

@@ -70,11 +70,13 @@ moab::ErrorCode slice_faceted_model_out(std::string filename,
 					std::vector<std::string> &group_names,
 					std::vector<int> &group_ids,
 					bool by_group,
-					bool verbose, bool debug) {
+					bool verbose,
+					bool debug,
+					bool ca) {
   opts.verbose = verbose;
   opts.debug = debug;
   std::vector< std::vector<xypnt> > paths;
-  moab::ErrorCode result = slice_faceted_model(filename, axis, coord, paths, codings, group_names, group_ids, by_group);
+  moab::ErrorCode result = slice_faceted_model(filename, axis, coord, paths, codings, group_names, group_ids, by_group, ca);
 
   std::vector< std::vector<xypnt> >::iterator path;
 
@@ -98,7 +100,8 @@ moab::ErrorCode slice_faceted_model(std::string filename,
 				    std::vector< std::vector<int> > &codings,
 				    std::vector<std::string> &group_names,
 				    std::vector<int> &group_ids,
-				    bool by_group) {
+				    bool by_group,
+				    bool ca) {
   
   moab::ErrorCode result;
   std::map<moab::EntityHandle,std::vector<Loop> > intersection_map;
@@ -172,7 +175,7 @@ moab::ErrorCode slice_faceted_model(std::string filename,
     std::vector<std::string>::iterator group_name;
     for (group_name = group_names.begin(); group_name != group_names.end();) {
       std::vector< std::vector<Loop> > all_group_paths;
-      result = get_volume_paths(group_mapping[*group_name], intersection_map, all_group_paths);
+      result = get_volume_paths(group_mapping[*group_name], intersection_map, all_group_paths, ca);
       ERR_CHECK(result);
 
 
@@ -212,7 +215,7 @@ moab::ErrorCode slice_faceted_model(std::string filename,
     result = get_all_volumes(volumes);
     ERR_CHECK(result);
 
-    result = get_volume_paths(volumes, intersection_map, all_paths);
+    result = get_volume_paths(volumes, intersection_map, all_paths, ca);
     ERR_CHECK(result);
     
     std::vector< std::vector<Loop> >::iterator i;
@@ -291,7 +294,8 @@ moab::ErrorCode get_volumes_by_group(std::map< std::string,
 moab::ErrorCode get_volume_paths(moab::Range volumes,
 				 std::map<moab::EntityHandle, 
 				 std::vector<Loop> > intersection_dict,
-				 std::vector< std::vector<Loop> > &all_vol_paths) {
+				 std::vector< std::vector<Loop> > &all_vol_paths,
+				 bool roam) {
   moab::ErrorCode result; 
   
   moab::Range::iterator i; 
@@ -306,14 +310,14 @@ moab::ErrorCode get_volume_paths(moab::Range volumes,
 			       << " intersections for this volume." << std::endl;
 
     std::vector<Loop> vol_paths;
-    stitch( this_vol_intersections, vol_paths);
+    stitch( this_vol_intersections, vol_paths, roam);
     all_vol_paths.push_back(vol_paths);
   }
 
   return moab::MB_SUCCESS;
 }
 
-void stitch(std::vector<Loop> loops, std::vector<Loop> &paths) {
+void stitch(std::vector<Loop> loops, std::vector<Loop> &paths, bool roam) {
 
   unsigned int i = 0; 
 
@@ -349,41 +353,55 @@ void stitch(std::vector<Loop> loops, std::vector<Loop> &paths) {
   paths.push_back(loops[i]);
   loops.erase(loops.begin()+i);
 
-
+  double pt_match_tol = MATCH_TOL;
+  int prev_loops_size = (int) loops.size();
+  bool first_search = true;
+  
   while (0 != loops.size()) {
-      
+
+    //if we found no match fron inner while loop, increase proximity tolerance
+    if ( prev_loops_size == (int) loops.size() && !first_search && roam) {
+      pt_match_tol*=1.05;
+    }     
+    else {
+      pt_match_tol = MATCH_TOL;
+    }
+    first_search = false;
+    
     //if we have a complete loop, then move on to a new starting point
     if (point_match(paths.back().points.front(), paths.back().points.back())) {
       paths.push_back(loops.front());
       loops.erase(loops.begin());
-    }	   
+      pt_match_tol = MATCH_TOL;
+    }
     else {
       i = 0;
+      prev_loops_size = (int) loops.size();
 	  
       while ( i < loops.size() ) {
 
 	Loop this_intersection = loops[i];
 
-	if (point_match( paths.back().points.front(), this_intersection.points.front())) {
+	if (point_match( paths.back().points.front(), this_intersection.points.front(),pt_match_tol)) {
 	  //reverse this_intersection and attach to the front of paths.back()
 	  std::reverse( this_intersection.points.begin(), this_intersection.points.end());
 	  paths.back().points.insert(paths.back().points.begin(), this_intersection.points.begin(), this_intersection.points.end());
 	  loops.erase(loops.begin()+i);
 	  i = 0;
 	}
-	else if (point_match( paths.back().points.front(), this_intersection.points.back())) {
+	else if (point_match( paths.back().points.front(), this_intersection.points.back(), pt_match_tol)) {
 	  // attach to the front of paths.back()
 	  paths.back().points.insert(paths.back().points.begin(), this_intersection.points.begin(), this_intersection.points.end());
 	  loops.erase(loops.begin()+i);
 	  i = 0;		  
 	}
-	else if (point_match( paths.back().points.back(), this_intersection.points.front())) {
+	else if (point_match( paths.back().points.back(), this_intersection.points.front(), pt_match_tol)) {
 	  //attach to the back of paths.back()
 	  paths.back().points.insert(paths.back().points.end(), this_intersection.points.begin(), this_intersection.points.end());
 	  loops.erase(loops.begin()+i);
 	  i = 0;		  
 	}
-	else if (point_match(paths.back().points.back(), this_intersection.points.back())) {
+	else if (point_match(paths.back().points.back(), this_intersection.points.back(), pt_match_tol)) {
 	  //reverse intersection and attach to the back of paths.back()
 	  std::reverse(this_intersection.points.begin(), this_intersection.points.end());
 	  paths.back().points.insert(paths.back().points.end(), this_intersection.points.begin(), this_intersection.points.end());

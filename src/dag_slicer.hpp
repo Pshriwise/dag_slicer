@@ -8,15 +8,17 @@
 class Dag_Slicer{
   
 public:
-  Dag_Slicer(std::string file_to_slice, int ax, double coord, bool by_grp = false);
+  Dag_Slicer(std::string file_to_slice, int ax, double coord, bool by_grp = false, bool ca = false);
   ~Dag_Slicer();
   //parameters
   int _axis;
   std::string _filename;
+  std::string _roam_warning = "WARNING: Roaming for unmatched stitch points has been enabled. This method is intended for use as an attempt to slice unsealed meshes and isn't garaunteed to produce a valid mesh slice.";
   double _coord;
   bool _by_group;
   bool _verbose;
   bool _debug;
+  bool _roam;
   //creation method
   int create_slice();
   //modify methods
