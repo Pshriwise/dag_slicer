@@ -34,9 +34,11 @@ Please see the example in the examples dir and this video playlist for examples 
 
 https://www.youtube.com/playlist?list=PLa7CZUIEd-lRsDJgIVxppaYDqgS04hwfq
 
-Note: For garaunteed performance of this tool, all facet-based models should be made watertight before use.
+__Note:__ For garaunteed performance of this tool, all facet-based models should be made watertight before use. However, a the newly added roaming intersections feature may assist in slicing models which cannot be made fully watertight.
 
 Recent additions:
+
+* __Can now slice non-watertight meshes!__ This can be accomplished by setting the roam attribute to `True` on the slicer class before slicing or selecting is as an option in GUI.
 
 * Group names can now be altered using the `rename_group` method. Like so:
 
@@ -50,7 +52,8 @@ Recent additions:
   slicer.write_file(<new_filename>)
   ```
   
-* A new GUI using iPython widgets. See the example in the examples folder.
+* A new GUI using iPython widgets! See the example in the examples folder.
+
 
 **Note: GH will not fully render the notebook with widgets so they won't be visible unless the notebook is run locally.** 
  
