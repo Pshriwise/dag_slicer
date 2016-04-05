@@ -26,8 +26,13 @@ Installation
 Use
 =======
 
-Please see the example in the examples dir and this video playlist (https://www.youtube.com/playlist?list=PLa7CZUIEd-lRsDJgIVxppaYDqgS04hwfq) for examples of use.
+Please see the example in the examples dir and this video playlist for examples of use.
 
+
+[![ScreenShot](https://img.youtube.com/vi/O_6JdD5INa4/0.jpg)](https://www.youtube.com/playlist?list=PLa7CZUIEd-lRsDJgIVxppaYDqgS04hwfq)
+
+
+https://www.youtube.com/playlist?list=PLa7CZUIEd-lRsDJgIVxppaYDqgS04hwfq
 
 Note: For garaunteed performance of this tool, all facet-based models should be made watertight before use.
 
