@@ -345,24 +345,24 @@ class Dag_Slicer(_object):
         except: self.this = this
     __swig_destroy__ = _Dag_Slicer.delete_Dag_Slicer
     __del__ = lambda self : None;
-    __swig_setmethods__["_axis"] = _Dag_Slicer.Dag_Slicer__axis_set
-    __swig_getmethods__["_axis"] = _Dag_Slicer.Dag_Slicer__axis_get
-    if _newclass:_axis = _swig_property(_Dag_Slicer.Dag_Slicer__axis_get, _Dag_Slicer.Dag_Slicer__axis_set)
-    __swig_setmethods__["_filename"] = _Dag_Slicer.Dag_Slicer__filename_set
-    __swig_getmethods__["_filename"] = _Dag_Slicer.Dag_Slicer__filename_get
-    if _newclass:_filename = _swig_property(_Dag_Slicer.Dag_Slicer__filename_get, _Dag_Slicer.Dag_Slicer__filename_set)
-    __swig_setmethods__["_roam_warning"] = _Dag_Slicer.Dag_Slicer__roam_warning_set
-    __swig_getmethods__["_roam_warning"] = _Dag_Slicer.Dag_Slicer__roam_warning_get
-    if _newclass:_roam_warning = _swig_property(_Dag_Slicer.Dag_Slicer__roam_warning_get, _Dag_Slicer.Dag_Slicer__roam_warning_set)
-    __swig_setmethods__["_coord"] = _Dag_Slicer.Dag_Slicer__coord_set
-    __swig_getmethods__["_coord"] = _Dag_Slicer.Dag_Slicer__coord_get
-    if _newclass:_coord = _swig_property(_Dag_Slicer.Dag_Slicer__coord_get, _Dag_Slicer.Dag_Slicer__coord_set)
-    __swig_setmethods__["_by_group"] = _Dag_Slicer.Dag_Slicer__by_group_set
-    __swig_getmethods__["_by_group"] = _Dag_Slicer.Dag_Slicer__by_group_get
-    if _newclass:_by_group = _swig_property(_Dag_Slicer.Dag_Slicer__by_group_get, _Dag_Slicer.Dag_Slicer__by_group_set)
-    __swig_setmethods__["_verbose"] = _Dag_Slicer.Dag_Slicer__verbose_set
-    __swig_getmethods__["_verbose"] = _Dag_Slicer.Dag_Slicer__verbose_get
-    if _newclass:_verbose = _swig_property(_Dag_Slicer.Dag_Slicer__verbose_get, _Dag_Slicer.Dag_Slicer__verbose_set)
+    __swig_setmethods__["axis"] = _Dag_Slicer.Dag_Slicer_axis_set
+    __swig_getmethods__["axis"] = _Dag_Slicer.Dag_Slicer_axis_get
+    if _newclass:axis = _swig_property(_Dag_Slicer.Dag_Slicer_axis_get, _Dag_Slicer.Dag_Slicer_axis_set)
+    __swig_setmethods__["filename"] = _Dag_Slicer.Dag_Slicer_filename_set
+    __swig_getmethods__["filename"] = _Dag_Slicer.Dag_Slicer_filename_get
+    if _newclass:filename = _swig_property(_Dag_Slicer.Dag_Slicer_filename_get, _Dag_Slicer.Dag_Slicer_filename_set)
+    __swig_setmethods__["roam_warning"] = _Dag_Slicer.Dag_Slicer_roam_warning_set
+    __swig_getmethods__["roam_warning"] = _Dag_Slicer.Dag_Slicer_roam_warning_get
+    if _newclass:roam_warning = _swig_property(_Dag_Slicer.Dag_Slicer_roam_warning_get, _Dag_Slicer.Dag_Slicer_roam_warning_set)
+    __swig_setmethods__["coord"] = _Dag_Slicer.Dag_Slicer_coord_set
+    __swig_getmethods__["coord"] = _Dag_Slicer.Dag_Slicer_coord_get
+    if _newclass:coord = _swig_property(_Dag_Slicer.Dag_Slicer_coord_get, _Dag_Slicer.Dag_Slicer_coord_set)
+    __swig_setmethods__["by_group"] = _Dag_Slicer.Dag_Slicer_by_group_set
+    __swig_getmethods__["by_group"] = _Dag_Slicer.Dag_Slicer_by_group_get
+    if _newclass:by_group = _swig_property(_Dag_Slicer.Dag_Slicer_by_group_get, _Dag_Slicer.Dag_Slicer_by_group_set)
+    __swig_setmethods__["verbose"] = _Dag_Slicer.Dag_Slicer_verbose_set
+    __swig_getmethods__["verbose"] = _Dag_Slicer.Dag_Slicer_verbose_get
+    if _newclass:verbose = _swig_property(_Dag_Slicer.Dag_Slicer_verbose_get, _Dag_Slicer.Dag_Slicer_verbose_set)
     def create_slice(self): return _Dag_Slicer.Dag_Slicer_create_slice(self)
     def rename_group(self, *args): return _Dag_Slicer.Dag_Slicer_rename_group(self, *args)
     def write_file(self, *args): return _Dag_Slicer.Dag_Slicer_write_file(self, *args)
@@ -384,12 +384,12 @@ class Dag_Slicer(_object):
     __swig_setmethods__["path_coding"] = _Dag_Slicer.Dag_Slicer_path_coding_set
     __swig_getmethods__["path_coding"] = _Dag_Slicer.Dag_Slicer_path_coding_get
     if _newclass:path_coding = _swig_property(_Dag_Slicer.Dag_Slicer_path_coding_get, _Dag_Slicer.Dag_Slicer_path_coding_set)
-    __swig_setmethods__["_debug"] = _Dag_Slicer.Dag_Slicer__debug_set
-    __swig_getmethods__["_debug"] = _Dag_Slicer.Dag_Slicer__debug_get
-    if _newclass:_debug = _swig_property(_Dag_Slicer.Dag_Slicer__debug_get, _Dag_Slicer.Dag_Slicer__debug_set)
-    __swig_setmethods__["_roam"] = _Dag_Slicer.Dag_Slicer__roam_set
-    __swig_getmethods__["_roam"] = _Dag_Slicer.Dag_Slicer__roam_get
-    if _newclass:_roam = _swig_property(_Dag_Slicer.Dag_Slicer__roam_get, _Dag_Slicer.Dag_Slicer__roam_set)
+    __swig_setmethods__["debug"] = _Dag_Slicer.Dag_Slicer_debug_set
+    __swig_getmethods__["debug"] = _Dag_Slicer.Dag_Slicer_debug_get
+    if _newclass:debug = _swig_property(_Dag_Slicer.Dag_Slicer_debug_get, _Dag_Slicer.Dag_Slicer_debug_set)
+    __swig_setmethods__["roam"] = _Dag_Slicer.Dag_Slicer_roam_set
+    __swig_getmethods__["roam"] = _Dag_Slicer.Dag_Slicer_roam_get
+    if _newclass:roam = _swig_property(_Dag_Slicer.Dag_Slicer_roam_get, _Dag_Slicer.Dag_Slicer_roam_set)
 Dag_Slicer_swigregister = _Dag_Slicer.Dag_Slicer_swigregister
 Dag_Slicer_swigregister(Dag_Slicer)
 

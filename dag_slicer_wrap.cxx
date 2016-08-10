@@ -5317,12 +5317,12 @@ public:
   Dag_Slicer(std::string file_to_slice, int ax, double coord, bool by_grp = false, bool ca = false);
   ~Dag_Slicer();
   //parameters
-  int _axis;
-  std::string _filename;
-  std::string _roam_warning = "WARNING: Roaming for unmatched stitch points has been enabled. This method is intended for use as an attempt to slice unsealed meshes and isn't garaunteed to produce a valid mesh slice.";
-  double _coord;
-  bool _by_group;
-  bool _verbose;
+  int axis;
+  std::string filename;
+  std::string roam_warning = "WARNING: Roaming for unmatched stitch points has been enabled. This method is intended for use as an attempt to slice unsealed meshes and isn't garaunteed to produce a valid mesh slice.";
+  double coord;
+  bool by_group;
+  bool verbose;
   //creation method
   int create_slice();
   //modify methods
@@ -5335,8 +5335,8 @@ public:
   std::vector< std::vector<double> > slice_y_pnts;
   std::vector<int> group_ids;
   std::vector< std::vector<int> > path_coding;
-  bool _debug;
-  bool _roam;
+  bool debug;
+  bool roam;
 };
 
 
@@ -16056,7 +16056,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_Dag_Slicer__axis_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_Dag_Slicer_axis_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Dag_Slicer *arg1 = (Dag_Slicer *) 0 ;
   int arg2 ;
@@ -16067,18 +16067,18 @@ SWIGINTERN PyObject *_wrap_Dag_Slicer__axis_set(PyObject *SWIGUNUSEDPARM(self), 
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:Dag_Slicer__axis_set",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:Dag_Slicer_axis_set",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_Dag_Slicer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer__axis_set" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer_axis_set" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
   }
   arg1 = reinterpret_cast< Dag_Slicer * >(argp1);
   ecode2 = SWIG_AsVal_int(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Dag_Slicer__axis_set" "', argument " "2"" of type '" "int""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Dag_Slicer_axis_set" "', argument " "2"" of type '" "int""'");
   } 
   arg2 = static_cast< int >(val2);
-  if (arg1) (arg1)->_axis = arg2;
+  if (arg1) (arg1)->axis = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -16086,7 +16086,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_Dag_Slicer__axis_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_Dag_Slicer_axis_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Dag_Slicer *arg1 = (Dag_Slicer *) 0 ;
   void *argp1 = 0 ;
@@ -16094,13 +16094,13 @@ SWIGINTERN PyObject *_wrap_Dag_Slicer__axis_get(PyObject *SWIGUNUSEDPARM(self), 
   PyObject * obj0 = 0 ;
   int result;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:Dag_Slicer__axis_get",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:Dag_Slicer_axis_get",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_Dag_Slicer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer__axis_get" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer_axis_get" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
   }
   arg1 = reinterpret_cast< Dag_Slicer * >(argp1);
-  result = (int) ((arg1)->_axis);
+  result = (int) ((arg1)->axis);
   resultobj = SWIG_From_int(static_cast< int >(result));
   return resultobj;
 fail:
@@ -16108,7 +16108,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_Dag_Slicer__filename_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_Dag_Slicer_filename_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Dag_Slicer *arg1 = (Dag_Slicer *) 0 ;
   std::string *arg2 = 0 ;
@@ -16118,24 +16118,24 @@ SWIGINTERN PyObject *_wrap_Dag_Slicer__filename_set(PyObject *SWIGUNUSEDPARM(sel
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:Dag_Slicer__filename_set",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:Dag_Slicer_filename_set",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_Dag_Slicer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer__filename_set" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer_filename_set" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
   }
   arg1 = reinterpret_cast< Dag_Slicer * >(argp1);
   {
     std::string *ptr = (std::string *)0;
     res2 = SWIG_AsPtr_std_string(obj1, &ptr);
     if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Dag_Slicer__filename_set" "', argument " "2"" of type '" "std::string const &""'"); 
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Dag_Slicer_filename_set" "', argument " "2"" of type '" "std::string const &""'"); 
     }
     if (!ptr) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Dag_Slicer__filename_set" "', argument " "2"" of type '" "std::string const &""'"); 
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Dag_Slicer_filename_set" "', argument " "2"" of type '" "std::string const &""'"); 
     }
     arg2 = ptr;
   }
-  if (arg1) (arg1)->_filename = *arg2;
+  if (arg1) (arg1)->filename = *arg2;
   resultobj = SWIG_Py_Void();
   if (SWIG_IsNewObj(res2)) delete arg2;
   return resultobj;
@@ -16145,7 +16145,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_Dag_Slicer__filename_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_Dag_Slicer_filename_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Dag_Slicer *arg1 = (Dag_Slicer *) 0 ;
   void *argp1 = 0 ;
@@ -16153,13 +16153,13 @@ SWIGINTERN PyObject *_wrap_Dag_Slicer__filename_get(PyObject *SWIGUNUSEDPARM(sel
   PyObject * obj0 = 0 ;
   std::string *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:Dag_Slicer__filename_get",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:Dag_Slicer_filename_get",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_Dag_Slicer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer__filename_get" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer_filename_get" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
   }
   arg1 = reinterpret_cast< Dag_Slicer * >(argp1);
-  result = (std::string *) & ((arg1)->_filename);
+  result = (std::string *) & ((arg1)->filename);
   resultobj = SWIG_From_std_string(static_cast< std::string >(*result));
   return resultobj;
 fail:
@@ -16167,7 +16167,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_Dag_Slicer__roam_warning_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_Dag_Slicer_roam_warning_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Dag_Slicer *arg1 = (Dag_Slicer *) 0 ;
   std::string *arg2 = 0 ;
@@ -16177,24 +16177,24 @@ SWIGINTERN PyObject *_wrap_Dag_Slicer__roam_warning_set(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:Dag_Slicer__roam_warning_set",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:Dag_Slicer_roam_warning_set",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_Dag_Slicer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer__roam_warning_set" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer_roam_warning_set" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
   }
   arg1 = reinterpret_cast< Dag_Slicer * >(argp1);
   {
     std::string *ptr = (std::string *)0;
     res2 = SWIG_AsPtr_std_string(obj1, &ptr);
     if (!SWIG_IsOK(res2)) {
-      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Dag_Slicer__roam_warning_set" "', argument " "2"" of type '" "std::string const &""'"); 
+      SWIG_exception_fail(SWIG_ArgError(res2), "in method '" "Dag_Slicer_roam_warning_set" "', argument " "2"" of type '" "std::string const &""'"); 
     }
     if (!ptr) {
-      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Dag_Slicer__roam_warning_set" "', argument " "2"" of type '" "std::string const &""'"); 
+      SWIG_exception_fail(SWIG_ValueError, "invalid null reference " "in method '" "Dag_Slicer_roam_warning_set" "', argument " "2"" of type '" "std::string const &""'"); 
     }
     arg2 = ptr;
   }
-  if (arg1) (arg1)->_roam_warning = *arg2;
+  if (arg1) (arg1)->roam_warning = *arg2;
   resultobj = SWIG_Py_Void();
   if (SWIG_IsNewObj(res2)) delete arg2;
   return resultobj;
@@ -16204,7 +16204,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_Dag_Slicer__roam_warning_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_Dag_Slicer_roam_warning_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Dag_Slicer *arg1 = (Dag_Slicer *) 0 ;
   void *argp1 = 0 ;
@@ -16212,13 +16212,13 @@ SWIGINTERN PyObject *_wrap_Dag_Slicer__roam_warning_get(PyObject *SWIGUNUSEDPARM
   PyObject * obj0 = 0 ;
   std::string *result = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:Dag_Slicer__roam_warning_get",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:Dag_Slicer_roam_warning_get",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_Dag_Slicer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer__roam_warning_get" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer_roam_warning_get" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
   }
   arg1 = reinterpret_cast< Dag_Slicer * >(argp1);
-  result = (std::string *) & ((arg1)->_roam_warning);
+  result = (std::string *) & ((arg1)->roam_warning);
   resultobj = SWIG_From_std_string(static_cast< std::string >(*result));
   return resultobj;
 fail:
@@ -16226,7 +16226,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_Dag_Slicer__coord_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_Dag_Slicer_coord_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Dag_Slicer *arg1 = (Dag_Slicer *) 0 ;
   double arg2 ;
@@ -16237,18 +16237,18 @@ SWIGINTERN PyObject *_wrap_Dag_Slicer__coord_set(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:Dag_Slicer__coord_set",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:Dag_Slicer_coord_set",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_Dag_Slicer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer__coord_set" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer_coord_set" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
   }
   arg1 = reinterpret_cast< Dag_Slicer * >(argp1);
   ecode2 = SWIG_AsVal_double(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Dag_Slicer__coord_set" "', argument " "2"" of type '" "double""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Dag_Slicer_coord_set" "', argument " "2"" of type '" "double""'");
   } 
   arg2 = static_cast< double >(val2);
-  if (arg1) (arg1)->_coord = arg2;
+  if (arg1) (arg1)->coord = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -16256,7 +16256,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_Dag_Slicer__coord_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_Dag_Slicer_coord_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Dag_Slicer *arg1 = (Dag_Slicer *) 0 ;
   void *argp1 = 0 ;
@@ -16264,13 +16264,13 @@ SWIGINTERN PyObject *_wrap_Dag_Slicer__coord_get(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj0 = 0 ;
   double result;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:Dag_Slicer__coord_get",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:Dag_Slicer_coord_get",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_Dag_Slicer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer__coord_get" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer_coord_get" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
   }
   arg1 = reinterpret_cast< Dag_Slicer * >(argp1);
-  result = (double) ((arg1)->_coord);
+  result = (double) ((arg1)->coord);
   resultobj = SWIG_From_double(static_cast< double >(result));
   return resultobj;
 fail:
@@ -16278,7 +16278,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_Dag_Slicer__by_group_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_Dag_Slicer_by_group_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Dag_Slicer *arg1 = (Dag_Slicer *) 0 ;
   bool arg2 ;
@@ -16289,18 +16289,18 @@ SWIGINTERN PyObject *_wrap_Dag_Slicer__by_group_set(PyObject *SWIGUNUSEDPARM(sel
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:Dag_Slicer__by_group_set",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:Dag_Slicer_by_group_set",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_Dag_Slicer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer__by_group_set" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer_by_group_set" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
   }
   arg1 = reinterpret_cast< Dag_Slicer * >(argp1);
   ecode2 = SWIG_AsVal_bool(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Dag_Slicer__by_group_set" "', argument " "2"" of type '" "bool""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Dag_Slicer_by_group_set" "', argument " "2"" of type '" "bool""'");
   } 
   arg2 = static_cast< bool >(val2);
-  if (arg1) (arg1)->_by_group = arg2;
+  if (arg1) (arg1)->by_group = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -16308,7 +16308,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_Dag_Slicer__by_group_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_Dag_Slicer_by_group_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Dag_Slicer *arg1 = (Dag_Slicer *) 0 ;
   void *argp1 = 0 ;
@@ -16316,13 +16316,13 @@ SWIGINTERN PyObject *_wrap_Dag_Slicer__by_group_get(PyObject *SWIGUNUSEDPARM(sel
   PyObject * obj0 = 0 ;
   bool result;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:Dag_Slicer__by_group_get",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:Dag_Slicer_by_group_get",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_Dag_Slicer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer__by_group_get" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer_by_group_get" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
   }
   arg1 = reinterpret_cast< Dag_Slicer * >(argp1);
-  result = (bool) ((arg1)->_by_group);
+  result = (bool) ((arg1)->by_group);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -16330,7 +16330,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_Dag_Slicer__verbose_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_Dag_Slicer_verbose_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Dag_Slicer *arg1 = (Dag_Slicer *) 0 ;
   bool arg2 ;
@@ -16341,18 +16341,18 @@ SWIGINTERN PyObject *_wrap_Dag_Slicer__verbose_set(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:Dag_Slicer__verbose_set",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:Dag_Slicer_verbose_set",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_Dag_Slicer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer__verbose_set" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer_verbose_set" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
   }
   arg1 = reinterpret_cast< Dag_Slicer * >(argp1);
   ecode2 = SWIG_AsVal_bool(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Dag_Slicer__verbose_set" "', argument " "2"" of type '" "bool""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Dag_Slicer_verbose_set" "', argument " "2"" of type '" "bool""'");
   } 
   arg2 = static_cast< bool >(val2);
-  if (arg1) (arg1)->_verbose = arg2;
+  if (arg1) (arg1)->verbose = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -16360,7 +16360,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_Dag_Slicer__verbose_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_Dag_Slicer_verbose_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Dag_Slicer *arg1 = (Dag_Slicer *) 0 ;
   void *argp1 = 0 ;
@@ -16368,13 +16368,13 @@ SWIGINTERN PyObject *_wrap_Dag_Slicer__verbose_get(PyObject *SWIGUNUSEDPARM(self
   PyObject * obj0 = 0 ;
   bool result;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:Dag_Slicer__verbose_get",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:Dag_Slicer_verbose_get",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_Dag_Slicer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer__verbose_get" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer_verbose_get" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
   }
   arg1 = reinterpret_cast< Dag_Slicer * >(argp1);
-  result = (bool) ((arg1)->_verbose);
+  result = (bool) ((arg1)->verbose);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -16789,7 +16789,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_Dag_Slicer__debug_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_Dag_Slicer_debug_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Dag_Slicer *arg1 = (Dag_Slicer *) 0 ;
   bool arg2 ;
@@ -16800,18 +16800,18 @@ SWIGINTERN PyObject *_wrap_Dag_Slicer__debug_set(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:Dag_Slicer__debug_set",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:Dag_Slicer_debug_set",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_Dag_Slicer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer__debug_set" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer_debug_set" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
   }
   arg1 = reinterpret_cast< Dag_Slicer * >(argp1);
   ecode2 = SWIG_AsVal_bool(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Dag_Slicer__debug_set" "', argument " "2"" of type '" "bool""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Dag_Slicer_debug_set" "', argument " "2"" of type '" "bool""'");
   } 
   arg2 = static_cast< bool >(val2);
-  if (arg1) (arg1)->_debug = arg2;
+  if (arg1) (arg1)->debug = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -16819,7 +16819,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_Dag_Slicer__debug_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_Dag_Slicer_debug_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Dag_Slicer *arg1 = (Dag_Slicer *) 0 ;
   void *argp1 = 0 ;
@@ -16827,13 +16827,13 @@ SWIGINTERN PyObject *_wrap_Dag_Slicer__debug_get(PyObject *SWIGUNUSEDPARM(self),
   PyObject * obj0 = 0 ;
   bool result;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:Dag_Slicer__debug_get",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:Dag_Slicer_debug_get",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_Dag_Slicer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer__debug_get" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer_debug_get" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
   }
   arg1 = reinterpret_cast< Dag_Slicer * >(argp1);
-  result = (bool) ((arg1)->_debug);
+  result = (bool) ((arg1)->debug);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -16841,7 +16841,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_Dag_Slicer__roam_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_Dag_Slicer_roam_set(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Dag_Slicer *arg1 = (Dag_Slicer *) 0 ;
   bool arg2 ;
@@ -16852,18 +16852,18 @@ SWIGINTERN PyObject *_wrap_Dag_Slicer__roam_set(PyObject *SWIGUNUSEDPARM(self), 
   PyObject * obj0 = 0 ;
   PyObject * obj1 = 0 ;
   
-  if (!PyArg_ParseTuple(args,(char *)"OO:Dag_Slicer__roam_set",&obj0,&obj1)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"OO:Dag_Slicer_roam_set",&obj0,&obj1)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_Dag_Slicer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer__roam_set" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer_roam_set" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
   }
   arg1 = reinterpret_cast< Dag_Slicer * >(argp1);
   ecode2 = SWIG_AsVal_bool(obj1, &val2);
   if (!SWIG_IsOK(ecode2)) {
-    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Dag_Slicer__roam_set" "', argument " "2"" of type '" "bool""'");
+    SWIG_exception_fail(SWIG_ArgError(ecode2), "in method '" "Dag_Slicer_roam_set" "', argument " "2"" of type '" "bool""'");
   } 
   arg2 = static_cast< bool >(val2);
-  if (arg1) (arg1)->_roam = arg2;
+  if (arg1) (arg1)->roam = arg2;
   resultobj = SWIG_Py_Void();
   return resultobj;
 fail:
@@ -16871,7 +16871,7 @@ fail:
 }
 
 
-SWIGINTERN PyObject *_wrap_Dag_Slicer__roam_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+SWIGINTERN PyObject *_wrap_Dag_Slicer_roam_get(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   Dag_Slicer *arg1 = (Dag_Slicer *) 0 ;
   void *argp1 = 0 ;
@@ -16879,13 +16879,13 @@ SWIGINTERN PyObject *_wrap_Dag_Slicer__roam_get(PyObject *SWIGUNUSEDPARM(self), 
   PyObject * obj0 = 0 ;
   bool result;
   
-  if (!PyArg_ParseTuple(args,(char *)"O:Dag_Slicer__roam_get",&obj0)) SWIG_fail;
+  if (!PyArg_ParseTuple(args,(char *)"O:Dag_Slicer_roam_get",&obj0)) SWIG_fail;
   res1 = SWIG_ConvertPtr(obj0, &argp1,SWIGTYPE_p_Dag_Slicer, 0 |  0 );
   if (!SWIG_IsOK(res1)) {
-    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer__roam_get" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "Dag_Slicer_roam_get" "', argument " "1"" of type '" "Dag_Slicer *""'"); 
   }
   arg1 = reinterpret_cast< Dag_Slicer * >(argp1);
-  result = (bool) ((arg1)->_roam);
+  result = (bool) ((arg1)->roam);
   resultobj = SWIG_From_bool(static_cast< bool >(result));
   return resultobj;
 fail:
@@ -17092,18 +17092,18 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"VecStr_swigregister", VecStr_swigregister, METH_VARARGS, NULL},
 	 { (char *)"new_Dag_Slicer", _wrap_new_Dag_Slicer, METH_VARARGS, NULL},
 	 { (char *)"delete_Dag_Slicer", _wrap_delete_Dag_Slicer, METH_VARARGS, NULL},
-	 { (char *)"Dag_Slicer__axis_set", _wrap_Dag_Slicer__axis_set, METH_VARARGS, NULL},
-	 { (char *)"Dag_Slicer__axis_get", _wrap_Dag_Slicer__axis_get, METH_VARARGS, NULL},
-	 { (char *)"Dag_Slicer__filename_set", _wrap_Dag_Slicer__filename_set, METH_VARARGS, NULL},
-	 { (char *)"Dag_Slicer__filename_get", _wrap_Dag_Slicer__filename_get, METH_VARARGS, NULL},
-	 { (char *)"Dag_Slicer__roam_warning_set", _wrap_Dag_Slicer__roam_warning_set, METH_VARARGS, NULL},
-	 { (char *)"Dag_Slicer__roam_warning_get", _wrap_Dag_Slicer__roam_warning_get, METH_VARARGS, NULL},
-	 { (char *)"Dag_Slicer__coord_set", _wrap_Dag_Slicer__coord_set, METH_VARARGS, NULL},
-	 { (char *)"Dag_Slicer__coord_get", _wrap_Dag_Slicer__coord_get, METH_VARARGS, NULL},
-	 { (char *)"Dag_Slicer__by_group_set", _wrap_Dag_Slicer__by_group_set, METH_VARARGS, NULL},
-	 { (char *)"Dag_Slicer__by_group_get", _wrap_Dag_Slicer__by_group_get, METH_VARARGS, NULL},
-	 { (char *)"Dag_Slicer__verbose_set", _wrap_Dag_Slicer__verbose_set, METH_VARARGS, NULL},
-	 { (char *)"Dag_Slicer__verbose_get", _wrap_Dag_Slicer__verbose_get, METH_VARARGS, NULL},
+	 { (char *)"Dag_Slicer_axis_set", _wrap_Dag_Slicer_axis_set, METH_VARARGS, NULL},
+	 { (char *)"Dag_Slicer_axis_get", _wrap_Dag_Slicer_axis_get, METH_VARARGS, NULL},
+	 { (char *)"Dag_Slicer_filename_set", _wrap_Dag_Slicer_filename_set, METH_VARARGS, NULL},
+	 { (char *)"Dag_Slicer_filename_get", _wrap_Dag_Slicer_filename_get, METH_VARARGS, NULL},
+	 { (char *)"Dag_Slicer_roam_warning_set", _wrap_Dag_Slicer_roam_warning_set, METH_VARARGS, NULL},
+	 { (char *)"Dag_Slicer_roam_warning_get", _wrap_Dag_Slicer_roam_warning_get, METH_VARARGS, NULL},
+	 { (char *)"Dag_Slicer_coord_set", _wrap_Dag_Slicer_coord_set, METH_VARARGS, NULL},
+	 { (char *)"Dag_Slicer_coord_get", _wrap_Dag_Slicer_coord_get, METH_VARARGS, NULL},
+	 { (char *)"Dag_Slicer_by_group_set", _wrap_Dag_Slicer_by_group_set, METH_VARARGS, NULL},
+	 { (char *)"Dag_Slicer_by_group_get", _wrap_Dag_Slicer_by_group_get, METH_VARARGS, NULL},
+	 { (char *)"Dag_Slicer_verbose_set", _wrap_Dag_Slicer_verbose_set, METH_VARARGS, NULL},
+	 { (char *)"Dag_Slicer_verbose_get", _wrap_Dag_Slicer_verbose_get, METH_VARARGS, NULL},
 	 { (char *)"Dag_Slicer_create_slice", _wrap_Dag_Slicer_create_slice, METH_VARARGS, NULL},
 	 { (char *)"Dag_Slicer_rename_group", _wrap_Dag_Slicer_rename_group, METH_VARARGS, NULL},
 	 { (char *)"Dag_Slicer_write_file", _wrap_Dag_Slicer_write_file, METH_VARARGS, NULL},
@@ -17119,10 +17119,10 @@ static PyMethodDef SwigMethods[] = {
 	 { (char *)"Dag_Slicer_group_ids_get", _wrap_Dag_Slicer_group_ids_get, METH_VARARGS, NULL},
 	 { (char *)"Dag_Slicer_path_coding_set", _wrap_Dag_Slicer_path_coding_set, METH_VARARGS, NULL},
 	 { (char *)"Dag_Slicer_path_coding_get", _wrap_Dag_Slicer_path_coding_get, METH_VARARGS, NULL},
-	 { (char *)"Dag_Slicer__debug_set", _wrap_Dag_Slicer__debug_set, METH_VARARGS, NULL},
-	 { (char *)"Dag_Slicer__debug_get", _wrap_Dag_Slicer__debug_get, METH_VARARGS, NULL},
-	 { (char *)"Dag_Slicer__roam_set", _wrap_Dag_Slicer__roam_set, METH_VARARGS, NULL},
-	 { (char *)"Dag_Slicer__roam_get", _wrap_Dag_Slicer__roam_get, METH_VARARGS, NULL},
+	 { (char *)"Dag_Slicer_debug_set", _wrap_Dag_Slicer_debug_set, METH_VARARGS, NULL},
+	 { (char *)"Dag_Slicer_debug_get", _wrap_Dag_Slicer_debug_get, METH_VARARGS, NULL},
+	 { (char *)"Dag_Slicer_roam_set", _wrap_Dag_Slicer_roam_set, METH_VARARGS, NULL},
+	 { (char *)"Dag_Slicer_roam_get", _wrap_Dag_Slicer_roam_get, METH_VARARGS, NULL},
 	 { (char *)"Dag_Slicer_swigregister", Dag_Slicer_swigregister, METH_VARARGS, NULL},
 	 { NULL, NULL, 0, NULL }
 };

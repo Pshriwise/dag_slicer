@@ -29,7 +29,9 @@ class slicer_gui(dagmc_slicer):
 
     def slice(self, button):
         kids = self.slice_box.children[0].children[0].children
-        self.filename = kids[0].value
+        for kid in kids:
+            print kid.value, type(kid.value)
+        self.filename = str(kids[0].value)
         self.axis = kids[1].value
         self.coord = kids[2].value
         self.by_group = kids[3].value
@@ -241,7 +243,7 @@ class slicer_gui(dagmc_slicer):
 
     def highlight(self, button):
         parent = button.parent
-        button_border_color = 'orange' if button.border_color == '' else ''
+        button_border_color = 'orange' if button.border_color == '' else 'black'
         patch_edge_color = 'orange' if button.border_color == '' else 'black'
 
         patch = self.legend_map[button]

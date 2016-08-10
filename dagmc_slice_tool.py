@@ -37,17 +37,17 @@ class dagmc_slicer(Dag_Slicer):
         # self.path_coding = np.array([], dtype='int')
         # self.group_names = np.array([], dtype='str')
 
-        if self._roam:
-            print("\033[93m"+self._roam_warning+"\033[0m")
+        if self.roam:
+            print("\033[93m"+self.roam_warning+"\033[0m")
         #run the super function to create the slice
-        if str(self._filename) is not "":
+        if str(self.filename) is not "":
             a = super(dagmc_slicer, self).create_slice()
             
     def rename_group(self, id, new_name):
         super(dagmc_slicer, self).rename_group(id, new_name)
 
     def write_file(self, new_filename):
-        if new_filename == self._filename:
+        if new_filename == self.filename:
             continue_result = self.continue_query("Continuing will overwrite the current file. Continue?")
             if  not continue_result:
                 print "Ok. Doing nothing."
