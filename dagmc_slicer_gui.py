@@ -95,11 +95,11 @@ class slicer_gui(dagmc_slicer):
             for patch,gid,gname in zip(patches,self.group_ids,self.group_names):
                 lb = widgets.Text(gname,description="Group " + str(gid))
                 bg_color = rgb2hex(patch.get_facecolor()[:-1])
-                key = widgets.Button(background_color=bg_color,height=32,width=32)
+                key = widgets.Button(background_color=bg_color,height=32,width=32, border_color = 'black')
                 key.on_click(self.highlight)
-                cb1 = widgets.Button(description="Visible")
+                cb1 = widgets.Button(description="Visible", background_color="#FFFFFF")
                 cb1.on_click(self.visiblefunc)
-                cb2 = widgets.Button(description="Fill")
+                cb2 = widgets.Button(description="Fill", background_color="#FFFFFF")
                 cb2.on_click(self.filledfunc)
                 updeight = widgets.Button(description="Update")
                 updeight.on_click(self.update_group_name)
@@ -189,19 +189,19 @@ class slicer_gui(dagmc_slicer):
         
     def visiblefunc(self,button):
 
-        button_color = 'grey' if button.background_color == '' else ''
+        button_color = '#D0D0D0' if button.background_color == '#FFFFFF' else '#FFFFFF'
 
         button.background_color = button_color
         patch = self.legend_map[button]
-        patch.set_visible(True if button.background_color == '' else False)
+        patch.set_visible(True if button.background_color == '#FFFFFF' else False)
 
     def filledfunc(self,button):
 
-        button_color = 'grey' if button.background_color == '' else ''
+        button_color = '#D0D0D0' if button.background_color == '#FFFFFF' else '#FFFFFF'
 
         button.background_color = button_color
         patch = self.legend_map[button]
-        patch.set_fill(True if button.background_color == '' else False)
+        patch.set_fill(True if button.background_color == '#FFFFFF' else False)
 
     def export_file(self,button):
 
@@ -243,8 +243,8 @@ class slicer_gui(dagmc_slicer):
 
     def highlight(self, button):
         parent = button.parent
-        button_border_color = 'orange' if button.border_color == '' else 'black'
-        patch_edge_color = 'orange' if button.border_color == '' else 'black'
+        button_border_color = 'orange' if button.border_color == 'black' else 'black'
+        patch_edge_color = 'orange' if button.border_color == 'black' else 'black'
 
         patch = self.legend_map[button]
         patch.set_edgecolor(patch_edge_color)
