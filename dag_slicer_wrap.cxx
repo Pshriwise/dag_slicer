@@ -5319,7 +5319,7 @@ public:
   //parameters
   int axis;
   std::string filename;
-  std::string roam_warning = "WARNING: Roaming for unmatched stitch points has been enabled. This method is intended for use as an attempt to slice unsealed meshes and isn't garaunteed to produce a valid mesh slice.";
+  std::string roam_warning;
   double coord;
   bool by_group;
   bool verbose;
