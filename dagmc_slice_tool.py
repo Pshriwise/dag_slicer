@@ -4,7 +4,7 @@ from matplotlib.path import Path
 from matplotlib.patches import PathPatch 
 import matplotlib.pyplot as plt
 import numpy as np
-from dag_slicer.dag_slicer import Dag_Slicer 
+from Dag_Slicer import Dag_Slicer
 from matplotlib.widgets import CheckButtons, RadioButtons
 from matplotlib.colors import rgb2hex
 
@@ -19,11 +19,11 @@ class dagmc_slicer(Dag_Slicer):
         
     def clear_slice(self):
         #clear old arrays so there isn't junk data in the way
-        self.slice_x_pnts = np.array([])
-        self.slice_y_pnts = np.array([])
-        self.path_coding = np.array([], dtype='int')
-        self.group_names = np.array([], dtype='str')
-        self.group_ids = np.array([],dtype='int')
+        # self.slice_x_pnts = np.array([])
+        # self.slice_y_pnts = np.array([])
+        # self.path_coding = np.array([], dtype='int')
+        # self.group_names = np.array([], dtype='str')
+        # self.group_ids = np.array([],dtype='int')
         self.shown = False 
 
     def create_slice(self):
@@ -32,22 +32,22 @@ class dagmc_slicer(Dag_Slicer):
         self.clear_slice()
 
         #clear old arrays so there isn't junk data in the way
-        self.slice_x_pnts = np.array([])
-        self.slice_y_pnts = np.array([])
-        self.path_coding = np.array([], dtype='int')
-        self.group_names = np.array([], dtype='str')
+        # self.slice_x_pnts = np.array([])
+        # self.slice_y_pnts = np.array([])
+        # self.path_coding = np.array([], dtype='int')
+        # self.group_names = np.array([], dtype='str')
 
-        if self.roam:
-            print("\033[93m"+self.roam_warning+"\033[0m")
+        if self._roam:
+            print("\033[93m"+self._roam_warning+"\033[0m")
         #run the super function to create the slice
-        if str(self.filename) is not "":
+        if str(self._filename) is not "":
             a = super(dagmc_slicer, self).create_slice()
             
     def rename_group(self, id, new_name):
         super(dagmc_slicer, self).rename_group(id, new_name)
 
     def write_file(self, new_filename):
-        if new_filename == self.filename:
+        if new_filename == self._filename:
             continue_result = self.continue_query("Continuing will overwrite the current file. Continue?")
             if  not continue_result:
                 print "Ok. Doing nothing."
