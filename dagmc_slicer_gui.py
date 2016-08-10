@@ -29,8 +29,6 @@ class slicer_gui(dagmc_slicer):
 
     def slice(self, button):
         kids = self.slice_box.children[0].children[0].children
-        for kid in kids:
-            print kid.value, type(kid.value)
         self.filename = str(kids[0].value)
         self.axis = kids[1].value
         self.coord = kids[2].value
@@ -213,7 +211,7 @@ class slicer_gui(dagmc_slicer):
         if button.description == "No":
             return
         
-        new_filename = self.export_box.children[0].value
+        new_filename = str(self.export_box.children[0].value)
 
         override = button.description == "Yes"
 
@@ -236,7 +234,7 @@ class slicer_gui(dagmc_slicer):
     def update_group_name(self,button):
 
         parent = button.parent
-        new_group_name = parent.children[1].value
+        new_group_name = str(parent.children[1].value)
         group_id = int(parent.children[1].description.strip()[-1])
 
         self.rename_group(group_id,new_group_name)
