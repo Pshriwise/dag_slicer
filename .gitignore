@@ -2,3 +2,7 @@
 build
 **.ipynb_checkpoints
 **~
+**.o
+slicepnts.txt
+coding.txt
+model_slicer
