@@ -40,10 +40,6 @@ py_modules = ['dagmc_slice_tool','dagmc_slicer_gui','Dag_Slicer']
 ext_modules = [
     Extension("_Dag_Slicer", ["src/dag_slicer_wrap.cxx","src/dag_slicer.cpp","src/slicer.cpp"], 
               include_dirs=incdirs, library_dirs=libdirs, libraries=libs, language="c++"),
-    # Extension("dag_slicer.stlcontainers", ["dag_slicer/stlcontainers.pyx"], 
-    #           include_dirs=incdirs, language="c++"),
-    # Extension("dag_slicer.dag_slicer", ['src/dag_slicer.cpp', 'src/slicer.cpp', "dag_slicer/dag_slicer.pyx", ],
-    # 	      include_dirs=incdirs, library_dirs=libdirs, libraries=libs, language="c++"),
     ]
 
 setup(  
@@ -51,7 +47,6 @@ setup(
   cmdclass = {'build_ext': build_ext},
   ext_modules = ext_modules,
   py_modules = py_modules,
-#  packages = ['dag_slicer']
 )
 
 
