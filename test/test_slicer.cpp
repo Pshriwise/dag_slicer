@@ -10,6 +10,7 @@
 #include "moab/Core.hpp"
 #include "moab/Interface.hpp"
 
+//test driver includes
 #include "testutils.hpp"
 
 using namespace moab;
@@ -36,11 +37,12 @@ void set_windings_test();
 
 int main(int /* argc */, char** /* argv */) { 
 
+  // setup
   moab::ErrorCode result = mbi()->load_mesh("cube.h5m");
   ERR_CHECK(result);
-  
-  int failed_tests = 0; 
 
+  // testing
+  int failed_tests = 0; 
   failed_tests += RUN_TEST(line_struct_test);
   failed_tests += RUN_TEST(get_sets_by_category_test);
   failed_tests += RUN_TEST(get_surfaces_test);
@@ -57,12 +59,11 @@ int main(int /* argc */, char** /* argv */) {
   failed_tests += RUN_TEST(find_winding_test);
   failed_tests += RUN_TEST(set_windings_test);
 
-
+  // tear down
   result = mbi()->delete_mesh();
   ERR_CHECK(result);
 
   failed_tests += RUN_TEST(group_slicing_test);
-  
   
   return failed_tests;
 }
@@ -91,19 +92,28 @@ void line_struct_test() {
   
   moab::CartVect point(0,1,0);
 
+  // check initialization of values
   CHECK( !test_line.started );
   CHECK( !test_line.full );
-  
+
+  // now add a point to the line
   test_line.add_pnt(point);
-  
+
+  // the line has one point now
+  // but is not full
   CHECK( test_line.started );
   CHECK( !test_line.full );
 
+  // add another point
   test_line.add_pnt(point);
-  
+
+  // the line has now been started
+  // but is not full
   CHECK( test_line.started );
   CHECK( test_line.full );
-  
+
+  // added the same point to the line twice
+  // make sure this is the case
   CHECK( test_line.begin == test_line.end );
 }
 
