@@ -11,7 +11,6 @@ struct program_option_struct opts;
 
 bool point_match(moab::CartVect pnt1, moab::CartVect pnt2, double tolerance) {
   moab::CartVect diff = pnt2-pnt1; 
-
   return (diff.length() < tolerance);
 }
 
@@ -27,6 +26,7 @@ moab::ErrorCode get_sets_by_category(moab::Range &entsets, char* category) {
   //create void pointer for tag data match
   const void *dum = &(category[0]);
 
+  // retrieve sets with the category value requested
   result = mbi()->get_entities_by_type_and_tag(0, moab::MBENTITYSET, &category_tag, &dum, 1, entsets);
   ERR_CHECK(result);
   
@@ -41,7 +41,8 @@ moab::ErrorCode get_surfaces(moab::Range &surfs) {
   char category[CATEGORY_TAG_SIZE] = "Surface";
   
   result = get_sets_by_category(surfs, category);
-
+  ERR_CHECK(result);
+  
   if (OPT_VERBOSE) std::cout << "There are " << surfs.size() << " surfaces in this model." << std::endl;
 
   return result;
@@ -55,6 +56,7 @@ moab::ErrorCode get_all_volumes(moab::Range &vols) {
   char category[CATEGORY_TAG_SIZE] = "Volume";
   
   result = get_sets_by_category(vols, category);
+  ERR_CHECK(result);
   
   if (OPT_VERBOSE) std::cout << "There are " << vols.size() << " volumes in this model." << std::endl;
 
@@ -73,19 +75,23 @@ moab::ErrorCode slice_faceted_model_out(std::string filename,
 					bool verbose,
 					bool debug,
 					bool ca) {
+  // set options for output
   opts.verbose = verbose;
   opts.debug = debug;
+  // datastructure for path data
   std::vector< std::vector<xypnt> > paths;
   moab::ErrorCode result = slice_faceted_model(filename, axis, coord, paths, codings, group_names, group_ids, by_group, ca);
 
+  // seperate the x and y values of the points
   std::vector< std::vector<xypnt> >::iterator path;
-
   for (path = paths.begin(); path != paths.end(); path++) {
     std::vector<double> path_xs, path_ys;
     for (unsigned int i = 0; i < (*path).size(); i++)	{
+      // set the values for this path
       path_xs.push_back((*path)[i].x);
       path_ys.push_back((*path)[i].y);
     }
+    // push paths back onto data structure
     x_pnts.push_back(path_xs);
     y_pnts.push_back(path_ys);
   }
@@ -106,27 +112,28 @@ moab::ErrorCode slice_faceted_model(std::string filename,
   moab::ErrorCode result;
   std::map<moab::EntityHandle,std::vector<Loop> > intersection_map;
   moab::Tag aabb_tag;
-  
+
+  // if this is a different filename than the one that was previously loaded,
+  // clean out the MOAB instance, AABB data, and load the new file
   if(is_new_filename(filename))
     {
       //remove all old mesh content
       result = mbi()->delete_mesh();
       ERR_CHECK(result);
 
-
+      // get the AABB tag handle
       result = mbi()->tag_get_handle("AABB", 6, moab::MB_TYPE_DOUBLE, aabb_tag, moab::MB_TAG_DENSE);
+      // delete the tag (and all of its data)
       if (result == moab::MB_SUCCESS) {
 	result = mbi()->tag_delete(aabb_tag);
 	ERR_CHECK(result);
       }
-	
-	
-
       
       //load the new file
       std::cout << "Loading new file..." << std::endl;
       result = mbi()->load_file(filename.c_str());
       if (moab::MB_FILE_DOES_NOT_EXIST == result) {
+	// some extra output if the file cannot be found
 	std::cout << "Could not open specified file." << std::endl;
 	return result;
       }
@@ -134,12 +141,12 @@ moab::ErrorCode slice_faceted_model(std::string filename,
 	ERR_CHECK(result);
       }
 
-      //get the filename_tag
+      // get the filename_tag
       moab::Tag filename_tag;
-      result = mbi()->tag_get_handle( FILENAME_TAG_NAME, 50, moab::MB_TYPE_OPAQUE, filename_tag, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE);
+      result = mbi()->tag_get_handle(FILENAME_TAG_NAME, 50, moab::MB_TYPE_OPAQUE, filename_tag, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE);
       ERR_CHECK(result);
 
-      //tag the root set with the filename
+      //tag the root set with the filename, to be checked against later
       moab::EntityHandle rs = mbi()->get_root_set();
       result = mbi()->tag_set_data(filename_tag,&rs,1,(void*)filename.c_str());
       ERR_CHECK(result);
@@ -149,9 +156,9 @@ moab::ErrorCode slice_faceted_model(std::string filename,
   result = get_surfaces(surfaces);
   ERR_CHECK(result);
 
+  // check for the AABB tag
   result = mbi()->tag_get_handle("AABB", 6, moab::MB_TYPE_DOUBLE, aabb_tag, moab::MB_TAG_DENSE);
-  //  ERR_CHECK(result);
-
+  // if it is found, filter out surfaces whose AABBs don't intersect with the slice plane
   if(result == moab::MB_SUCCESS) {
     std::cout << "Filtering surfaces." << std::endl;
     result = filter_surfaces(surfaces, aabb_tag, axis, coord);
@@ -159,6 +166,7 @@ moab::ErrorCode slice_faceted_model(std::string filename,
     ERR_CHECK(result);
   }
 
+  // now create intersections with remaining surfaces
   result = create_surface_intersections(surfaces, axis, coord, intersection_map);
   ERR_CHECK(result);
 
@@ -244,8 +252,6 @@ moab::ErrorCode get_volumes_by_group(std::map< std::string,
   group_names.clear();
   group_ids.clear();
   
-  //get all meshsets in the model
-
   //get all groups in the model (defined by having a name tag and category tag)
   moab::Tag category_tag, name_tag, global_id_tag;
   result = mbi()->tag_get_handle(CATEGORY_TAG_NAME, category_tag);
