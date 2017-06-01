@@ -34,7 +34,7 @@ moab::ErrorCode get_sets_by_category(moab::Range &entsets, char* category) {
 
 }
 
-moab::ErrorCode get_surfaces(moab::Range &surfs) {
+moab::ErrorCode get_all_surfaces(moab::Range &surfs) {
 
   moab::ErrorCode result = moab::MB_SUCCESS;
 
@@ -110,6 +110,7 @@ moab::ErrorCode slice_faceted_model(std::string filename,
 				    bool ca) {
   
   moab::ErrorCode result;
+  // data structure for mapping surfaces to their slice loop
   std::map<moab::EntityHandle,std::vector<Loop> > intersection_map;
   moab::Tag aabb_tag;
 
@@ -146,17 +147,19 @@ moab::ErrorCode slice_faceted_model(std::string filename,
       result = mbi()->tag_get_handle(FILENAME_TAG_NAME, 50, moab::MB_TYPE_OPAQUE, filename_tag, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE);
       ERR_CHECK(result);
 
-      //tag the root set with the filename, to be checked against later
+      // tag the root set with the filename
       moab::EntityHandle rs = mbi()->get_root_set();
       result = mbi()->tag_set_data(filename_tag,&rs,1,(void*)filename.c_str());
       ERR_CHECK(result);
     }
-  
+
+  // retrieve all surfaces from the file
   moab::Range surfaces;
-  result = get_surfaces(surfaces);
+  result = get_all_surfaces(surfaces);
   ERR_CHECK(result);
 
-  // check for the AABB tag
+  
+  // check for the AABB tag in the instance
   result = mbi()->tag_get_handle("AABB", 6, moab::MB_TYPE_DOUBLE, aabb_tag, moab::MB_TAG_DENSE);
   // if it is found, filter out surfaces whose AABBs don't intersect with the slice plane
   if(result == moab::MB_SUCCESS) {
@@ -166,27 +169,36 @@ moab::ErrorCode slice_faceted_model(std::string filename,
     ERR_CHECK(result);
   }
 
-  // now create intersections with remaining surfaces
+  // now create intersections for each surface and add it to the intersection map
   result = create_surface_intersections(surfaces, axis, coord, intersection_map);
   ERR_CHECK(result);
 
   //path container for a volume
   std::vector< std::vector<Loop> > all_paths;
 
+  ////////////////////
+  // SLICE BY GROUP //
+  ////////////////////
   if (by_group) {
+    // a mapping of groupname to group volumes
     std::map< std::string, moab::Range > group_mapping;
     result = get_volumes_by_group(group_mapping, group_names, group_ids);
     ERR_CHECK(result);
-    assert(group_names.size() == group_ids.size());
+    
     if (OPT_VERBOSE) std::cout << "Size of group map: " << group_mapping.size() << std::endl;
     if (OPT_VERBOSE) std::cout << "Size of group names: " << group_names.size() << std::endl;
     std::vector<std::string>::iterator group_name;
+
+    // for each group, generate the path loops for each set of volumes in the group
     for (group_name = group_names.begin(); group_name != group_names.end();) {
+
+      // generate the loops of line segments that compose intersection paths with this group's volumes
       std::vector< std::vector<Loop> > all_group_paths;
       result = get_volume_paths(group_mapping[*group_name], intersection_map, all_group_paths, ca);
       ERR_CHECK(result);
 
-
+      // if there are no paths generated for this group's volumes,
+      // remove the group from the list of group names and ids
       if (0 == all_group_paths.size()) {
 	if (OPT_VERBOSE) std::cout << "Erasing group: " << *group_name << std::endl;
 	int val = group_name-group_names.begin();
@@ -196,15 +208,19 @@ moab::ErrorCode slice_faceted_model(std::string filename,
 	continue;
       }
 
-      if (OPT_DEBUG) std::cout << "Getting slice for group:" << *group_name << std::endl;
       
+      if (OPT_DEBUG) std::cout << "Getting slice for group:" << *group_name << std::endl;
+
+      // concatenate the paths for this group into a single, compound  path
+      // and generate coding to inticate where closed paths begin and end
       std::vector<xypnt> group_path;
       std::vector<int> group_coding;
       std::vector< std::vector<Loop> >::iterator path;
-
       for (path = all_group_paths.begin(); path != all_group_paths.end(); path++) {
+	
 	std::vector<xypnt> vol_path;
 	std::vector<int> vol_coding;
+	// create the matplotlib path coding for 
 	create_patch(axis, *path, vol_path, vol_coding);
 	//insert this path and coding into the group path and group coding
 	group_path.insert(group_path.end(), vol_path.begin(), vol_path.end());
@@ -218,14 +234,21 @@ moab::ErrorCode slice_faceted_model(std::string filename,
       group_name++;
     } //group loop
   }
+  /////////////////////
+  // SLICE BY VOLUME //
+  /////////////////////
   else {
+
+    // get all volumes from the instance
     moab::Range volumes;
     result = get_all_volumes(volumes);
     ERR_CHECK(result);
 
+    // get the paths for each volume
     result = get_volume_paths(volumes, intersection_map, all_paths, ca);
     ERR_CHECK(result);
-    
+
+    //generate coding for each path
     std::vector< std::vector<Loop> >::iterator i;
     for (i = all_paths.begin(); i != all_paths.end(); i++) {
       std::vector<xypnt> path;
@@ -237,7 +260,6 @@ moab::ErrorCode slice_faceted_model(std::string filename,
   }
 
   std::cout << "Size of all paths is: " << paths.size() << std::endl;
-  
   return moab::MB_SUCCESS;
 }
 
@@ -247,12 +269,12 @@ moab::ErrorCode get_volumes_by_group(std::map< std::string,
 				     std::vector<int> &group_ids) {
   moab::ErrorCode result;
 
-  //clear out old data
+  //clear out old data if present
   group_map.clear();
   group_names.clear();
   group_ids.clear();
   
-  //get all groups in the model (defined by having a name tag and category tag)
+  //retrieve the tags needed for this operation
   moab::Tag category_tag, name_tag, global_id_tag;
   result = mbi()->tag_get_handle(CATEGORY_TAG_NAME, category_tag);
   ERR_CHECK(result);
@@ -260,40 +282,49 @@ moab::ErrorCode get_volumes_by_group(std::map< std::string,
   ERR_CHECK(result);
   result = mbi()->tag_get_handle(GLOBAL_ID_TAG_NAME, global_id_tag);
   ERR_CHECK(result);
+  
+  //get all groups in the model (defined by having a name tag and category tag)  
   moab::Tag ths[2] = {category_tag,name_tag};
   moab::Range group_sets;
   result = mbi()->get_entities_by_type_and_tag(0, moab::MBENTITYSET, &ths[0], NULL, 2, group_sets);
   ERR_CHECK(result);
 
+  // for each group set in the instance, get its name and global ID
   moab::Range::iterator i;
   for (i = group_sets.begin(); i != group_sets.end(); ++i) {
 
-    //get this group's children
+    // get the group's name
     std::string group_name;
-    int group_global_id;
     group_name.resize(NAME_TAG_SIZE);
     result = mbi()->tag_get_data(name_tag, &(*i), 1, (void *)group_name.c_str());
     ERR_CHECK(result);
 
+    // get the group's global id
+    int group_global_id;
     result = mbi()->tag_get_data(global_id_tag, &(*i), 1, (void *)&group_global_id);
     ERR_CHECK(result);
-    
+    //add this group name to the vector of group names
+    group_names.push_back(group_name);
+
+    // get the contents of the group (should be volumes)
     moab::Range group_contents;
     result = mbi()->get_entities_by_type(*i, moab::MBENTITYSET, group_contents);
     ERR_CHECK(result);
-
-    //add this group to the list of group names
-    group_names.push_back(group_name);
     //add this id to the list of group ids
     group_ids.push_back(group_global_id);
    
-
-    //add this set of children to the map
+    // add this group to the mapping
     group_map[group_name] = group_contents;
     group_contents.clear();
       
   }
 
+  // this function should return the same number of names and ids
+  if (group_names.size() != group_ids.size()) {
+    std::cout << "Ineqaul number of group names and ids found." << std::endl;
+    return moab::MB_FAILURE;
+  }
+  
   return moab::MB_SUCCESS;
 }
 
@@ -302,31 +333,35 @@ moab::ErrorCode get_volume_paths(moab::Range volumes,
 				 std::vector<Loop> > intersection_dict,
 				 std::vector< std::vector<Loop> > &all_vol_paths,
 				 bool roam) {
-  moab::ErrorCode result; 
-  
+  moab::ErrorCode result;
+  // for each volume, create the paths that make up its intersection
   moab::Range::iterator i; 
   for (i = volumes.begin(); i != volumes.end(); i++) {
+    // retrieve this volume's surface intersections from the intersection dict
     std::vector<Loop> this_vol_intersections;
     result = get_volume_intersections(*i, intersection_dict, this_vol_intersections);
     ERR_CHECK(result);
 
+    // if no intersections were found, move on to the next volume
     if (0 == this_vol_intersections.size()) continue; 
 
     if (OPT_VERBOSE) std::cout << "Retrieved " << this_vol_intersections.size()
 			       << " intersections for this volume." << std::endl;
-
+    
+    // stitch the surface intersections of this volume into closed paths
     std::vector<Loop> vol_paths;
-    stitch( this_vol_intersections, vol_paths, roam);
+    stitch(this_vol_intersections, vol_paths, roam);
+    // add volume's path(s) to the total set
     all_vol_paths.push_back(vol_paths);
   }
-
+  
   return moab::MB_SUCCESS;
 }
 
 void stitch(std::vector<Loop> loops, std::vector<Loop> &paths, bool roam) {
 
-  unsigned int i = 0; 
-
+  // stitch the loops into closed paths
+  unsigned int i = 0;
   while (i < loops.size()) {
     //check for complete loops first 
     //start with arbitrary loop
@@ -349,45 +384,60 @@ void stitch(std::vector<Loop> loops, std::vector<Loop> &paths, bool roam) {
   }
   
 
-  //if there are no point collections left, we're done
+  //if there are no point collections left,
+  // then they all came in as closed loops and we're done
   if (0 == loops.size()) return;
   
-  //now we'll start stitching loops together
+  //now we'll start stitching unclosed loops together
   i = 0;
 
-  //start by adding an arbitrary surface intersection to the paths
+  // start by adding an arbitrary surface intersection to the paths
+  // as seeds 
   paths.push_back(loops[i]);
   loops.erase(loops.begin()+i);
 
-  double pt_match_tol = MATCH_TOL;
+  // tolerance for considering points to be coincident
+  double pt_match_tol = MATCH_TOL; 
+  // used to track the number of loops that have been placed in a path  
   int prev_loops_size = (int) loops.size();
-  bool first_search = true;
-  
+// indicator as to whether or not this is the first search  
+  bool first_search = true; 
+
+  // continue until all loops have been placed
   while (0 != loops.size()) {
 
-    //if we found no match fron inner while loop, increase proximity tolerance
+    // if no match for this unclosed loop was found in the first pass,
+    // and roaming is enabled, then increase the point matching tolerance
+    // slightly
     if ( prev_loops_size == (int) loops.size() && !first_search && roam) {
       pt_match_tol*=1.05;
-    }     
+    }
+    // if not roaming, or this is the first pass through the loops
+    // set the point matching tolerance to the original value
     else {
       pt_match_tol = MATCH_TOL;
     }
+
+    // at this point, the search will begin
     first_search = false;
     
-    //if we have a complete loop, then move on to a new starting point
+    // if we have a complete loop, then grab a new seed loop at random
     if (point_match(paths.back().points.front(), paths.back().points.back())) {
       paths.push_back(loops.front());
       loops.erase(loops.begin());
-      pt_match_tol = MATCH_TOL;
+      // in this case the point matching tolerance should be rese
+      pt_match_tol = MATCH_TOL; 
     }
+    // if the loop is unclosed, then start the search for a matching loop
     else {
+      
       i = 0;
-      prev_loops_size = (int) loops.size();
-	  
+      prev_loops_size = (int) loops.size(); // mark how many unmatched loops exist before the search
       while ( i < loops.size() ) {
-
+	// use the next intersection in the list of loops
 	Loop this_intersection = loops[i];
 
+	// checkfor a point match - front of current path to front of this loop
 	if (point_match( paths.back().points.front(), this_intersection.points.front(),pt_match_tol)) {
 	  //reverse this_intersection and attach to the front of paths.back()
 	  std::reverse( this_intersection.points.begin(), this_intersection.points.end());
@@ -395,38 +445,39 @@ void stitch(std::vector<Loop> loops, std::vector<Loop> &paths, bool roam) {
 	  loops.erase(loops.begin()+i);
 	  i = 0;
 	}
+	// check for a point match - front of current path to the back of this loop
 	else if (point_match( paths.back().points.front(), this_intersection.points.back(), pt_match_tol)) {
 	  // attach to the front of paths.back()
 	  paths.back().points.insert(paths.back().points.begin(), this_intersection.points.begin(), this_intersection.points.end());
 	  loops.erase(loops.begin()+i);
 	  i = 0;		  
 	}
+	// check for a point match - back of current path to the front of this loop
 	else if (point_match( paths.back().points.back(), this_intersection.points.front(), pt_match_tol)) {
 	  //attach to the back of paths.back()
 	  paths.back().points.insert(paths.back().points.end(), this_intersection.points.begin(), this_intersection.points.end());
 	  loops.erase(loops.begin()+i);
 	  i = 0;		  
 	}
+	// check for a point match - back of current path to back of this loop
 	else if (point_match(paths.back().points.back(), this_intersection.points.back(), pt_match_tol)) {
 	  //reverse intersection and attach to the back of paths.back()
 	  std::reverse(this_intersection.points.begin(), this_intersection.points.end());
 	  paths.back().points.insert(paths.back().points.end(), this_intersection.points.begin(), this_intersection.points.end());
 	  loops.erase(loops.begin()+i);
 	  i = 0;
-	} 
-
-	//if no match is found, move on to the next intersection 
+	}
+	// if no match is found, move on to the next intersection 
 	i++;
-
       } //end inner while
- 
-    } // end if
+      
+    } // end if-else for complete loop check
 
   } // end outer while
   
   if (OPT_VERBOSE) std::cout << "Created " << paths.size() << "paths for this volume." << std::endl;
-  
   return;
+  
 } // end stitch
 
 moab::ErrorCode get_volume_intersections(moab::EntityHandle volume,
@@ -434,10 +485,12 @@ moab::ErrorCode get_volume_intersections(moab::EntityHandle volume,
 					 std::vector<Loop> > intersection_dict,
 					 std::vector<Loop> &volume_intersections) {
   moab::ErrorCode result;
+  // get the children of this volume
   std::vector<moab::EntityHandle> chld_surfaces;
   result = mbi()->get_child_meshsets(volume, chld_surfaces);
   ERR_CHECK(result);
-  
+
+  // for each child surface, insert the set of intersections from the intersection dict
   std::vector<moab::EntityHandle>::iterator i;
   for (i = chld_surfaces.begin(); i != chld_surfaces.end(); i++) {
       std::vector<Loop> this_set = intersection_dict[*i];
@@ -454,26 +507,29 @@ moab::ErrorCode create_surface_intersections(moab::Range surfs,
 					     std::vector<Loop> > &intersection_map) {
   moab::ErrorCode result; 
 
+  // check for the AABB tag
   bool bound_surfs;
   moab::Tag aabb_tag;
   result = mbi()->tag_get_handle("AABB", 6, moab::MB_TYPE_DOUBLE, aabb_tag, moab::MB_TAG_DENSE);
-
+  // if present, there is no need to setup AABBs for the surfaces, they should already be there
   if(moab::MB_SUCCESS == result) {
     bound_surfs = false;
   }
+  // if the tag is not found, then create the tag, and indicate that AABBs should be built for each surface
   else if (moab::MB_TAG_NOT_FOUND == result) {
     result = mbi()->tag_get_handle("AABB", 6, moab::MB_TYPE_DOUBLE, aabb_tag, moab::MB_TAG_CREAT|moab::MB_TAG_DENSE);
     ERR_CHECK(result);
     bound_surfs = true;
   }
+  // if some error other than MB_TAG_NOT_FOUND is returned, then return a failure
   else {
-    std::cout << "Failure here" << std::endl;
     ERR_CHECK(moab::MB_FAILURE);
   }
 
-  
+  // for evvery surface, create an intersection
   moab::Range::iterator i; 
   for (i = surfs.begin(); i != surfs.end(); i++) {
+    
     //get the surface triangles
     std::vector<moab::EntityHandle> surf_tris; 
     result = mbi()->get_entities_by_type(*i, moab::MBTRI, surf_tris);
@@ -484,9 +540,9 @@ moab::ErrorCode create_surface_intersections(moab::Range surfs,
     result = surface_intersections(*i, aabb_tag, surf_tris, axis, coord, surf_intersections, bound_surfs);
     ERR_CHECK(result);
 
+    // add this surface's intersection to the intersection mapping
     intersection_map[*i] = surf_intersections;
     surf_intersections.clear();
-
   }
 
   return result; 
@@ -502,41 +558,54 @@ moab::ErrorCode surface_intersections(moab::EntityHandle surf,
 				      bool bound) {
   moab::ErrorCode result; 
   std::vector<Line> intersect_lines;
+  // initalize max/min values for the AABB of this surface
   double myarr[6] = {1.e38,-1.e38,1.e38,-1.e38,1.e38,-1.e38};
   std::vector<double> bounds(myarr, myarr+6);
+
+  // loop over triangles, detecting intersections
   std::vector<moab::EntityHandle>::iterator i; 
-  for ( i = tris.begin(); i != tris.end(); i++) { 
+  for ( i = tris.begin(); i != tris.end(); i++) {
+
+    // check triangle for intersection with slice plane
+    // also update the axis-aligned bounds of the surface
     Line line; bool intersect;
     result = intersection(axis, coord, *i, line, intersect, bounds, bound);
     ERR_CHECK(result);
-      
+
+    // if an intersection was found, add it to the lintersection lines
     if(intersect) intersect_lines.push_back(line);
       
   } 
 
-  //tag surface handle with bounds if asked
+  //tag surface handle with bounds if requested
   if (bound) {
     result = mbi()->tag_set_data(aabb_tag, &surf, 1, (void *)(&bounds[0]));
     ERR_CHECK(result);
   }
-  std::vector<Loop> all_surf_intersections;
   
-  //now it is time to order these 
+  // now the line segments should be ordered
   unsigned int index = 0; //index for intersection lines
-  //arbitrarily start a new intersection loop
-  Loop curr_loop; 
+  //arbitrarily start a new, empty intersection loop
+  Loop curr_loop;
 
+  // loop over all intersections until they are placed in a loop
+  std::vector<Loop> all_surf_intersections;
   while (intersect_lines.size() != 0) {
 
+    // initialize the current loop with a pair of intersection points
     curr_loop.points.clear();
     curr_loop.points.push_back( intersect_lines.back().begin);
     curr_loop.points.push_back( intersect_lines.back().end);
+    // remove this intersection from the list of intersections
     intersect_lines.pop_back();
 
+    // now loop over all remaining intersections
     while (index < intersect_lines.size()) {
 
+      // get the next intersection
       Line this_line = intersect_lines[index];
 
+      // check for a match - front of this triangle intersection with the current loop's front
       if (point_match(this_line.begin, curr_loop.points.front())) {
 	//insert the line into the current loop
 	curr_loop.points.insert(curr_loop.points.begin(), this_line.end );
@@ -544,21 +613,25 @@ moab::ErrorCode surface_intersections(moab::EntityHandle surf,
 	intersect_lines.erase(intersect_lines.begin()+index);
 	index = 0;
       }
+      // check for a match - front of this triangle intersection with the current loop's back
       else if ( point_match( this_line.begin, curr_loop.points.back() ) ) {
 	curr_loop.points.push_back( this_line.end );
 	intersect_lines.erase(intersect_lines.begin()+index);
 	index = 0;
       }
+      // check for a match - back of this triangle intersection with the current loop's front
       else if ( point_match( this_line.end, curr_loop.points.front() ) ) {
 	curr_loop.points.insert(curr_loop.points.begin(), this_line.begin );
 	intersect_lines.erase(intersect_lines.begin()+index);
 	index = 0;
       }
+      // check for a match - back of this triangle intersection with the current loop's back      
       else if ( point_match( this_line.end, curr_loop.points.back() ) ) {
 	curr_loop.points.push_back( this_line.begin );
 	intersect_lines.erase(intersect_lines.begin()+index);
 	index = 0;
       }
+      // if no match was found, move on to the next triangle intersection
       else {
 	index++;
       }
@@ -566,7 +639,7 @@ moab::ErrorCode surface_intersections(moab::EntityHandle surf,
     all_surf_intersections.push_back(curr_loop);
   }
 
-  //set return var
+  // set the return variable
   surf_intersections = all_surf_intersections;
 
   return result; 
@@ -578,7 +651,6 @@ moab::ErrorCode intersection(int axis,
 			     moab::EntityHandle tri,
 			     Line &tri_intersection,
 			     bool &intersect){
-
   std::vector<double> dum_bounds(6);
   moab::ErrorCode result = intersection(axis,coord,tri,tri_intersection,intersect,dum_bounds,false);
   ERR_CHECK(result);
@@ -595,11 +667,11 @@ moab::ErrorCode intersection(int axis,
 			     bool bound) {
   moab::ErrorCode result;
   //get the triangle vertices
-  std::vector<moab::EntityHandle> verts;
-  
+  std::vector<moab::EntityHandle> verts;  
   result = mbi()->get_adjacencies(&tri, 1, 0, false, verts);
   ERR_CHECK(result);
-  
+
+  // get the triangle coordinates
   moab::CartVect tri_coords[3];
   result = mbi()->get_coords(&(verts[0]), 1, tri_coords[0].array());
   ERR_CHECK(result);
@@ -608,10 +680,14 @@ moab::ErrorCode intersection(int axis,
   result = mbi()->get_coords(&(verts[2]), 1, tri_coords[2].array());
   ERR_CHECK(result);
 
+  // check the triangle for an intersection with the slice plane
   triangle_plane_intersect(axis, coord, tri_coords, tri_intersection);
-  
+
+  // check that an intersection was found
   intersect = tri_intersection.full;
 
+  // if updated bounds are requested,
+  // update the bounds using this triangle's vertex coordinates
   if (bound) {
     for(unsigned int i = 0; i < 3; i++) {
       for(unsigned int j = 0; j < 3; j++) {
@@ -691,11 +767,12 @@ void create_patch(int axis,
 		  std::vector<xypnt> &path_out,
 		  std::vector<int> &coding_out) {
 
+  // generate the explicit x,y values for each point in the loop
   std::vector<Loop>::iterator loop; 
   for (loop = input_loops.begin(); loop != input_loops.end(); loop++) {
       (*loop).gen_xys(axis);
     }
-
+  
   //generate containment matrix for the loops
   std::vector< std::vector<int> > M;
   get_containment(input_loops, M);
@@ -719,13 +796,16 @@ void create_patch(int axis,
 
 void get_containment(std::vector<Loop> loops,
 		     std::vector< std::vector<int> > &Mat) {
+  // create a square matrix size NxN, where N is the number of loops
   Mat.resize(loops.size());
+  // set each entry (diagonals are always true)
   for (unsigned int i = 0; i < loops.size(); i++) {
     Mat[i].resize(loops.size());
     for (unsigned int j = 0; j < loops.size(); j++) {
       if ( i == j)
 	Mat[i][j] = true; //polygons contain themselves
       else
+	// set entry based on whether or not loop a is in loop b or not
 	Mat[i][j] = is_poly_a_in_poly_b( loops[i], loops[j]);
     }
   }
@@ -760,7 +840,7 @@ void get_windings(std::vector<Loop> loops, std::vector<int> &windings)
 {
   std::vector<Loop>::iterator loop;
   windings.clear(); //JIC
-  
+  // get the winding for each loop
   for (loop = loops.begin(); loop != loops.end(); loop++) {
       windings.push_back(find_winding(*loop));
     }
@@ -776,6 +856,7 @@ int find_winding(Loop loop)
     area += (loop.xypnts[j].x + loop.xypnts[i].x) * (loop.xypnts[j].y - loop.xypnts[i].y);
     j=i;
   }
+  // if the area is zero or positive, then the winding is clockwise, otherwise it is counter-clockwise
   return area >= 0 ? CW : CCW;
 }
 
@@ -783,19 +864,25 @@ void get_fill_windings(std::vector< std::vector<int> > fill_mat,
 		       std::vector<int> &windings) {
   unsigned int a = fill_mat.size();
   unsigned int b = fill_mat[0].size();
-  
-  if( a != b) {
-    ERR_CHECK(moab::MB_FAILURE);
-      }
-  
+
+  // verify that fill_mat is a squre data structure
+  if( a != b ) { ERR_CHECK(moab::MB_FAILURE); }
+
+  // for each entry in the matrix, determine the desired winding based on
+  // the sum of the current row
   int wind;
   for (unsigned int i = 0; i < a; i++) {
     int dum = 0;
+    // sum along this row
     for (std::vector<int>::iterator j = fill_mat[i].begin();
 	 j != fill_mat[i].end(); j++) {
       dum += *j;
     }
+    // if sum of containment values for this row is even, the
+    // desired winding is clockwise
+    // if odd, counter-clockwise
     wind = dum%2 == 0 ? CW : CCW;
+    // add this winding value to the set of desired windings
     windings.push_back(wind);
   }
 }
@@ -803,8 +890,10 @@ void get_fill_windings(std::vector< std::vector<int> > fill_mat,
 void set_windings(std::vector<int> current_windings,
 		  std::vector<int> desired_windings,
 		  std::vector<Loop> &loops) {
+  
   assert(current_windings.size() == desired_windings.size());
 
+  // if the winding of a loop is incorrect, then reverse it
   for (unsigned int i = 0; i < current_windings.size(); i++) {
     if (current_windings[i] != desired_windings[i]) {
       std::reverse( loops[i].points.begin(), loops[i].points.end()); //JIC
@@ -813,14 +902,20 @@ void set_windings(std::vector<int> current_windings,
   }
 } 
 
+
 void generate_patch_path(std::vector<Loop> loops,
 			 std::vector<xypnt> &path,
 			 std::vector<int> &coding) {
+  // coding values
+  int MOVE_TO = 1;
+  int LINE_TO = 2;
+  // loop over vectors, at the beginning of each new loop
+  // place a "MOVE_TO" code value, otherwise place a "LINE_TO" value
   std::vector<Loop>::iterator loop;
   for (loop = loops.begin(); loop != loops.end(); loop++) {
       for(unsigned int i = 0; i < (*loop).xypnts.size(); i++) {
 	  path.push_back((*loop).xypnts[i]);
-	  i == 0 ? coding.push_back(1) : coding.push_back(2);
+	  i == 0 ? coding.push_back(MOVE_TO) : coding.push_back(LINE_TO);
 	}
     }
 }
@@ -837,6 +932,7 @@ void rename_group_out(int group_global_id, std::string new_name) {
   moab::Tag global_id_tag;
   result = mbi()->tag_get_handle(GLOBAL_ID_TAG_NAME, global_id_tag);
   ERR_CHECK(result);
+  // setup query data for the group in question
   std::vector<moab::Tag> tags;
   tags.push_back(category_tag);
   tags.push_back(global_id_tag);
@@ -845,13 +941,17 @@ void rename_group_out(int group_global_id, std::string new_name) {
   void *grp_ptr = &grp;
   void *id_ptr = &group_global_id;
   void *vals[2] = {grp_ptr,id_ptr};
+  // query for the group using the provided group global_id and the category tag with value "Group"
   result = mbi()->get_entities_by_type_and_tag(0, moab::MBENTITYSET, &tags[0], &(vals[0]), 2, entsets, moab::Interface::INTERSECT, true);
   ERR_CHECK(result);
 
+  // ensure that exactly one group was found
   if(1 != entsets.size() ) { 
     std::cout << "Invalid group id." << std::endl;
     ERR_CHECK(moab::MB_FAILURE);
   }
+
+  // get the handle of the group to modify
   moab::EntityHandle group_to_mod = entsets[0];
   //get the name tag, because this global id should indicate a group with this tag
   moab::Tag name_tag; 
@@ -870,13 +970,14 @@ void rename_group_out(int group_global_id, std::string new_name) {
 }
 
 void write_file_out(std::string new_filename) {
-
   moab::ErrorCode result;
-
+  // if the provided filename is the same as the current filename tagged on the instance,
+  // print a warning
   if (!is_new_filename(new_filename)) {
     std::cout << "Warning! This filename is identical to the current filename. Originaly file will be over-written." << std::endl;
       }
 
+  // write the file
   result = mbi()->write_file(new_filename.c_str());
   ERR_CHECK(result);
 }
@@ -889,15 +990,16 @@ bool is_new_filename(std::string name) {
   result = mbi()->tag_get_handle( FILENAME_TAG_NAME, 50, moab::MB_TYPE_OPAQUE, filename_tag, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE);
   ERR_CHECK(result);
 
-
   //check the root_set for this tag
   moab::EntityHandle root_set = mbi()->get_root_set();
   std::vector<moab::Tag> root_set_tags;
   result = mbi()->tag_get_tags_on_entity(root_set, root_set_tags);
   ERR_CHECK(result);
-
-
+  // search for the tag
   std::vector<moab::Tag>::iterator val  = std::find(root_set_tags.begin(),root_set_tags.end(),filename_tag);
+
+  
+  // if the tag is found, then check the current filename vs the provided name
   if(val != root_set_tags.end()) { 
     //check that filename is the same
     std::string current_filename;
@@ -907,7 +1009,7 @@ bool is_new_filename(std::string name) {
     current_filename.resize(name.size());
     if(current_filename == name) return false;
   }
-
+  // if the tag was not found on the root set, then assume this is a new filename
   return true;
 }
 
@@ -917,6 +1019,7 @@ moab::ErrorCode filter_surfaces(moab::Range &surfs, moab::Tag aabb_tag, int axis
   moab::ErrorCode result;
   std::vector<moab::EntityHandle> surfs_to_skip;
   moab::Range::iterator i;
+  // for each surface, check for intersection with the slice plane
   for(i = surfs.begin(); i != surfs.end(); i++) {
     //first get the box data
     double box[6];
@@ -930,9 +1033,11 @@ moab::ErrorCode filter_surfaces(moab::Range &surfs, moab::Tag aabb_tag, int axis
     }
   }
 
+  // remove the surfaces to skip from the input list of surface
   for(std::vector<moab::EntityHandle>::iterator s = surfs_to_skip.begin();
       s != surfs_to_skip.end(); s++) surfs.erase(*s);
   
   std::cout << "Number of surfaces after filtering: " << surfs.size() << std::endl;
+  
   return result;
 }
