@@ -80,7 +80,7 @@ struct Loop {
       }
 
     //this shouldn't happen
-    if ( x == 0 && y == 0 || x == y) {
+    if ( (x == 0 && y == 0) || (x == y)) {
       MB_CHK_SET_ERR_CONT(moab::MB_FAILURE, "x and y index values cannot be the same");
     }
     
