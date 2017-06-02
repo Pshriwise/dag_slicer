@@ -21,14 +21,14 @@ moab::ErrorCode get_sets_by_category(moab::Range &entsets, char* category) {
   //get the name tag from the moab instance
   moab::Tag category_tag; 
   result = mbi()->tag_get_handle(CATEGORY_TAG_NAME, category_tag); 
-  ERR_CHECK(result); 
+  MB_CHK_SET_ERR(result, "Failed to get category tag handle"); 
 
   //create void pointer for tag data match
   const void *dum = &(category[0]);
 
   // retrieve sets with the category value requested
   result = mbi()->get_entities_by_type_and_tag(0, moab::MBENTITYSET, &category_tag, &dum, 1, entsets);
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR(result, "Failed to get entities tagged with the category value");
   
   return result;
 
@@ -41,7 +41,7 @@ moab::ErrorCode get_all_surfaces(moab::Range &surfs) {
   char category[CATEGORY_TAG_SIZE] = "Surface";
   
   result = get_sets_by_category(surfs, category);
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR(result, "Failed to get surfaces using the category tag");
   
   if (OPT_VERBOSE) std::cout << "There are " << surfs.size() << " surfaces in this model." << std::endl;
 
@@ -56,7 +56,7 @@ moab::ErrorCode get_all_volumes(moab::Range &vols) {
   char category[CATEGORY_TAG_SIZE] = "Volume";
   
   result = get_sets_by_category(vols, category);
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR(result, "Failed to get volumes using the category tag");
   
   if (OPT_VERBOSE) std::cout << "There are " << vols.size() << " volumes in this model." << std::endl;
 
@@ -120,14 +120,14 @@ moab::ErrorCode slice_faceted_model(std::string filename,
     {
       //remove all old mesh content
       result = mbi()->delete_mesh();
-      ERR_CHECK(result);
+      MB_CHK_SET_ERR(result, "Failed to delete mesh");
 
       // get the AABB tag handle
       result = mbi()->tag_get_handle("AABB", 6, moab::MB_TYPE_DOUBLE, aabb_tag, moab::MB_TAG_DENSE);
       // delete the tag (and all of its data)
       if (result == moab::MB_SUCCESS) {
 	result = mbi()->tag_delete(aabb_tag);
-	ERR_CHECK(result);
+	MB_CHK_SET_ERR(result, "Failed to delete the AABB tag");
       }
       
       //load the new file
@@ -139,24 +139,24 @@ moab::ErrorCode slice_faceted_model(std::string filename,
 	return result;
       }
       else {
-	ERR_CHECK(result);
+	MB_CHK_SET_ERR(result, "Failed to load file");
       }
 
       // get the filename_tag
       moab::Tag filename_tag;
       result = mbi()->tag_get_handle(FILENAME_TAG_NAME, 50, moab::MB_TYPE_OPAQUE, filename_tag, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE);
-      ERR_CHECK(result);
+      MB_CHK_SET_ERR(result, "Failed to get the filename tag handle");
 
       // tag the root set with the filename
       moab::EntityHandle rs = mbi()->get_root_set();
       result = mbi()->tag_set_data(filename_tag,&rs,1,(void*)filename.c_str());
-      ERR_CHECK(result);
+      MB_CHK_SET_ERR(result, "Failed to set the filename tag data");
     }
 
   // retrieve all surfaces from the file
   moab::Range surfaces;
   result = get_all_surfaces(surfaces);
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR(result, "Failed to get all surfaces");
 
   
   // check for the AABB tag in the instance
@@ -166,12 +166,12 @@ moab::ErrorCode slice_faceted_model(std::string filename,
     std::cout << "Filtering surfaces." << std::endl;
     result = filter_surfaces(surfaces, aabb_tag, axis, coord);
     std::cout << "Got here" << std::endl;
-    ERR_CHECK(result);
+    MB_CHK_SET_ERR(result, "Failed to filter surfaces using the axis aligned bounding coordinates");
   }
 
   // now create intersections for each surface and add it to the intersection map
   result = create_surface_intersections(surfaces, axis, coord, intersection_map);
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR(result, "Failed to create surface intersections");
 
   //path container for a volume
   std::vector< std::vector<Loop> > all_paths;
@@ -183,7 +183,7 @@ moab::ErrorCode slice_faceted_model(std::string filename,
     // a mapping of groupname to group volumes
     std::map< std::string, moab::Range > group_mapping;
     result = get_volumes_by_group(group_mapping, group_names, group_ids);
-    ERR_CHECK(result);
+    MB_CHK_SET_ERR(result, "Failed to get the volumes by group");
     
     if (OPT_VERBOSE) std::cout << "Size of group map: " << group_mapping.size() << std::endl;
     if (OPT_VERBOSE) std::cout << "Size of group names: " << group_names.size() << std::endl;
@@ -195,7 +195,7 @@ moab::ErrorCode slice_faceted_model(std::string filename,
       // generate the loops of line segments that compose intersection paths with this group's volumes
       std::vector< std::vector<Loop> > all_group_paths;
       result = get_volume_paths(group_mapping[*group_name], intersection_map, all_group_paths, ca);
-      ERR_CHECK(result);
+      MB_CHK_SET_ERR(result, "Failed to get the volume paths for a group");
 
       // if there are no paths generated for this group's volumes,
       // remove the group from the list of group names and ids
@@ -242,11 +242,11 @@ moab::ErrorCode slice_faceted_model(std::string filename,
     // get all volumes from the instance
     moab::Range volumes;
     result = get_all_volumes(volumes);
-    ERR_CHECK(result);
+    MB_CHK_SET_ERR(result, "Failed to get all volumes");
 
     // get the paths for each volume
     result = get_volume_paths(volumes, intersection_map, all_paths, ca);
-    ERR_CHECK(result);
+    MB_CHK_SET_ERR(result, "Failed to get all volume paths");
 
     //generate coding for each path
     std::vector< std::vector<Loop> >::iterator i;
@@ -277,17 +277,17 @@ moab::ErrorCode get_volumes_by_group(std::map< std::string,
   //retrieve the tags needed for this operation
   moab::Tag category_tag, name_tag, global_id_tag;
   result = mbi()->tag_get_handle(CATEGORY_TAG_NAME, category_tag);
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR(result, "Failed to get the category tag handle");
   result = mbi()->tag_get_handle(NAME_TAG_NAME, name_tag);
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR(result, "Failed to get the name tag handle");
   result = mbi()->tag_get_handle(GLOBAL_ID_TAG_NAME, global_id_tag);
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR(result, "Failed to get the global id tag handle");
   
   //get all groups in the model (defined by having a name tag and category tag)  
   moab::Tag ths[2] = {category_tag,name_tag};
   moab::Range group_sets;
   result = mbi()->get_entities_by_type_and_tag(0, moab::MBENTITYSET, &ths[0], NULL, 2, group_sets);
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR(result, "Failed to get all entities with a category tag and name tag (groups)");
 
   // for each group set in the instance, get its name and global ID
   moab::Range::iterator i;
@@ -297,19 +297,19 @@ moab::ErrorCode get_volumes_by_group(std::map< std::string,
     std::string group_name;
     group_name.resize(NAME_TAG_SIZE);
     result = mbi()->tag_get_data(name_tag, &(*i), 1, (void *)group_name.c_str());
-    ERR_CHECK(result);
+    MB_CHK_SET_ERR(result, "Failed to get the name tag data for a group");
 
     // get the group's global id
     int group_global_id;
     result = mbi()->tag_get_data(global_id_tag, &(*i), 1, (void *)&group_global_id);
-    ERR_CHECK(result);
+    MB_CHK_SET_ERR(result, "Failed to get the global id of a group");
     //add this group name to the vector of group names
     group_names.push_back(group_name);
 
     // get the contents of the group (should be volumes)
     moab::Range group_contents;
     result = mbi()->get_entities_by_type(*i, moab::MBENTITYSET, group_contents);
-    ERR_CHECK(result);
+    MB_CHK_SET_ERR(result, "Failed to get the contained entity sets of a group");
     //add this id to the list of group ids
     group_ids.push_back(group_global_id);
    
@@ -340,7 +340,7 @@ moab::ErrorCode get_volume_paths(moab::Range volumes,
     // retrieve this volume's surface intersections from the intersection dict
     std::vector<Loop> this_vol_intersections;
     result = get_volume_intersections(*i, intersection_dict, this_vol_intersections);
-    ERR_CHECK(result);
+    MB_CHK_SET_ERR(result, "Failed to create volume intersections");
 
     // if no intersections were found, move on to the next volume
     if (0 == this_vol_intersections.size()) continue; 
@@ -488,7 +488,7 @@ moab::ErrorCode get_volume_intersections(moab::EntityHandle volume,
   // get the children of this volume
   std::vector<moab::EntityHandle> chld_surfaces;
   result = mbi()->get_child_meshsets(volume, chld_surfaces);
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR(result, "Failed to get the child meshsets (surfaces) of a volume");
 
   // for each child surface, insert the set of intersections from the intersection dict
   std::vector<moab::EntityHandle>::iterator i;
@@ -518,12 +518,12 @@ moab::ErrorCode create_surface_intersections(moab::Range surfs,
   // if the tag is not found, then create the tag, and indicate that AABBs should be built for each surface
   else if (moab::MB_TAG_NOT_FOUND == result) {
     result = mbi()->tag_get_handle("AABB", 6, moab::MB_TYPE_DOUBLE, aabb_tag, moab::MB_TAG_CREAT|moab::MB_TAG_DENSE);
-    ERR_CHECK(result);
+    MB_CHK_SET_ERR(result, "Failed to create the AABB tag handle");
     bound_surfs = true;
   }
   // if some error other than MB_TAG_NOT_FOUND is returned, then return a failure
   else {
-    ERR_CHECK(moab::MB_FAILURE);
+    MB_CHK_SET_ERR(moab::MB_FAILURE, "Failed to get the AABB tag handle");
   }
 
   // for evvery surface, create an intersection
@@ -533,12 +533,12 @@ moab::ErrorCode create_surface_intersections(moab::Range surfs,
     //get the surface triangles
     std::vector<moab::EntityHandle> surf_tris; 
     result = mbi()->get_entities_by_type(*i, moab::MBTRI, surf_tris);
-    ERR_CHECK(result); 
+    MB_CHK_SET_ERR(result, "Failed to get the triangles of a surface"); 
       
     //now create surface intersection
     std::vector<Loop> surf_intersections;
     result = surface_intersections(*i, aabb_tag, surf_tris, axis, coord, surf_intersections, bound_surfs);
-    ERR_CHECK(result);
+    MB_CHK_SET_ERR(result, "Failed to generate a surface's intersections");
 
     // add this surface's intersection to the intersection mapping
     intersection_map[*i] = surf_intersections;
@@ -570,7 +570,7 @@ moab::ErrorCode surface_intersections(moab::EntityHandle surf,
     // also update the axis-aligned bounds of the surface
     Line line; bool intersect;
     result = intersection(axis, coord, *i, line, intersect, bounds, bound);
-    ERR_CHECK(result);
+    MB_CHK_SET_ERR(result, "Failed to intersect the slicing plane with a triangle");
 
     // if an intersection was found, add it to the lintersection lines
     if(intersect) intersect_lines.push_back(line);
@@ -580,7 +580,7 @@ moab::ErrorCode surface_intersections(moab::EntityHandle surf,
   //tag surface handle with bounds if requested
   if (bound) {
     result = mbi()->tag_set_data(aabb_tag, &surf, 1, (void *)(&bounds[0]));
-    ERR_CHECK(result);
+    MB_CHK_SET_ERR(result, "Failed to set the AABB tag data on a surface");
   }
   
   // now the line segments should be ordered
@@ -653,7 +653,7 @@ moab::ErrorCode intersection(int axis,
 			     bool &intersect){
   std::vector<double> dum_bounds(6);
   moab::ErrorCode result = intersection(axis,coord,tri,tri_intersection,intersect,dum_bounds,false);
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR(result, "Failed to intersect slice plane with triangle");
   return result;
 					
 }
@@ -669,16 +669,16 @@ moab::ErrorCode intersection(int axis,
   //get the triangle vertices
   std::vector<moab::EntityHandle> verts;  
   result = mbi()->get_adjacencies(&tri, 1, 0, false, verts);
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR(result, "Failed to get the adjacencies of a triangle");
 
   // get the triangle coordinates
   moab::CartVect tri_coords[3];
   result = mbi()->get_coords(&(verts[0]), 1, tri_coords[0].array());
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR(result, "Failed to get coordinates of triangle vertex");
   result = mbi()->get_coords(&(verts[1]), 1, tri_coords[1].array());
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR(result, "Failed to get coordinates of triangle vertex");
   result = mbi()->get_coords(&(verts[2]), 1, tri_coords[2].array());
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR(result, "Failed to get coordinates of triangle vertex");
 
   // check the triangle for an intersection with the slice plane
   triangle_plane_intersect(axis, coord, tri_coords, tri_intersection);
@@ -866,7 +866,7 @@ void get_fill_windings(std::vector< std::vector<int> > fill_mat,
   unsigned int b = fill_mat[0].size();
 
   // verify that fill_mat is a squre data structure
-  if( a != b ) { ERR_CHECK(moab::MB_FAILURE); }
+  if( a != b ) { MB_CHK_SET_ERR_RET(moab::MB_FAILURE, "Fill matrix is not square"); }
 
   // for each entry in the matrix, determine the desired winding based on
   // the sum of the current row
@@ -927,11 +927,11 @@ void rename_group_out(int group_global_id, std::string new_name) {
   //get the category tag
   moab::Tag category_tag;
   result = mbi()->tag_get_handle(CATEGORY_TAG_NAME, category_tag);
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR_RET(result, "Failed to get the category tag handle");
   //get the global id tag 
   moab::Tag global_id_tag;
   result = mbi()->tag_get_handle(GLOBAL_ID_TAG_NAME, global_id_tag);
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR_RET(result, "Failed to get the global id tag handle");
   // setup query data for the group in question
   std::vector<moab::Tag> tags;
   tags.push_back(category_tag);
@@ -943,12 +943,12 @@ void rename_group_out(int group_global_id, std::string new_name) {
   void *vals[2] = {grp_ptr,id_ptr};
   // query for the group using the provided group global_id and the category tag with value "Group"
   result = mbi()->get_entities_by_type_and_tag(0, moab::MBENTITYSET, &tags[0], &(vals[0]), 2, entsets, moab::Interface::INTERSECT, true);
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR_RET(result, "Failed to get entity sets with a category tag value of 'Group' and a global id tag value " << group_global_id);
 
   // ensure that exactly one group was found
   if(1 != entsets.size() ) { 
     std::cout << "Invalid group id." << std::endl;
-    ERR_CHECK(moab::MB_FAILURE);
+    MB_CHK_SET_ERR_RET(moab::MB_FAILURE, "Group ID is invalid");
   }
 
   // get the handle of the group to modify
@@ -956,7 +956,7 @@ void rename_group_out(int group_global_id, std::string new_name) {
   //get the name tag, because this global id should indicate a group with this tag
   moab::Tag name_tag; 
   result = mbi()->tag_get_handle(NAME_TAG_NAME,name_tag);
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR_RET(result, "Failed to get the name tag handle");
   //give warning about truncated name
   if(NAME_TAG_SIZE < new_name.size()) {
     std::cout << "Warning: size of name exceed standard group name size. It will be trucnated." << std::endl;
@@ -964,7 +964,7 @@ void rename_group_out(int group_global_id, std::string new_name) {
   //now set the new name
   new_name.resize(NAME_TAG_SIZE);
   result = mbi()->tag_set_data(name_tag, &group_to_mod, 1, (void*)new_name.c_str());
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR_RET(result, "Failed to get the name tag data for a group set");
 
   return;
 }
@@ -979,7 +979,7 @@ void write_file_out(std::string new_filename) {
 
   // write the file
   result = mbi()->write_file(new_filename.c_str());
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR_RET(result, "Failed to write file");
 }
 
 bool is_new_filename(std::string name) {
@@ -988,13 +988,13 @@ bool is_new_filename(std::string name) {
   //get the filename_tag
   moab::Tag filename_tag;
   result = mbi()->tag_get_handle( FILENAME_TAG_NAME, 50, moab::MB_TYPE_OPAQUE, filename_tag, moab::MB_TAG_CREAT|moab::MB_TAG_SPARSE);
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR(result, "Failed to get or create the filename tag handle");
 
   //check the root_set for this tag
   moab::EntityHandle root_set = mbi()->get_root_set();
   std::vector<moab::Tag> root_set_tags;
   result = mbi()->tag_get_tags_on_entity(root_set, root_set_tags);
-  ERR_CHECK(result);
+  MB_CHK_SET_ERR_CONT(result, "Failed to get all tag handles on the root set");
   // search for the tag
   std::vector<moab::Tag>::iterator val  = std::find(root_set_tags.begin(),root_set_tags.end(),filename_tag);
 
@@ -1005,7 +1005,7 @@ bool is_new_filename(std::string name) {
     std::string current_filename;
     current_filename.resize(50);
     result = mbi()->tag_get_data(filename_tag, &root_set, 1, (void*)current_filename.c_str());
-    ERR_CHECK(result);
+    MB_CHK_SET_ERR(result, "Failed to get the filename tag data stored on the root set");
     current_filename.resize(name.size());
     if(current_filename == name) return false;
   }
@@ -1024,7 +1024,7 @@ moab::ErrorCode filter_surfaces(moab::Range &surfs, moab::Tag aabb_tag, int axis
     //first get the box data
     double box[6];
     result = mbi()->tag_get_data(aabb_tag, &(*i), 1, (void *)box);
-    ERR_CHECK(result);
+    MB_CHK_SET_ERR(result, "Failed to get the AABB tag data for a surface");
     //now check to see if this slice plane intersects with the surface
     double min = box[2*axis], max = box[(axis*2)+1];
     //if not, remove the surface from the range
