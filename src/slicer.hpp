@@ -20,14 +20,6 @@
 #define MATCH_TOL 1e-7
 #define FILENAME_TAG_NAME "FILENAME"
 
-inline void ERR_CHECK(moab::ErrorCode rval) {
-  if (rval) {
-    assert(false);
-    std::cout << "ERROR" << std::endl; 
-    exit(1);
-  }
-}
-
 #ifndef SLICER_H
 #define SLICER_H
 
@@ -88,8 +80,8 @@ struct Loop {
       }
 
     //this shouldn't happen
-    if ( x == 0 && y == 0 ) {
-      ERR_CHECK(moab::MB_FAILURE);
+    if ( x == 0 && y == 0 || x == y) {
+      MB_CHK_SET_ERR_CONT(moab::MB_FAILURE, "x and y index values cannot be the same");
     }
     
     xypnts.resize(points.size());
