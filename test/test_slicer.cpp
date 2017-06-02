@@ -119,7 +119,7 @@ void line_struct_test() {
 
 void create_surface_intersections_test() {
   moab::Range surfs;
-  get_surfaces(surfs);
+  get_all_surfaces(surfs);
 
   std::map<moab::EntityHandle, std::vector<Loop> >int_map;
   moab::ErrorCode result = create_surface_intersections(surfs, 0, 0, int_map);
@@ -567,7 +567,7 @@ void get_sets_by_category_test() {
 
 void get_surfaces_test() {
   moab::Range surfaces; 
-  moab::ErrorCode result = get_surfaces(surfaces);
+  moab::ErrorCode result = get_all_surfaces(surfaces);
   ERR_CHECK(result);
   //test file is a cube and should have 6 surfaces
   CHECK_EQUAL(6, (int)surfaces.size());
