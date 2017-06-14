@@ -11,9 +11,9 @@ Dag_Slicer::Dag_Slicer( std::string file_to_slice,
   _roam_warning = ROAM_WARNING
 }
 
-  Dag_Slicer::~Dag_Slicer() { }
+Dag_Slicer::~Dag_Slicer() { }
 
-  int Dag_Slicer::create_slice() {
+int Dag_Slicer::create_slice() {
     slice_x_pnts.clear(); 
     slice_y_pnts.clear(); 
     path_coding.clear();
