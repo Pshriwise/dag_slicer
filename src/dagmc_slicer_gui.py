@@ -1,8 +1,4 @@
 
-# coding: utf-8
-
-# In[1]:
-
 get_ipython().magic(u'matplotlib notebook')
 import matplotlib
 import numpy as np
