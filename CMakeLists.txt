@@ -1,18 +1,17 @@
-project(DAGMC-Slicer)
+PROJECT(DAGMC-Slicer)
 
-cmake_minimum_required(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 # Allow use of find_package(HDF5), find_package(MOAB), etc.
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake)
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
-find_package(MOAB REQUIRED)
+# look for MOAB installation
+FIND_PACKAGE(MOAB REQUIRED)
 
-set(MOAB_LINK_LIBS "${MOAB_LIBRARIES}")
-set(MOAB_INCLUDES "${MOAB_INCLUDE_DIRS}")
+# do work in src and test dirs
+ADD_SUBDIRECTORY(src)
+ADD_SUBDIRECTORY(test)
 
-add_subdirectory(src)
-add_subdirectory(test)
-
-enable_testing()
-
-add_test(NAME test_slicer COMMAND test_slicer WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/test)
+# add test to build
+ENABLE_TESTING()
+ADD_TEST(NAME test_slicer COMMAND test_slicer WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/test)
