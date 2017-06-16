@@ -11,3 +11,8 @@ set(MOAB_LINK_LIBS "${MOAB_LIBRARIES}")
 set(MOAB_INCLUDES "${MOAB_INCLUDE_DIRS}")
 
 add_subdirectory(src)
+add_subdirectory(test)
+
+enable_testing()
+
+add_test(NAME test_slicer COMMAND test_slicer WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/test)
