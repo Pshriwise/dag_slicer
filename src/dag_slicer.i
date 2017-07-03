@@ -19,29 +19,40 @@
  class Dag_Slicer{
   
 public:
-  Dag_Slicer(std::string file_to_slice, int ax, double coord, bool by_grp = false, bool ca = false);
+  Dag_Slicer(std::string file_to_slice,
+	     int ax, // slice axis
+	     double coord, // coordinate of the slice
+	     bool by_grp = false, // slice by group
+	     bool ca = false);
   ~Dag_Slicer();
-  //parameters
-  int axis;
-  std::string filename;
-  std::string roam_warning;
-  double coord;
-  bool by_group;
-  bool verbose;
+  
   //creation method
   int create_slice();
+  
   //modify methods
   void rename_group(int group_global_id, std::string new_name);
   void write_file(std::string new_filename);
-  //data
+
+  // output data
   std::vector<std::string> group_names;
   std::vector<double> dum_pnts;
   std::vector< std::vector<double> > slice_x_pnts;
   std::vector< std::vector<double> > slice_y_pnts;
   std::vector<int> group_ids;
   std::vector< std::vector<int> > path_coding;
+
+  // slice parameters  
+  std::string filename;
+  int axis;
+  double coord;
+  bool by_group;
+  bool verbose;  
   bool debug;
   bool roam;
+
+  // other
+  std::string roam_warning;
+
 };
 
 %}

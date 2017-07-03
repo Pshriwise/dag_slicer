@@ -8,6 +8,8 @@ from Cython.Distutils import build_ext
 
 import numpy as np
 
+sys.path.append("./src")
+
 def get_moab_paths():
 
     argv = sys.argv[-2:]
@@ -35,7 +37,7 @@ print moab_library_path
 libdirs = [moab_library_path]
 libs = ['MOAB']
 
-py_modules = ['src/dagmc_slice_tool','src/dagmc_slicer_gui','src/Dag_Slicer']
+py_modules = ['dagmc_slice_tool','dagmc_slicer_gui','Dag_Slicer']
 
 ext_modules = [
     Extension("_Dag_Slicer", ["src/dag_slicer_wrap.cxx","src/dag_slicer.cpp","src/slicer.cpp"], 

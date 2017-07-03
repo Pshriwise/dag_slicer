@@ -1,4 +1,3 @@
-
 #include "slicer.hpp"
 #include "options.hpp"
 
