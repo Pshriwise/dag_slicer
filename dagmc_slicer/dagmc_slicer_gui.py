@@ -59,8 +59,8 @@ class slicer_gui(dagmc_slicer):
         #     self.create_slice()
 
 
-        self.legend = widgets.Box()
-        
+        self.legend = widgets.VBox()
+
         #now setup the plot object
         all_paths = []
         for i in range(len(self.slice_x_pnts)):
@@ -89,7 +89,9 @@ class slicer_gui(dagmc_slicer):
             for patch,gid,gname in zip(patches,self.group_ids,self.group_names):
                 lb = widgets.Text(gname,description="Group " + str(gid))
                 bg_color = rgb2hex(patch.get_facecolor()[:-1])
-                key = widgets.Button(background_color=bg_color,height=32,width=32, border_color = 'black')
+                l = widgets.Layout(height="32",width="32")
+                key = widgets.Button(layout = l, border_color = 'black')
+                key.style.button_color = bg_color
                 key.on_click(self.highlight)
                 cb1 = widgets.Button(description="Visible", background_color="#FFFFFF")
                 cb1.on_click(self.visiblefunc)
@@ -123,7 +125,7 @@ class slicer_gui(dagmc_slicer):
             t = widgets.Tab() #new object to reset page counter
             self.legend_box.children = []
             for page in pages:
-                b = widgets.Box(children=page)
+                b = widgets.VBox(children=page)
                 t.children+=(b,)
 
             self.legend_box.children = (t,)
@@ -148,9 +150,9 @@ class slicer_gui(dagmc_slicer):
         filename_widget = widgets.Text(description = "Filename", value = self.filename)
 
         
-        self.params_box = widgets.Box()
+        self.params_box = widgets.VBox()
         self.params_box.children = [filename_widget,ax_widget,coord_widget,group_widget,ca_widget]
-        self.export_box = widgets.Box()
+        self.export_box = widgets.VBox()
         export_button = widgets.Button(description="Save File")
         export_button.on_click(self.export_file)
         export_name = widgets.Text(description="Filename", margin = 5)
@@ -161,12 +163,12 @@ class slicer_gui(dagmc_slicer):
         accord.set_title(1,"Export")
 
         
-        self.slice_box = widgets.Box()
+        self.slice_box = widgets.VBox()
         self.slice_box.children = (accord,run_button)
         
-        self.legend_box = widgets.Box()
+        self.legend_box = widgets.VBox()
 
-        self.gui_box = widgets.HBox()
+        self.gui_box = widgets.VBox()
         accord2 = widgets.Accordion()
         accord2.children = (self.legend_box,)
         accord2.set_title(0,"Legend")
@@ -219,8 +221,8 @@ class slicer_gui(dagmc_slicer):
             y.on_click(self.export_file)
             n = widgets.Button(description="No", margin = 2)
             n.on_click(self.export_file)
-            resp_box = widgets.HBox(children=[y,n])
-            confirm_box = widgets.Box(children=[msg,resp_box])
+            resp_box = widgets.VBox(children=[y,n])
+            confirm_box = widgets.VBox(children=[msg,resp_box])
             self.export_box.children += (confirm_box,)
             return
 
