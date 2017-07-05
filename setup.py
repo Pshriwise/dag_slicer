@@ -37,7 +37,7 @@ print moab_library_path
 libdirs = [moab_library_path]
 libs = ['MOAB']
 
-py_modules = ['dagmc_slicer.dagmc_slice_tool','dagmc_slicer.dagmc_slicer_gui','dagmc_slicer.Dag_Slicer']
+py_modules = ['dagmc_slicer.dagmc_slice_tool','dagmc_slicer.dagmc_slicer_gui', 'dagmc_slicer.Dag_Slicer']
 
 ext_modules = [
     Extension("_Dag_Slicer", ["src/dag_slicer_wrap.cxx","src/dag_slicer.cpp","src/slicer.cpp"], 
@@ -45,7 +45,7 @@ ext_modules = [
     ]
 
 setup(  
-  name = 'dag_slicer',
+  name = 'dagmc_slicer',
   cmdclass = {'build_ext': build_ext},
   ext_modules = ext_modules,
   py_modules = py_modules,
