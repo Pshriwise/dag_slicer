@@ -4,7 +4,7 @@ from matplotlib.path import Path
 from matplotlib.patches import PathPatch 
 import matplotlib.pyplot as plt
 import numpy as np
-from Dag_Slicer import Dag_Slicer
+from dagmc_slicer.Dag_Slicer import Dag_Slicer
 from matplotlib.widgets import CheckButtons, RadioButtons
 from matplotlib.colors import rgb2hex
 
@@ -50,7 +50,7 @@ class dagmc_slicer(Dag_Slicer):
         if new_filename == self.filename:
             continue_result = self.continue_query("Continuing will overwrite the current file. Continue?")
             if  not continue_result:
-                print "Ok. Doing nothing."
+                print("Ok. Doing nothing.")
                 return
         super(dagmc_slicer, self).write_file(new_filename)
 
@@ -62,7 +62,7 @@ class dagmc_slicer(Dag_Slicer):
         if reply == 'n':
             return False
         else:
-            print "Please reply with either y or n."
+            print("Please reply with either y or n.")
             self.continue_query(question)
 
     def show_slice(self, colors=None):        
