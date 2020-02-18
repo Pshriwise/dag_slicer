@@ -8,7 +8,7 @@ from matplotlib.patches import PathPatch
 from IPython.html.widgets import interact,interact_manual
 from IPython.html import widgets
 from IPython.display import display
-from dagmc_slice_tool import dagmc_slicer
+from dagmc_slicer.dagmc_slice_tool import dagmc_slicer
 from matplotlib.colors import rgb2hex
 from IPython.display import Javascript
 
